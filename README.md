@@ -1,9 +1,13 @@
 # UsbGpib
-Versatile, cheap and portable USB to GPIB converter (USBTMC class based).
+Versatile, cheap, portable and robust USB to GPIB converter (USBTMC class based).
+
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGPIB.jpg" width="80%"/>
 
 If you have a lot of test equipment at home, you might know the issues: Lot's of devices only have GPIB as interface and the generic GPIB adapters and GPIB cables on the market are very expensive and some of them even have many issues, when run under Windows 10 (device driver does not work). 
 
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/SizeComparison.jpg" width="40%" align="right"/>
 The adapters are also typically very long, such that they extend the overall length of your test equipment my at least 10cm (~4 inch).
+
 
 Apart of the 2 very big manufacturer, other GPIB adapters, e.g. with Ethernet or also USB interface are not recognized my normal VISA providers or PyVisa, making the measurement control implementation specific for your GPIB adapter.
 
@@ -17,6 +21,7 @@ Some goals of the project were:
 - The Firmware should be upgradeable over USB
 - It should be rock-solid (!) I don't want to end up in a very long measurement beeing interrupted because of a software issue of my USB GPIB converter.
 - It should support additional features like serial poll, remote enabling/disabling
+- If there is no GPIB device connected to the USBGpib converter, or the GPIB device is powered down, there should be no USB device visible on the PC.
 
 All those goals are met :-)
 
@@ -34,10 +39,122 @@ Apart from that, there is an excellent USB stack available [http://www.fourwalle
 
 The GPIB side of the schematic can be directly connected to the ATMega32U4 IO pins. The IO pins from the microcontroller side are only set to 2 different states: Tristate (input) or output LOW, to talk over GPIB.
 
+## Component sourcing
+
+All components are easy to source, so I only specify the potential critical ones:
+
+- 16 MHz Crystal: Farnell 2853867 - MCSJK-7E-16.00-8-30-100-B-30 
+- GPIB connector: Farnell 2421095 - NORCOMP 112-024-113R001
+- USB connector: Farnell 2668483 - Amphenol ICC 61729-1011BLF
+
+## PCB
+
+The PCB can be ordered at nearly any PCB pool production service (e.g. 10 PCBs for 2 USD + shipping). The gerber files are included in the "HW/Gerber files" subdirectory.
+
+## Mounting the PCB
+
+Mounting is fairly simple, as there are no extremly small components. I suggest to mount first all the SMD components, followed by the bulky connectors.
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/mounting.jpg" width="80%"/>
 
 
+# Housing
+
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/housing.png" width="33%"/><img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/housing_snap.png" width="50%"/>
+
+I created a sophisticated 3D printable housing for this adapter. The design was made for Fusion 360. The project file + the STL files are included in the "Housing" subdirectory.
+
+The PCB fits perfectly into it. Optionally it can be fixed with 2 mounting screws (the GPIB connector has 2 threads) and the TOP cover snaps onto the housing base.
+
+I printed this using an Ender 5 3D printer with black PL, 0.15mm layer height, 1mm wall thickness, no support.
+Take care, that you rotate the TOP part of the housing by 180 degrees, so that the flat side is located on the printer bed.
+Printing works fine, several iterations of the design were made to ensure good printability.
+I printed so far 15 housings, without a single fail.
+
+# Software
+
+## source code
+
+The source code of the Boot loader (slightly modified LUFA MassStorage Boot loader) and the main USBGPIB converter are located in the "SW" subdirectory.
+At the time of publication LUFA 170418 release was used, with GCC as compiler.
+
+## binaries
+
+For those, that just want to create their own device, I've included the binary output in the "SW/binaries" subdirectory.
+
+## Flashing the Microcontroller first time
+
+For initial programming an AVR ISP adapter is needed to program the "Bootloader.hex" file.
+
+After programming the file, disconnect and connect the device and a USB drive will show up. Copy the TestAndMeasurement.bin file to this USB drive - ideally using the command line. Example: copy TestAneMeasurement.bin F:\FLASH.BIN.
+
+After programming the file, disconnect and connect it again and you're ready to use it!
+
+## Updating the firmware at later stages
+
+To enter the boot loader at later stages for updates, short circuit the 2 pins of the ISP header, as shown in below picture for about 3 seconds:
+
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/BootLoaderEnterTrick.jpg" width="40%"/>
+
+Afterwards, a USB drive will show up and you can copy the firmware again to the device, as described in the previous section.
+
+# Using the device
+
+## USB enumeration
+
+You might be surprised initially, that the device does not show up in your device manager (or lsusb), when you connect only the USB side. This is a feature, not a bug.
+Only, if a GPIB device is connected, you can see the device on your PC too.
+
+The reason behind the feature is simple: Instead of having a standard GPIB wiring, where you have a single GPIB controller and lots of GPIB devices interconnected, USBGPIB supports only a direct connection of the USBGPIB device to your measurement device. If you have like me e.g. 14 Instruments you don't want all to show up in the device manager, if the measurement device itself is powered down - you won't anyway be able to communicate with a powered down device.
+
+When USB and the GPIB side is connected, the device enumerates. The USBGPIB device reads out the ID of the instrument and constructs a unique USB Serial number out of it. It is thus easily possible to assiate multiple connected USBGPIB devices with the measurement instrument.
+
+The VISA ressource name is constructed from this USB Serial number. You can identify easily e.g. in NiMax, which device is connected:
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/NiMaxExample.png" width="90%"/>
+
+If you connect your USBGPIB device afterwards to another GPIB measurement device, it will disconnect and connect with a new serial number string, matching the other GPIB device *IDN? response again.
+
+## GPIB settings on your measurement device
+
+GPIBUSB does probe all GPIB primary addresses (and secondary address 0) for presence of a GPIB Talker/listener. It is thus not required to set a specific GPIB address - GPIBUSB will find it itself.
+
+The only importance setting on the measurement device is, that the GPIB interface is enabled, which is typically the case.
+
+## LED indicator
+
+The LED indicates different states:
+
+LED blinking: The USBGPIB converter is connected to a measurement instrument, it is powered off or its GPIB port is disabled. In this state, the device is also not connected to USB and will not show up in the device manager or lsusb.
+LED on: The device is connected to a measurement device and GPIB communication possible. It is also accessible over USB
+LED off: The device is not connected over USB, or the PC powered off :-)
+
+## Controlling GPIB devices
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/towerOfGpib.jpg" width="30%" align="right"/>
 
 
+As this converter implements the standard USBTMC Test and measurement class, you can control your instrument from ANY of the normal VISA tools. I tried so far R&S VISA and NI Visa, using Python and Matlab to talk to the devices.
 
+# Testing status
 
+## Sucessfully tested measurement equipment:
+- R&S FSEM30
+- R&S SMIQ03
+- R&S CMU200
+- R&S SMW200A
+- R&S FSW
+- R&S FSV
+- Keithley 199 multimeter
+- HP 3325A synthesizer/frequency generator
+- HP 3457A multimeter
+- Agilent E4406A VSA transmitter tester
+- Tektronix TDS7104 Digital Phosphor Oscilloscope
+- HP 8596A spectrum analyzer
+- Agilent E3648A dual power supply
+
+## Scenarious
+
+- I tested as operating systems Windows 7 and 10 so far only. But linux should also work out of the box.
+- USB1.1, USB2.0 and USB3.x ports tested, with and without USB HUB in between.
+- The connection stays responsive, when power cycling the PC, or hibernating/sleeping it
+- Different connection cycles (GPIB side connected first, USB side connected first, swapping GPIB side equipment, ...)
+- Extensive testing of timeout scenarious. E.g. making an illegal query and testing, if the USBTMC handles the timeouts properly. This was a very tricky part to get right.
 
