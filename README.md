@@ -1,38 +1,39 @@
 # UsbGpib
 Versatile, cheap, portable and robust USB to GPIB converter (USBTMC class based).
 
+You'll find many projects like this, but this one is special (ok, everybody will claim this) :-)
+
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGPIB.jpg" width="80%"/>
 
-If you have a lot of test equipment at home, you might know the issues: Lot's of devices only have GPIB as interface and the generic GPIB adapters and GPIB cables on the market are very expensive and some of them even have many issues, when run under Windows 10 (device driver does not work). 
+If you have a lot of test equipment at home, you might know the issues: Lots of devices only have GPIB as interface and the  GPIB adapters and GPIB cables on the market are very expensive and some of them even have many issues, when run under Windows 10 (device driver does not work). Or they e.g. are not able to be operated with VISA, because they are UART based, need special command sequences, ...
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/SizeComparison.jpg" width="40%" align="right"/>
-The adapters are also typically very long, such that they extend the overall length of your test equipment my at least 10cm (~4 inch).
+The adapters are also typically very long, such that they extend the overall length of your test equipment by at least 10cm (~4 inches).
 
-
-Apart of the 2 very big manufacturer, other GPIB adapters, e.g. with Ethernet or also USB interface are not recognized my normal VISA providers or PyVisa, making the measurement control implementation specific for your GPIB adapter.
+Apart of the 2 very big manufacturers, other GPIB adapters, e.g. with Ethernet or also USB interface are not recognized my normal VISA providers or PyVisa, making the measurement control implementation specific for your GPIB adapter.
 
 I've got frustrated and tried to turn it into something positive.
 
 Some goals of the project were:
-- Work based on the standard USBTMC protocol. This allows the GPIB test equipment to look like a USB based measurement device and work flawless with e.g. NI VISA, Labview, Matlab or PyVisa.
+- Work based on the standard USBTMC protocol. This allows the GPIB test equipment to look like a normal USB based measurement device and work flawless with e.g. NI VISA, Labview, Matlab or PyVisa.
 - Have a small length - otherwise my eqipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short.
-- It should be cheap but still versatile
+- It should be cheap but still versatile (you can build a single one of these for only 14 USD!)
 - It should support ALL my test equipments, from many different GPIB implementation generations and different GPIB flavors
 - The Firmware should be upgradeable over USB
 - It should be rock-solid (!) I don't want to end up in a very long measurement beeing interrupted because of a software issue of my USB GPIB converter.
 - It should support additional features like serial poll, remote enabling/disabling
 - If there is no GPIB device connected to the USBGpib converter, or the GPIB device is powered down, there should be no USB device visible on the PC.
 
-All those goals are met :-)
+All those goals are met.
 
 # Hardware
 
 ## Microcontroller choice
 
-Allthough I typically would prefer nowadays a nice ARM Cortex M0/3/4/7 controller, there is an issue with it. Available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level shifter towards the GPIB Bus.
+Allthough I typically would prefer nowadays an ARM Cortex M0/3/4/7 controller, there is an issue with it. Available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level shifter towards the GPIB Bus.
 GPIB is based on 5V (not exactly true, but a first iteration).
 
-This limited the Microcontroller choice to e.g. AVR or PIC controllers. Because of very good availability I ended up in ATMEGA32U4 controllers.
+This limited the microcontroller choice to e.g. AVR or PIC controllers. Because of very good availability I ended up in ATMEGA32U4 controllers.
 Apart of the device supporting 5V I/O voltages, it also does not require a regulator to be part of the application - it has an internal 3.3V regulator. This minimizes the full application schematic and BOM.
 
 Apart from that, there is an excellent USB stack available [http://www.fourwalledcubicle.com/LUFA.php](http://www.fourwalledcubicle.com/LUFA.php).
@@ -61,23 +62,23 @@ Mounting is fairly simple, as there are no extremly small components. I suggest 
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/housing.png" width="33%"/><img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/housing_snap.png" width="50%"/>
 
-I created a sophisticated 3D printable housing for this adapter. The design was made for Fusion 360. The project file + the STL files are included in the "Housing" subdirectory.
+I created a sophisticated 3D printable housing for this adapter. The design was made with Fusion 360. The project file + the STL files are included in the "Housing" subdirectory.
 
-The PCB fits perfectly into it. Optionally it can be fixed with 2 mounting screws (the GPIB connector has 2 threads) and the TOP cover snaps onto the housing base.
+The PCB fits perfectly into it. Optionally it can be fixed with 2 mounting screws (the GPIB connector has 2 threads, use 2 times 4-40 UNC x 3/8) and the TOP cover snaps onto the housing base.
 
-I printed this using an Ender 5 3D printer with black PL, 0.15mm layer height, 1mm wall thickness, no support.
+I printed this using an Ender 5 3D printer with black PLA, 0.15mm layer height, 1mm wall thickness, no support.
 Take care, that you rotate the TOP part of the housing by 180 degrees, so that the flat side is located on the printer bed.
 Printing works fine, several iterations of the design were made to ensure good printability.
 I printed so far 15 housings, without a single fail.
 
 # Software
 
-## source code
+## Source code
 
 The source code of the Boot loader (slightly modified LUFA MassStorage Boot loader) and the main USBGPIB converter are located in the "SW" subdirectory.
 At the time of publication LUFA 170418 release was used, with GCC as compiler.
 
-## binaries
+## Binaries
 
 For those, that just want to create their own device, I've included the binary output in the "SW/binaries" subdirectory.
 
@@ -87,7 +88,7 @@ For initial programming an AVR ISP adapter is needed to program the "Bootloader.
 
 After programming the file, disconnect and connect the device and a USB drive will show up. Copy the TestAndMeasurement.bin file to this USB drive - ideally using the command line. Example: copy TestAneMeasurement.bin F:\FLASH.BIN.
 
-After programming the file, disconnect and connect it again and you're ready to use it!
+When done, disconnect and connect USB again and you're ready to use it!
 
 ## Updating the firmware at later stages
 
@@ -101,7 +102,7 @@ Afterwards, a USB drive will show up and you can copy the firmware again to the 
 
 ## USB enumeration
 
-You might be surprised initially, that the device does not show up in your device manager (or lsusb), when you connect only the USB side. This is a feature, not a bug.
+You might be surprised initially, that the device does not show up in your device manager (or lsusb), when you connect only the USB side. This is a feature, not a bug (really!).
 Only, if a GPIB device is connected, you can see the device on your PC too.
 
 The reason behind the feature is simple: Instead of having a standard GPIB wiring, where you have a single GPIB controller and lots of GPIB devices interconnected, USBGPIB supports only a direct connection of the USBGPIB device to your measurement device. If you have like me e.g. 14 Instruments you don't want all to show up in the device manager, if the measurement device itself is powered down - you won't anyway be able to communicate with a powered down device.
@@ -109,6 +110,7 @@ The reason behind the feature is simple: Instead of having a standard GPIB wirin
 When USB and the GPIB side is connected, the device enumerates. The USBGPIB device reads out the ID of the instrument and constructs a unique USB Serial number out of it. It is thus easily possible to assiate multiple connected USBGPIB devices with the measurement instrument.
 
 The VISA ressource name is constructed from this USB Serial number. You can identify easily e.g. in NiMax, which device is connected:
+
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/NiMaxExample.png" width="90%"/>
 
 If you connect your USBGPIB device afterwards to another GPIB measurement device, it will disconnect and connect with a new serial number string, matching the other GPIB device *IDN? response again.
@@ -157,4 +159,6 @@ As this converter implements the standard USBTMC Test and measurement class, you
 - The connection stays responsive, when power cycling the PC, or hibernating/sleeping it
 - Different connection cycles (GPIB side connected first, USB side connected first, swapping GPIB side equipment, ...)
 - Extensive testing of timeout scenarious. E.g. making an illegal query and testing, if the USBTMC handles the timeouts properly. This was a very tricky part to get right.
+- Tested special transfer modes. E.g. capturing screenshots from different equipments is usually something, which will drive other GPIB adapters to the limits, because binary data of unknown length needs to be transported successfully.
+
 
