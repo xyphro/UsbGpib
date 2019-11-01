@@ -1,0 +1,1 @@
+<Project name="usbgpib"><File path="TestAndMeasurement.c"></File><File path="makefile"></File><File path="Descriptors.c"></File><File path="Descriptors.h"></File><File path="TestAndMeasurement.h"></File><File path="gpib.c"></File><File path="gpib.h"></File></Project>
