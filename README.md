@@ -12,7 +12,10 @@ The adapters are also typically very long, such that they extend the overall len
 
 Apart of the 2 very big manufacturers, other GPIB adapters, e.g. with Ethernet or also USB interface are not recognized my normal VISA providers or PyVisa, making the measurement control implementation specific for your GPIB adapter.
 
-I've got frustrated and tried to turn it into something positive.
+I've got frustrated and tried to turn it into something positive - Here a video showing the final device in action - click to view:
+
+[![](https://img.youtube.com/vi/pZp1QZCXrF8/0.jpg)](https://www.youtube.com/watch?v=pZp1QZCXrF8) 
+
 
 Some goals of the project were:
 - Work based on the standard USBTMC protocol. This allows the GPIB test equipment to look like a normal USB based measurement device and work flawless with e.g. NI VISA, Labview, Matlab or PyVisa.
