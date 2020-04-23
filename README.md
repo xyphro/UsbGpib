@@ -89,7 +89,13 @@ For those, that just want to create their own device, I've included the binary o
 
 For initial programming an AVR ISP adapter is needed to program the "Bootloader.hex" file.
 
-After programming the file, disconnect and connect the device and a USB drive will show up. Copy the TestAndMeasurement.bin file to this USB drive - ideally using the command line. Example: copy TestAneMeasurement.bin F:\FLASH.BIN.
+It is very important, that the Fuses of the AVR are programmed.
+
+Here an example how to program the bootloader using avrdude (using usbasp programmer):
+avrdude -c usbasp -p m32u4 -e -Ulock:w:0x3F:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xff:m
+avrdude -c usbasp -p m32u4 -U flash:w:BootLoader.hex
+
+After programming the file, disconnect and connect the device and a USB drive will show up. Copy the TestAndMeasurement.bin file to this USB drive - ideally using the command line. Example: copy TestAndMeasurement.bin F:\FLASH.BIN.
 
 When done, disconnect and connect USB again and you're ready to use it!
 
