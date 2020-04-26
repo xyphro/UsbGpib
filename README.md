@@ -164,4 +164,52 @@ As this converter implements the standard USBTMC Test and measurement class, you
 - Extensive testing of timeout scenarious. E.g. making an illegal query and testing, if the USBTMC handles the timeouts properly. This was a very tricky part to get right.
 - Tested special transfer modes. E.g. capturing screenshots from different equipments is usually something, which will drive other GPIB adapters to the limits, because binary data of unknown length needs to be transported successfully.
 
+# Setting Parameters
 
+Since 26th April 2020 update, there is are additional options implemented to configure the behaviour of GPIBUSB.
+
+First of all, it turned out, that some old test equipment is not capable to support EOI generation when reading data. So GPIBUSB would not be capable to sense, when the instrument finished talking. This old test eqipment terminates talking by generating e.g. \n (line feed) or \r\n (CRLF) or \r as termination.
+
+To support those instruments an option to select the termination method is implemented - see section "read termination".
+
+Furthermore it is now possible to turn off the automatic readout of the instruments *IDN? or ID? response after power on. This mechanism works fine on most test equipments, but again there is test equipment, that does not support this, which would end up in generating a different VISA ressource name every time you power on.
+If this automatic ID readout is turned off, the VISA ressource name will be just generated based on the detected GPIB address and the USB serial number of GPIBUSB.
+
+All parameters are applied immediately after setting them and are stored in a non voltatile way in the EEProm of the microcontroller.
+
+To enter the mode to set the setting the indicator pulse command has to be send to GPIBUSB followed by a textstring as explained below.
+
+To generate a indicator pulse (which blinks the LED of only the addressed USBTMC device), the following pyvisa snippet can be used (VM is the opened VISA ressource):
+
+VM.control_in(0xa1, 0x40, 0, 0);
+This makes the LED blink once, but also check, if the next command is a set parameter command, starting with '!' character.
+
+## read termination method
+
+The following read termination method options are available:
+- Option 0: (default): EOI only (the normal way GPIB works)
+- Option 1: EOI + \n (LF / line feed)
+- Option 2: EOI + \r (CR / carriage return)
+
+If your device terminates with \r\n, select Option #2.
+
+To set these options execute (Pyvisa example):
+VM.control_in(0xa1, 0x40, 0, 0)
+VM.write('!01XX')
+
+for XX enter either:
+- 00 for Option 0 (EOI only) => VM.write('!0100')
+- 01 for Option 1 (EOI and \n) => VM.write('!0101')
+- 02 for Option 2 (EOI and \r) => VM.write('!0102')
+
+## Automatic instrument identification readout
+
+To turn off the automatic instrument ID readout after power up, execute:
+VM.control_in(0xa1, 0x40, 0, 0)
+VM.write('!0001')
+
+To turn on the automatic instrument ID readout (this is the default behaviour of GPIBUSB), execute:
+VM.control_in(0xa1, 0x40, 0, 0)
+VM.write('!0000')
+
+After a power cycle the USB device VISA ressource name and USB serial number string will change, based on this setting

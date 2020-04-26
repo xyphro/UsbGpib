@@ -42,6 +42,8 @@ static uint8_t  timer0_div;
 static uint8_t  s_device_state = GPIB_DEVICE_CONNECTSTATE_UNKNOWN;
 static uint8_t s_gpib_disconnect_counter;
 static volatile bool     s_gpib_transaction_active = false; /* TRUE, if a device is addressed as talker or listener */
+
+static char s_terminator = '\0'; /* \0 = no termination character - EOI only, other options are '\n' or '\r' */
  
 static void gpib_recover(void)
 {
@@ -379,7 +381,12 @@ uint8_t gpib_readdat(bool *pEoi, bool *ptimedout, gpibtimeout_t ptimeoutfunc)
 		while ( (DAV_STATE == 0) && !timedout ); /* wait until DAV gets high */
 	}
 
-	*pEoi = eoi;
+	
+	if (s_terminator == '\0')
+		*pEoi = eoi;
+	else
+		*pEoi = eoi || (c == s_terminator);
+
 	if (timedout)
 	{
 		gpib_recover();
@@ -448,8 +455,22 @@ bool gpib_writedat(uint8_t dat, bool Eoi, gpibtimeout_t ptimeoutfunc)
 	return timedout;
 }
 
+void gpib_set_readtermination(char terminator)
+{
+	switch(terminator)
+	{
+		case '\n':
+			s_terminator = '\n';
+			break;
+		case '\r':
+			s_terminator = '\r';
+			break;
+		default:
+			s_terminator = '\0';
+			break;
+	}
+}
 
-#if 1
 
 static uint16_t timeout_val;
 
@@ -519,4 +540,3 @@ uint8_t gpib_search(void)
 		
 	return foundaddr;
 }
-#endif

@@ -29,6 +29,8 @@ bool gpib_ATN_HIGH(void);
 
 uint8_t gpib_search(void);
 
+void gpib_set_readtermination(char terminator);
+
 
 
 /* read status byte using serial poll */

@@ -93,6 +93,9 @@ static uint16_t LastTransferLength = 0;
 /** Buffer to hold the next message to sent to the TMC host */
 static uint8_t NextResponseBuffer[64];
 
+/** This will be set true after a indicator pulse command is received. If the next GPIB command starts with '!', a parameter has to be set */
+static bool s_nextwrite_mightbeparameterset = false;
+
 
 static uint32_t s_remaining_bytes_receive=0;
 
@@ -289,7 +292,7 @@ bool identifyGpibDevice(void)
 		}
 	}
 	else
-	{ /* no gpib address found => user normal serial number */
+	{ /* no gpib address found => use normal serial number */
 		TMC_SetInternalSerial(true);
 		gotStringViaGPIB = false;
 	}
@@ -381,6 +384,11 @@ int main(void)
 	
 	gpib_init();
 	
+	/* apply settings from eeprom */
+	eeprom_busy_wait();	
+	gpib_set_readtermination(eeprom_read_byte(105));
+	
+	
 	//LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
 	GlobalInterruptEnable();
 	
@@ -410,35 +418,46 @@ int main(void)
 		check_bootloaderEntry();
 	}; /* Identify the GPIB Address of the connected GPIB device */
 	
-	/* found a responsive GPIB address, now setup USB descriptor with *IDN? or ID? command response */
 	eeprom_busy_wait();
-	prevaddr = eeprom_read_byte((uint8_t*)0); /* read previous gpib address */
-	if (identifyGpibDevice())
-	{ /* received a string over GPIB => Store it in EEPROM, if it changed */
-		uint8_t *pdat, i;
-		
-		/* update gpib address and usb string descriptor in eeprom */
-		eeprom_update_if_changed(0, gpib_addr);
-		pdat = (void *)&tmc_serial_string;
-		for (i=0; i<sizeof(tmc_serial_string); i++)
-		{
-			eeprom_update_if_changed(1+i, *pdat++);
-		}
-	}
-	else
-	{ /* received NO string over GPIB => Check, if the GPIB addr matches the one in eeprom, then report EEProm string! */
-		if (prevaddr == gpib_addr)
-		{
+	if (eeprom_read_byte(104) != 0x01)
+	{
+		/* found a responsive GPIB address, now setup USB descriptor with *IDN? or ID? command response */
+		eeprom_busy_wait();
+		prevaddr = eeprom_read_byte((uint8_t*)0); /* read previous gpib address */
+		if (identifyGpibDevice())
+		{ /* received a string over GPIB => Store it in EEPROM, if it changed */
 			uint8_t *pdat, i;
-
+			
 			/* update gpib address and usb string descriptor in eeprom */
+			eeprom_update_if_changed(0, gpib_addr);
 			pdat = (void *)&tmc_serial_string;
 			for (i=0; i<sizeof(tmc_serial_string); i++)
 			{
-				*pdat++ = eeprom_read_byte((uint8_t*)(1+i));
-			}			
-			
+				eeprom_update_if_changed(1+i, *pdat++);
+			}
 		}
+		else
+		{ /* received NO string over GPIB => Check, if the GPIB addr matches the one in eeprom, then report EEProm string! */
+			if (prevaddr == gpib_addr)
+			{
+				uint8_t *pdat, i;
+
+				/* update gpib address and usb string descriptor in eeprom */
+				pdat = (void *)&tmc_serial_string;
+				for (i=0; i<sizeof(tmc_serial_string); i++)
+				{
+					*pdat++ = eeprom_read_byte((uint8_t*)(1+i));
+				}			
+				
+			}
+		}
+	}
+	else /* user disabled fully automated detection mode */
+	{
+		TMC_SetInternalSerial(true);
+		gpib_ren(false);
+		_delay_ms(100);
+		gpib_ren(true);
 	}
 
 	/* all fine, now kickoff connect to USB to be able to communicate! */
@@ -756,7 +775,9 @@ IsTMCBulkOUTReset = true;
 				_delay_ms(250);
 				LED(1);
 				
+				s_nextwrite_mightbeparameterset = true;
 				break;
+
 			case Req_RenControl:
 				if ((USB_ControlRequest.wValue & 0xff) == 1)
 				{
@@ -797,31 +818,100 @@ IsTMCBulkOUTReset = true;
 	}
 }
 
+static uint8_t charToval(char c)
+{
+	uint8_t val;
+	val = 0;
+	if ( (c >= '0') && (c <= '9') )
+		val = c-'0';
+	if ( (c >= 'a') && (c <= 'f') )
+		val = c-'a'+10;
+	if ( (c >= 'A') && (c <= 'F') )
+		val = c-'A'+10;
+	return val;
+}
+/*
+Process an internal command. This is triggered, if a indicator pulse command was received, followed
+by a write of a command starting with an exclamation mark (!).
+Syntax:
+!XXYY
+XX = index (hex) 00 for GPIB automatic dection:
+					YY selects the method:
+					0x00 or 0xff => Fully automatic (also try to sense ID? or *IDN? string and use it as serial number string)
+					0x01         => Only detect GPIB address automatically and use the GPIB address as serial number string
+                 01 for Termination method for READs:
+					YY selects the method:
+					0x00 or 0xff => EOI termination
+					0x01         => EOI or '\n' (LF = linefeed)
+					0x02         => EOI or '\r' (CR = carriage return)
+*/
+void ProcessInternalCommand(uint8_t* const Data, uint8_t Length)
+{
+	uint8_t xx, yy;
+	
+	xx = charToval(Data[1])*16 + charToval(Data[2]);
+	yy = charToval(Data[3])*16 + charToval(Data[4]);
+	
+	switch (xx)
+	{
+		case 0x00: /* automatic detection y */
+			eeprom_update_if_changed(104, yy);
+			break;
+		case 0x01: /* select termination method */
+			switch (yy)
+			{
+				case 0x01: /* \n */
+					eeprom_update_if_changed(105, '\n');
+					gpib_set_readtermination('\n');
+					break;
+				case 0x02: /* \r */
+					eeprom_update_if_changed(105, '\r');
+					gpib_set_readtermination('\r');
+					break;
+				default:
+					eeprom_update_if_changed(105, '\0');
+					gpib_set_readtermination('\0');
+					break;
+			}
+			break;
+	}
+}
 
 void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfer, bool isLastTransfer, gpibtimeout_t ptimeoutfunc)
 {
 	uint8_t i, dat;
-	bool timedout;
-	 
-	timedout = false;
+	bool timedout, isinternalcommand;
 	
-	gpib_ren(1); /* ensure that remote control is enabled */
 	
-	LED(0);
-	if (isFirstTransfer)
-		timedout = gpib_make_listener(gpib_addr, ptimeoutfunc);
-		
-	i = 0;
-	while ( (Length > 0) && !timedout)
+	/* check, if this is an internal command */ 
+	isinternalcommand = isFirstTransfer && isFirstTransfer && s_nextwrite_mightbeparameterset && (Data[0] == '!');
+	if (isinternalcommand)
 	{
-		Length--;
-		dat = Data[i++];
-		timedout = gpib_writedat(dat, (Length == 0)  && isLastTransfer, ptimeoutfunc);
+		ProcessInternalCommand(Data, Length);
 	}
-	
-	if (isLastTransfer && !timedout) /* in case of timeout the interface is cleared within the writedat function, no need to untalk!*/
-		gpib_untalk_unlisten(ptimeoutfunc);
-	LED(1);
+	else
+	{
+		timedout = false;
+		
+		gpib_ren(1); /* ensure that remote control is enabled */
+		
+		LED(0);
+		if (isFirstTransfer)
+			timedout = gpib_make_listener(gpib_addr, ptimeoutfunc);
+			
+		i = 0;
+		while ( (Length > 0) && !timedout)
+		{
+			Length--;
+			dat = Data[i++];
+			timedout = gpib_writedat(dat, (Length == 0)  && isLastTransfer, ptimeoutfunc);
+		}
+		
+		if (isLastTransfer && !timedout) /* in case of timeout the interface is cleared within the writedat function, no need to untalk!*/
+			gpib_untalk_unlisten(ptimeoutfunc);
+		LED(1);
+	}
+	s_nextwrite_mightbeparameterset = false;
 }
 
 uint8_t GetNextMessage(uint8_t* const Data, uint8_t maxlen, bool isFirstMessage, bool *pisLastMessage, gpibtimeout_t ptimeoutfunc)
@@ -1088,10 +1178,10 @@ bool WriteTMCHeader(TMC_MessageHeader_t* const MessageHeader)
 HP 3457A: END,ALWAYS => turns on EOI signal!
 
 ISSUES:
-  - short packet handling not OK!!!!! Commit an empty packet 
+  - short packet handling not OK!!!!! Commit an empty packet   
   
 BOOT UPDATE:
   V:
   cd V:\Data\Projekt\Privat\gpibadapter\lufa-master\Demos\Device\Incomplete\TestAndMeasurement
-  copy TestAndMeasurement.bin F:\FLASH.BIN /Y
+  copy TestAndMeasurement.bin G:\FLASH.BIN /Y
 */
