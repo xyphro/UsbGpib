@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name gpib)(type KiCad)(uri ${KIPRJMOD}/footprints/SamacSys_Parts.pretty)(options "")(descr ""))
+)
