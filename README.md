@@ -29,6 +29,18 @@ Some goals of the project were:
 
 All those goals are met.
 
+# May '22 update!!!
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGpibV2.jpg" width="40%" align="right"/>
+
+A version 2.0 of the original HW & SW is in the pipeline.
+This is mainly to address the unavaiability of ATMEGA32U4 in TQFP at the moment. There are however Arduino boards from that you can desolder them. Those are sometimes in QFN, so the PCB now supports QFN and TQFP housings. Additionally I'll make an AtMega16U4 SW variant without bootloader, because AtMega16U4 is available still right now.
+Note that I changed the package sizes also of the 0402 components to 0603 for easier soldering.
+
+In case you use an AtMega32U4 this board is still fully compatible with the current version of the software!
+
+Due to very low bandwidth for such kinds of projects it will take a while until I have the AtMega16U4 firmware ready and tested.
+
+
 # Hardware
 
 ## Microcontroller choice
