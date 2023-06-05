@@ -373,6 +373,7 @@ void eeprom_update_if_changed(uint16_t addr, uint8_t value)
 int main(void)
 {
 	uint8_t prevaddr;
+	int8_t startupCntHalfSec = -2;
 
 	//mcusr_mirror = MCUSR; 
 	MCUSR = 0; 
@@ -393,6 +394,7 @@ int main(void)
 	//LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
 	GlobalInterruptEnable();
 	
+	/* stop here until a gpib device is connected (checked in Timer0 ISR) */
 	while (!gpib_is_connected())
 	{
 		_delay_ms(250);
@@ -400,6 +402,27 @@ int main(void)
 		_delay_ms(250);
 		LED(0);
 		check_bootloaderEntry();
+		if (startupCntHalfSec != 0)
+		{
+			startupCntHalfSec++;
+		}
+	}
+
+	/* if the instrument has been just powered-on */
+	if(startupCntHalfSec==0)
+	{
+		startupCntHalfSec=eeprom_read_byte(106);
+		if(startupCntHalfSec > 0)
+		{
+			/* wait here until complete power-up */
+			while((startupCntHalfSec--) != 0)
+			{
+				_delay_ms(100);
+				LED(1);
+				_delay_ms(400);
+				LED(0);
+			}
+		}
 	}
 	
 	/* physically GPIB is connected, now check if any GPIB address is responsive */
@@ -852,18 +875,22 @@ Process an internal command. This is triggered, if a indicator pulse command was
 by a write of a command starting with an exclamation mark (!).
 Syntax:
 !XXYY
-XX = command (hex) 00 for VISA resource name:
+XX = command (hex)
+				00 for VISA resource name:
 					YY selects the method:
 					0x00 or 0xff => Fully automatic (also try to sense ID? or *IDN? string and use it as serial number string)
 					0x01         => Only detect GPIB address automatically and use it together with the 20 chars MCU signature as serial number string
 					0x02         => Only detect GPIB address automatically and use it together with 6 chars MCU signature as serial number string
 					0x03         => Only detect GPIB address automatically and use it as serial number string
 					0x04         => Serial number string is only composed by 12 chars of the MCU signature
-                 01 for Termination method for READs:
+				01 for Termination method for READs:
 					YY selects the method:
 					0x00 or 0xff => EOI termination
 					0x01         => EOI or '\n' (LF = linefeed)
 					0x02         => EOI or '\r' (CR = carriage return)
+				02 for startup delay (only when device is powered-on after the GPIBUSB):
+					YY is the delay in half seconds.
+					Max value = 120 == 60 sec. Set to 0 or 0xff to disable.
 */
 void ProcessInternalCommand(uint8_t* const Data, uint8_t Length)
 {
@@ -892,6 +919,12 @@ void ProcessInternalCommand(uint8_t* const Data, uint8_t Length)
 					eeprom_update_if_changed(105, '\0');
 					gpib_set_readtermination('\0');
 					break;
+			}
+			break;
+		case 0x02: /* power-on delay */
+			if (yy <= 120 || yy == 0xFF)
+			{
+				eeprom_update_if_changed(106, yy);
 			}
 			break;
 	}
