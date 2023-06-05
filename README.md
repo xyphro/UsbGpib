@@ -19,11 +19,11 @@ I've got frustrated and tried to turn it into something positive - Here a video 
 
 Some goals of the project were:
 - Work based on the standard USBTMC protocol. This allows the GPIB test equipment to look like a normal USB based measurement device and work flawless with e.g. NI VISA, Labview, Matlab or PyVisa.
-- Have a small length - otherwise my eqipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short.
+- Have a small length - otherwise my equipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short.
 - It should be cheap but still versatile (you can build a single one of these for only 14 USD!)
 - It should support ALL my test equipments, from many different GPIB implementation generations and different GPIB flavors
 - The Firmware should be upgradeable over USB
-- It should be rock-solid (!) I don't want to end up in a very long measurement beeing interrupted because of a software issue of my USB GPIB converter.
+- It should be rock-solid (!) I don't want to end up in a very long measurement being interrupted because of a software issue of my USB GPIB converter.
 - It should support additional features like serial poll, remote enabling/disabling
 - If there is no GPIB device connected to the USBGpib converter, or the GPIB device is powered down, there should be no USB device visible on the PC.
 
@@ -33,7 +33,7 @@ All those goals are met.
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGpibV2.jpg" width="40%" align="right"/>
 
 A version 2.0 of the original HW & SW is in the pipeline.
-This is mainly to address the unavaiability of ATMEGA32U4 in TQFP at the moment. There are however Arduino boards from that you can desolder them. Those are sometimes in QFN, so the PCB now supports QFN and TQFP housings. Additionally I'll make an AtMega16U4 SW variant without bootloader, because AtMega16U4 is available still right now.
+This is mainly to address the unavailability of ATMEGA32U4 in TQFP at the moment. There are however Arduino boards from that you can desolder them. Those are sometimes in QFN, so the PCB now supports QFN and TQFP housings. Additionally I'll make an AtMega16U4 SW variant without bootloader, because AtMega16U4 is available still right now.
 Note that I changed the package sizes also of the 0402 components to 0603 for easier soldering.
 
 In case you use an AtMega32U4 this board is still fully compatible with the current version of the software!
@@ -45,7 +45,7 @@ Due to very low bandwidth for such kinds of projects it will take a while until 
 
 ## Microcontroller choice
 
-Allthough I typically would prefer nowadays an ARM Cortex M0/3/4/7 controller, there is an issue with it. Available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level shifter towards the GPIB Bus.
+Although I typically would prefer nowadays an ARM Cortex M0/3/4/7 controller, there is an issue with it. Available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level shifter towards the GPIB Bus.
 GPIB is based on 5V (not exactly true, but a first iteration).
 
 This limited the microcontroller choice to e.g. AVR or PIC controllers. Because of very good availability I ended up in ATMEGA32U4 controllers.
@@ -69,7 +69,7 @@ The PCB can be ordered at nearly any PCB pool production service (e.g. 10 PCBs f
 
 ## Mounting the PCB
 
-Mounting is fairly simple, as there are no extremly small components. I suggest to mount first all the SMD components, followed by the bulky connectors.
+Mounting is fairly simple, as there are no extremely small components. I suggest to mount first all the SMD components, followed by the bulky connectors.
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/mounting.jpg" width="80%"/>
 
 
@@ -129,9 +129,9 @@ Only, if a GPIB device is connected, you can see the device on your PC too.
 
 The reason behind the feature is simple: Instead of having a standard GPIB wiring, where you have a single GPIB controller and lots of GPIB devices interconnected, USBGPIB supports only a direct connection of the USBGPIB device to your measurement device. If you have like me e.g. 14 Instruments you don't want all to show up in the device manager, if the measurement device itself is powered down - you won't anyway be able to communicate with a powered down device.
 
-When USB and the GPIB side is connected, the device enumerates. The USBGPIB device reads out the ID of the instrument and constructs a unique USB Serial number out of it. It is thus easily possible to assiate multiple connected USBGPIB devices with the measurement instrument.
+When USB and the GPIB side is connected, the device enumerates. The USBGPIB device reads out the ID of the instrument and constructs a unique USB Serial number out of it. It is thus easily possible to associate multiple connected USBGPIB devices with the measurement instrument.
 
-The VISA ressource name is constructed from this USB Serial number. You can identify easily e.g. in NiMax, which device is connected:
+The VISA resource name is constructed from this USB Serial number. You can identify easily e.g. in NiMax, which device is connected:
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/NiMaxExample.png" width="90%"/>
 
@@ -180,7 +180,7 @@ As this converter implements the standard USBTMC Test and measurement class, you
 - USB1.1, USB2.0 and USB3.x ports tested, with and without USB HUB in between.
 - The connection stays responsive, when power cycling the PC, or hibernating/sleeping it
 - Different connection cycles (GPIB side connected first, USB side connected first, swapping GPIB side equipment, ...)
-- Extensive testing of timeout scenarious. E.g. making an illegal query and testing, if the USBTMC handles the timeouts properly. This was a very tricky part to get right.
+- Extensive testing of timeout scenarios. E.g. making an illegal query and testing, if the USBTMC handles the timeouts properly. This was a very tricky part to get right.
 - Tested special transfer modes. E.g. capturing screenshots from different equipments is usually something, which will drive other GPIB adapters to the limits, because binary data of unknown length needs to be transported successfully.
 
 # Setting Parameters
