@@ -216,7 +216,7 @@ bool gpib_gotoLocal(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 		
 	if (timedout)
 		gpib_recover();
-
+	return timedout;
 }
 
 
@@ -241,12 +241,29 @@ static bool gpib_cmd_DCL(gpibtimeout_t ptimeoutfunc) // device clear
 {
 	return gpib_tx(0x14, true, ptimeoutfunc);
 }
+*/
+
+
 
 static bool gpib_cmd_SDC(gpibtimeout_t ptimeoutfunc) // selective device clear
 {
 	return gpib_tx(0x04, true, ptimeoutfunc);
 }
-*/
+
+bool gpib_sdc(uint8_t addr, gpibtimeout_t ptimeoutfunc)
+{
+	bool timedout;
+
+	timedout = gpib_cmd_LAG(addr, ptimeoutfunc); 
+	if (!timedout)
+		timedout = gpib_cmd_SDC(ptimeoutfunc);
+	if (!timedout)
+		timedout = gpib_cmd_UNL(ptimeoutfunc);
+		
+	if (timedout)
+		gpib_recover();
+	return timedout;
+}
 
 static void timer_init(void)
 {

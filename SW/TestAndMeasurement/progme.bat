@@ -1,2 +1,2 @@
 REM make avrdude-all
-make atprogram
+gmake atprogram

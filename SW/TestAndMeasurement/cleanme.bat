@@ -1,1 +1,1 @@
-make clean
+gmake clean

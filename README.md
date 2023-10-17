@@ -29,17 +29,14 @@ Some goals of the project were:
 
 All those goals are met.
 
-# May '22 update!!!
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGpibV2.jpg" width="40%" align="right"/>
+# October '23 update!!!
 
-A version 2.0 of the original HW & SW is in the pipeline.
-This is mainly to address the unavaiability of ATMEGA32U4 in TQFP at the moment. There are however Arduino boards from that you can desolder them. Those are sometimes in QFN, so the PCB now supports QFN and TQFP housings. Additionally I'll make an AtMega16U4 SW variant without bootloader, because AtMega16U4 is available still right now.
-Note that I changed the package sizes also of the 0402 components to 0603 for easier soldering.
-
-In case you use an AtMega32U4 this board is still fully compatible with the current version of the software!
-
-Due to very low bandwidth for such kinds of projects it will take a while until I have the AtMega16U4 firmware ready and tested.
-
+I implemented several changes:
+- 488.2 support is enabled.
+- fixed issue: Linux PCs show that Config 1 descriptor is not correct.
+- Fixed read status byte, Clear and trigger assertion functions.
+- Compatibility with R&S Visa is back - it got broken in a previous version. Read status byte, Clear and trigger did not work properly.
+- I deleted 2 HW variants to avoid confusion. Right now there is one Eagle version (mine) and a user contributed Kicad version included.
 
 # Hardware
 

@@ -1,1 +1,1 @@
-make all
+gmake all
