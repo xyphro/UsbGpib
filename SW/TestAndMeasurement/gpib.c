@@ -29,6 +29,8 @@
 #define ATN_STATE  (PINF & (1<<6))
 #define EOI_STATE  (PINB & (1<<4))
 
+#define ATN_OUT_STATE ((DDRF &  (1<<6))==0)
+
 #define GPIB_DEVICE_CONNECTSTATE_UNKNOWN      (0)
 #define GPIB_DEVICE_CONNECTSTATE_DISCONNECTED (1)
 #define GPIB_DEVICE_CONNECTSTATE_CONNECTED    (2)
@@ -59,9 +61,23 @@ static bool gpib_tx(uint8_t dat, bool iscommand, gpibtimeout_t ptimeoutfunc)
 	NDAC_HIGH;  /* they should be already high, but let's enforce it */
 	
 	if (iscommand)
+	{
+		bool atn_was_high = ATN_OUT_STATE;
+		if (atn_was_high)
+			_delay_us(220);
 		ATN_LOW;
+		if (atn_was_high)
+			_delay_us(70);
+	}
 	else
+	{
+		bool atn_was_low = !ATN_OUT_STATE;
+		if (atn_was_low)
+			_delay_us(220);
 		ATN_HIGH;
+		if (atn_was_low)
+			_delay_us(70);
+	}
 
 	DDRD = dat;   /* set Data to data bus */
 	_delay_us(1); /* wait for data to settle */
@@ -71,6 +87,7 @@ static bool gpib_tx(uint8_t dat, bool iscommand, gpibtimeout_t ptimeoutfunc)
 	{
 		timedout = ptimeoutfunc();
 	}
+	//while ( !((NDAC_STATE == 0) && (NRFD_STATE != 0)) && !timedout); /* wait until ready for data (NRFD to get high) */
 	while ( (NRFD_STATE == 0) && !timedout); /* wait until ready for data (NRFD to get high) */
 
 	if (!timedout)
@@ -85,7 +102,6 @@ static bool gpib_tx(uint8_t dat, bool iscommand, gpibtimeout_t ptimeoutfunc)
 	}
 	
 	DDRD = 0x00; /* release data bus */
-	ATN_HIGH;	 
 	
 	if (timedout)
 	{
@@ -336,7 +352,16 @@ void gpib_init(void)
 
 bool gpib_is_connected(void)
 {
-	return s_device_state == GPIB_DEVICE_CONNECTSTATE_CONNECTED;
+	if ( (DDRF & (1<<6)) != 0 )
+	{
+		_delay_us(10);
+		ATN_HIGH; 
+		return true;
+	}
+	else
+	{
+		return s_device_state == GPIB_DEVICE_CONNECTSTATE_CONNECTED;
+	}
 }
 
 void gpib_ren(bool enable)
@@ -373,6 +398,14 @@ uint8_t gpib_readdat(bool *pEoi, bool *ptimedout, gpibtimeout_t ptimeoutfunc)
 	
 	c = 0;
 	eoi = false;	
+
+	// ensure that ATN is high
+	bool atn_was_low = !ATN_OUT_STATE;
+	if (atn_was_low)
+		_delay_us(220);
+	ATN_HIGH;
+	if (atn_was_low)
+		_delay_us(70);
 	
 	/* skipping NRFD LOW step, because we are able to handshake and response to data */
 	NDAC_LOW;
@@ -434,7 +467,7 @@ bool  gpib_make_talker(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 	timedout = gpib_cmd_UNL(ptimeoutfunc);
 	if (!timedout)
 		timedout = gpib_cmd_TAG(addr, ptimeoutfunc); /* address as talker*/
-	ATN_HIGH; /* make ATN H */	
+//	ATN_HIGH; /* make ATN H */	
 	NDAC_LOW;   /* make NDAC L */
 	
 	if (timedout)
@@ -452,7 +485,7 @@ bool gpib_make_listener(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 	if (!timedout)
 		timedout = gpib_cmd_LAG(addr, ptimeoutfunc); /* address target as listener*/
 		
-	ATN_HIGH;    /* make ATN H */
+//	ATN_HIGH;    /* make ATN H */
 	
 	if (timedout)
 		gpib_recover();
@@ -542,6 +575,7 @@ uint8_t gpib_search(void)
 	if (addr >= 32)
 	{
 		/* address once without SA. If it responds, force it to this primary addressing only! */
+		timeout_start(500);
 		gpib_cmd_LAG(addr & 0x1f, is_timedout);
 		ATN_HIGH; /* make ATN H */
 		_delay_ms(2);
