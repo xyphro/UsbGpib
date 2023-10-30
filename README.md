@@ -38,6 +38,19 @@ I implemented several changes:
 - Compatibility with R&S Visa is back - it got broken in a previous version. Read status byte, Clear and trigger did not work properly.
 - I deleted 2 HW variants to avoid confusion. Right now there is one Eagle version (mine) and a user contributed Kicad version included.
 
+# October '23 update #2 (30th October)
+
+New fix: ATN line timing is updated. In an issue report (#38) I got to know after some remote debugging, that there is at least one device which requires ATN timing to be more relaxed.
+This update does take care of it. The general transfer speed is not decreased, just some latency is added. The same slower ATN timing was identified to be used on a NI GPIB-USB-HS device.
+
+In parallel I work on a new HW revision. This HW is intended to be smaller and fix mechanical issues with the current HW design where the adapter does not fit when the housing is fitted on certain equipment. By mimicing the original formfactor of GPIB cables, it should maximize compatibility.
+HW design is ordered and I wait for arrival and testing before releasing it (it is a Kicad design btw.).
+
+To explain the concept:
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UpcomingHWRevision.png" width="40%" align="right"/>
+
+The housing is still under design (1 CNC milled variant + 1 3D FDM printed variant) and I will take care of matching the original dimensions.
+
 # Hardware
 
 ## Microcontroller choice
