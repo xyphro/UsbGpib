@@ -47,7 +47,7 @@ In parallel I work on a new HW revision. This HW is intended to be smaller and f
 HW design is ordered and I wait for arrival and testing before releasing it (it is a Kicad design btw.).
 
 To explain the concept:
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UpcomingHWRevision.png" width="40%" align="right"/>
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UpcomingHWRevision.png" width="40%"/>
 
 The housing is still under design (1 CNC milled variant + 1 3D FDM printed variant) and I will take care of matching the original dimensions.
 
