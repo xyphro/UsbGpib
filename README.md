@@ -51,6 +51,17 @@ To explain the concept:
 
 The housing is still under design (1 CNC milled variant + 1 3D FDM printed variant) and I will take care of matching the original dimensions.
 
+# 7th November '23 update
+
+The new boards arrived and it looks really neat and tiny. The concept to break off the "one time use programming connector" works well.
+The housing is not the final version and was just used to test the fit of the PCB. The final Version will use 2 screwsand nuts for stable mounting, because the strong force is required to pull such centronics out from the equipment.
+
+Waiting for the GPIB connectors to arrive for further testing. Bootloader programming works, USB enumeration too.
+
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/outlook_Rev2.jpg" width="40%"/>
+
+
+
 # Hardware
 
 ## Microcontroller choice
