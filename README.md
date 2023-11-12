@@ -254,3 +254,18 @@ for `YY` enter either:
 - `00` for Option 0 (EOI only) => `VM.write('!0100')`
 - `01` for Option 1 (EOI and \n) => `VM.write('!0101')`
 - `02` for Option 2 (EOI and \r) => `VM.write('!0102')`
+
+## Startup delay - Command 02
+Some instruments may exhibit undesired reactions if addressed immediately after powering on. This scenario, particularly when the USB-GPIB is powered and connected to a switched-off instrument that is subsequently powered on, could for instance inadvertently trigger bootloader functions. To mitigate this issue, a delay feature has been implemented: upon the instrument's power-up, any interaction with it is delayed for a certain period of time.
+Users can program the delay time in 0.5-second increments, up to 60 s, or disable this feature if not required.
+
+To choose the desired delay, execute (Pyvisa example):
+```
+VM.control_in(0xa1, 0x40, 0, 0, 1)
+VM.write('!02YY')
+```
+
+`YY` is the required delay time in half seconds (hexadecimal value).
+For example `0A` is 10 in decimal and means 5 second delay.
+Maximum value is `78` = 120 = 60 seconds.
+To disable this feature set `YY` to 0 or FF.
