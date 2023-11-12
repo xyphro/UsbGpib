@@ -199,7 +199,7 @@ To enter the mode to set the setting the indicator pulse command has to be send 
 
 To generate a indicator pulse (which blinks the LED of only the addressed USBTMC device), the following pyvisa snippet can be used (VM is the opened VISA ressource):
 
-VM.control_in(0xa1, 0x40, 0, 0);
+VM.control_in(0xa1, 0x40, 0, 0, 1);
 This makes the LED blink once, but also check, if the next command is a set parameter command, starting with '!' character.
 
 ## read termination method
@@ -212,7 +212,7 @@ The following read termination method options are available:
 If your device terminates with \r\n, select Option #2.
 
 To set these options execute (Pyvisa example):
-VM.control_in(0xa1, 0x40, 0, 0)
+VM.control_in(0xa1, 0x40, 0, 0, 1)
 VM.write('!01XX')
 
 for XX enter either:
@@ -223,11 +223,11 @@ for XX enter either:
 ## Automatic instrument identification readout
 
 To turn off the automatic instrument ID readout after power up, execute:
-VM.control_in(0xa1, 0x40, 0, 0)
+VM.control_in(0xa1, 0x40, 0, 0, 1)
 VM.write('!0001')
 
 To turn on the automatic instrument ID readout (this is the default behaviour of GPIBUSB), execute:
-VM.control_in(0xa1, 0x40, 0, 0)
+VM.control_in(0xa1, 0x40, 0, 0, 1)
 VM.write('!0000')
 
 After a power cycle the USB device VISA ressource name and USB serial number string will change, based on this setting
