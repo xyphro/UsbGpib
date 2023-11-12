@@ -29,38 +29,14 @@ Some goals of the project were:
 
 All those goals are met.
 
-# October '23 update!!!
+# 12 November '23 update!!!
 
-I implemented several changes:
-- 488.2 support is enabled.
-- fixed issue: Linux PCs show that Config 1 descriptor is not correct.
-- Fixed read status byte, Clear and trigger assertion functions.
-- Compatibility with R&S Visa is back - it got broken in a previous version. Read status byte, Clear and trigger did not work properly.
-- I deleted 2 HW variants to avoid confusion. Right now there is one Eagle version (mine) and a user contributed Kicad version included.
+The new revision PCBs arrived and I mounted them off. They worked out of the box. Still will do a bit more testing before making it available online.
+Also designed a small but stable 3d printable housing, fixed together with 2 screws and 2 nuts. Fits perfect. 
 
-# October '23 update #2 (30th October)
+As you can see, it will have a USB type-C connector. For easier bootloader entering a push button is placed, which can be pressed down with a paperclip through a hole in the housing.
 
-New fix: ATN line timing is updated. In an issue report (#38) I got to know after some remote debugging, that there is at least one device which requires ATN timing to be more relaxed.
-This update does take care of it. The general transfer speed is not decreased, just some latency is added. The same slower ATN timing was identified to be used on a NI GPIB-USB-HS device.
-
-In parallel I work on a new HW revision. This HW is intended to be smaller and fix mechanical issues with the current HW design where the adapter does not fit when the housing is fitted on certain equipment. By mimicing the original formfactor of GPIB cables, it should maximize compatibility.
-HW design is ordered and I wait for arrival and testing before releasing it (it is a Kicad design btw.).
-
-To explain the concept:
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UpcomingHWRevision.png" width="40%"/>
-
-The housing is still under design (1 CNC milled variant + 1 3D FDM printed variant) and I will take care of matching the original dimensions.
-
-# 7th November '23 update
-
-The new boards arrived and it looks really neat and tiny. The concept to break off the "one time use programming connector" works well.
-The housing is not the final version and was just used to test the fit of the PCB. The final Version will use 2 screwsand nuts for stable mounting, because the strong force is required to pull such centronics out from the equipment.
-
-Waiting for the GPIB connectors to arrive for further testing. Bootloader programming works, USB enumeration too.
-
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/outlook_Rev2.jpg" width="40%"/>
-
-
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="40%"/>
 
 # Hardware
 
