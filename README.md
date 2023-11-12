@@ -34,6 +34,8 @@ All those goals are met.
 The new revision PCBs arrived and I mounted them off. They worked out of the box. Still will do a bit more testing before making it available online.
 Also designed a small but stable 3d printable housing, fixed together with 2 screws and 2 nuts. Fits perfect. 
 
+It is REALLY tiny compared to the first REV 1. Despite beeing tiny, it is thanks to the housing possible to easily plug it to instruments (those Centronics style connectors require a lot of force).
+
 As you can see, it will have a USB type-C connector. For easier bootloader entering a push button is placed, which can be pressed down with a paperclip through a hole in the housing.
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="40%"/>
