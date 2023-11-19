@@ -54,6 +54,7 @@ TMC_Capabilities_t Capabilities =
 		.Device     =
 			{
 				.SupportsAbortINOnMatch = false, // false
+				.Reserved = 0,
 			},
 		.Reserved2 = {0, 0, 0, 0, 0, 0},
 		.bcdUSB488 = VERSION_BCD(1,0,0),
@@ -61,14 +62,14 @@ TMC_Capabilities_t Capabilities =
 			{
 				.SupportTrigger         = 1, //0
 				.SupportRenControl      = 1,
-				.Is488IF                = 0,
+				.Is488IF                = 1, // was:0
 				.Reserved				= 0,
 			},
-		.USB488IfCap2 =
+		.USB488IfCap2 = // device capabilities
 			{
 				.DT1Capable                 = 1,//0 => Device trigger no capability / full capability		=> send *TRG command
 				.RL1Capable					= 1,//0 => Remote Local   no capability / full capability
-				.SR1Capable					= 0,//0 => service request 
+				.SR1Capable					= 1,//0 => service request 
 				.MandatorySCPI				= 0,//0
 				.Reserved					= 0,//0
 			},
@@ -83,6 +84,14 @@ static bool IsTMCBulkINReset = false;
 
 /** Stream callback abort flag for bulk OUT data */
 static bool IsTMCBulkOUTReset = false;
+
+/** Flag that a selective device clear should be executed */
+static bool handleSDC = false;
+
+/** Flag that a status byte should be read */
+static bool handleRSTB = false;
+static uint8_t RSTB_btag;
+static uint8_t RSTB_status;
 
 /** Last used tag value for data transfers */
 static uint8_t CurrentTransferTag = 0;
@@ -276,8 +285,8 @@ bool identifyGpibDevice(void)
 		
 		
 		if (!hascomma)
-			if ( (tmc_serial_string.UnicodeString[0] = 'H') &&
-				 (tmc_serial_string.UnicodeString[1] = 'P') &&
+			if ( (tmc_serial_string.UnicodeString[0] == 'H') &&
+				 (tmc_serial_string.UnicodeString[1] == 'P') &&
 				 (tmc_serial_string.UnicodeString[2] >= '0') &&
 				 (tmc_serial_string.UnicodeString[2] <= '9')     )
 			{
@@ -388,7 +397,7 @@ int main(void)
 	
 	/* apply settings from eeprom */
 	eeprom_busy_wait();	
-	gpib_set_readtermination(eeprom_read_byte(105));
+	gpib_set_readtermination(eeprom_read_byte((const uint8_t *)105));
 	
 	
 	//LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
@@ -573,7 +582,7 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 	bool ConfigSuccess = true;
 
 	/* Setup TMC In, Out and Notification Endpoints */
-	ConfigSuccess &= Endpoint_ConfigureEndpoint(TMC_NOTIFICATION_EPADDR, EP_TYPE_INTERRUPT, TMC_IO_EPSIZE, 1);
+	ConfigSuccess &= Endpoint_ConfigureEndpoint(TMC_NOTIFICATION_EPADDR, EP_TYPE_INTERRUPT, TMC_NOTIFICATION_EPSIZE, 1);
 	ConfigSuccess &= Endpoint_ConfigureEndpoint(TMC_IN_EPADDR,  EP_TYPE_BULK, TMC_IO_EPSIZE, 1);
 	ConfigSuccess &= Endpoint_ConfigureEndpoint(TMC_OUT_EPADDR, EP_TYPE_BULK, TMC_IO_EPSIZE, 1);
 }
@@ -597,30 +606,26 @@ void EVENT_USB_Device_ControlRequest(void)
 		switch (USB_ControlRequest.bRequest)
 		{
 			case Req_ReadStatusByte:
-			
-//Jump_To_Bootloader();			
 				btag = USB_ControlRequest.wValue;
 
+				gpib_ren(1); /* ensure that remote control is enabled */
 				timeout_start(50000); /* 0.5s timeout*/
 				statusReg =  gpib_readStatusByte(gpib_addr, is_timedout);
 				Endpoint_ClearSETUP();
+
 				
 				/* Write the request response byte */
 				Endpoint_Write_8(TMC_STATUS_SUCCESS);
 				Endpoint_Write_8(btag);
 				Endpoint_Write_8(statusReg);
+				
+				/* prepare interrupt response*/
+				RSTB_btag = btag;
+				RSTB_status = statusReg;
+				handleRSTB = true;
 
 				Endpoint_ClearIN();
 				Endpoint_ClearStatusStage();
-				
-/*Endpoint_SelectEndpoint(TMC_NOTIFICATION_EPADDR);
-Endpoint_Write_8(TMC_STATUS_SUCCESS);
-Endpoint_Write_8(btag);
-Endpoint_Write_8(statusReg);
-Endpoint_ClearIN();*/
-
-	
-				
 				break;
 			case Req_InitiateAbortBulkOut:
 				if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_ENDPOINT))
@@ -652,8 +657,6 @@ IsTMCBulkOUTReset = true;
 
 					Endpoint_ClearIN();
 					Endpoint_ClearStatusStage();
-					
-//Endpoint_ResetEndpoint(TMC_IN_EPADDR);
 				}
 
 				break;
@@ -711,12 +714,6 @@ IsTMCBulkOUTReset = true;
 
 					Endpoint_ClearIN();
 					Endpoint_ClearStatusStage();
-
-#if 0					
-					/* KG: Added for proper synchronsity handling */
-					Endpoint_ResetEndpoint(TMC_IN_EPADDR);
-					TMC_resetstates();
-#endif
 				}
 
 				break;
@@ -756,6 +753,8 @@ IsTMCBulkOUTReset = true;
 						/* Indicate that all in-progress/pending data IN and OUT requests should be aborted */
 						IsTMCBulkINReset  = true;
 						IsTMCBulkOUTReset = true;
+						handleSDC = true; // trigger handling of SDC command to device
+						
 
 						/* Save the split request for later checking when a new request is received */
 						RequestInProgress = Req_InitiateClear;
@@ -777,10 +776,13 @@ IsTMCBulkOUTReset = true;
 					/* Check that a CLEAR transaction has been requested and that the request has completed */
 					if (RequestInProgress != Req_InitiateClear)
 						TMCRequestStatus = TMC_STATUS_SPLIT_NOT_IN_PROGRESS;
-					else if (IsTMCBulkINReset || IsTMCBulkOUTReset)
+					else if (IsTMCBulkINReset || IsTMCBulkOUTReset || handleSDC)
 						TMCRequestStatus = TMC_STATUS_PENDING;
-					else
+					else 
+					{
+						TMCRequestStatus = TMC_STATUS_SUCCESS;
 						RequestInProgress = 0;
+					}
 
 					Endpoint_ClearSETUP();
 
@@ -998,8 +1000,6 @@ uint8_t GetNextMessage(uint8_t* const Data, uint8_t maxlen, bool isFirstMessage,
 		Eoi = true;
 	*pisLastMessage = Eoi;
 	
-//NextResponseBuffer[i++]	= gpib_search();
-
 	memcpy((char*)Data, (char*)NextResponseBuffer, i);
 	
 	LED(1);
@@ -1047,6 +1047,7 @@ void TMC_Task(void)
 			switch (MessageHeader.MessageID)
 			{
 				case TMC_MESSAGEID_TRIGGER:
+					gpib_ren(1); /* ensure that remote control is enabled */
 					timeout_start(50000); /* 0.5s timeout*/
 					gpib_trigger(gpib_addr, is_timedout);
 					Endpoint_ClearOUT();					
@@ -1078,7 +1079,6 @@ void TMC_Task(void)
 					break;
 				case TMC_MESSAGEID_DEV_DEP_MSG_IN:
 					Endpoint_ClearOUT();
-//FIXME: ZLP not OK! -------------------------------------------------------v
 					curlen = MIN(TMC_IO_EPSIZE-sizeof(TMC_MessageHeader_t) -1, MessageHeader.TransferSize);
 					MessageHeader.TransferSize = GetNextMessage(MessagePayload, curlen, TMC_InLastMessageComplete, &lastmessage, tmc_gpib_read_timedout);
 					TMC_InLastMessageComplete = lastmessage;
@@ -1097,8 +1097,6 @@ void TMC_Task(void)
 							  break;
 						}
 					}
-//TODO: short packet handling not OK!!!!! Commit an empty packet 
-//					if (!IsTMCBulkINReset)
 
 					/* Also in case of a timeout, the host does not expire a Bulk IN IRP, so we still need to commit an empty endpoint to retire the IRP */
 					Endpoint_SelectEndpoint(TMC_IN_EPADDR);
@@ -1106,10 +1104,6 @@ void TMC_Task(void)
 					
 					if (IsTMCBulkINReset)
 					{
-						//Endpoint_SelectEndpoint(TMC_IN_EPADDR);
-						//Endpoint_AbortPendingIN();
-						/* KG: Added for proper synchronsity handling */
-						//Endpoint_ResetEndpoint(TMC_IN_EPADDR);
 						TMC_resetstates();
 					}
 
@@ -1119,8 +1113,6 @@ void TMC_Task(void)
 					Endpoint_StallTransaction();
 					break;
 			}
-
-			//LEDs_SetAllLEDs(LEDMASK_USB_READY);
 		}
 	}
 	else
@@ -1155,6 +1147,39 @@ void TMC_Task(void)
 			TMC_LastMessageComplete = lastmessage;
 			ProcessSentMessage(MessagePayload, curlen, false, lastmessage, tmc_gpib_write_timedout);
 		}
+	}
+	
+	if (handleSDC)
+	{
+		gpib_ren(1); /* ensure that remote control is enabled */
+		timeout_start(50000); /* 0.5s timeout*/
+		gpib_sdc(gpib_addr, is_timedout);
+
+		handleSDC = false;
+	}
+	
+	if (handleRSTB)
+	{
+		uint8_t  ErrorCode;
+		uint16_t BytesTransferred;
+		uint8_t  notdata[2];
+		
+		handleRSTB = false;
+		
+		//Endpoint_ClearOUT();
+		
+		notdata[0] = RSTB_btag | 0x80;
+		notdata[1] = RSTB_status;
+		Endpoint_SelectEndpoint(TMC_NOTIFICATION_EPADDR);
+		Endpoint_Write_Stream_LE(notdata, sizeof(notdata), NULL);
+		//while ((ErrorCode = Endpoint_Write_Stream_LE(notdata, sizeof(notdata), &BytesTransferred)) ==
+//			   ENDPOINT_RWSTREAM_IncompleteTransfer)
+		//{
+//			if (IsTMCBulkINReset)
+			  //break;
+		//}
+		//Endpoint_SelectEndpoint(TMC_NOTIFICATION_EPADDR);
+		Endpoint_ClearIN();		
 	}
 
 	if (IsTMCBulkOUTReset || IsTMCBulkINReset)
@@ -1237,4 +1262,5 @@ BOOT UPDATE:
   V:
   cd V:\Data\Projekt\Privat\gpibadapter\lufa-master\Demos\Device\Incomplete\TestAndMeasurement
   copy TestAndMeasurement.bin G:\FLASH.BIN /Y
+  (usb.addr contains "1.3") and not (usb.src == "1.3.1")
 */

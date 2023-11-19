@@ -31,7 +31,8 @@ uint8_t gpib_search(void);
 
 void gpib_set_readtermination(char terminator);
 
-
+/* selective device clear */
+bool gpib_sdc(uint8_t addr, gpibtimeout_t ptimeoutfunc);
 
 /* read status byte using serial poll */
 uint8_t gpib_readStatusByte(uint8_t addr, gpibtimeout_t ptimeoutfunc);

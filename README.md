@@ -29,17 +29,16 @@ Some goals of the project were:
 
 All those goals are met.
 
-# May '22 update!!!
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGpibV2.jpg" width="40%" align="right"/>
+# 12 November '23 update!!!
 
-A version 2.0 of the original HW & SW is in the pipeline.
-This is mainly to address the unavailability of ATMEGA32U4 in TQFP at the moment. There are however Arduino boards from that you can desolder them. Those are sometimes in QFN, so the PCB now supports QFN and TQFP housings. Additionally I'll make an AtMega16U4 SW variant without bootloader, because AtMega16U4 is available still right now.
-Note that I changed the package sizes also of the 0402 components to 0603 for easier soldering.
+The new revision PCBs arrived and I mounted them off. They worked out of the box. Still will do a bit more testing before making it available online.
+Also designed a small but stable 3d printable housing, fixed together with 2 screws and 2 nuts. Fits perfect. 
 
-In case you use an AtMega32U4 this board is still fully compatible with the current version of the software!
+It is REALLY tiny compared to the first REV 1. Despite beeing tiny, it is thanks to the housing possible to easily plug it to instruments (those Centronics style connectors require a lot of force).
 
-Due to very low bandwidth for such kinds of projects it will take a while until I have the AtMega16U4 firmware ready and tested.
+As you can see, it will have a USB type-C connector. For easier bootloader entering a push button is placed, which can be pressed down with a paperclip through a hole in the housing.
 
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="40%"/>
 
 # Hardware
 
