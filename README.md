@@ -40,6 +40,20 @@ As you can see, it will have a USB type-C connector. For easier bootloader enter
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="40%"/>
 
+# 5 December '23 update!!!
+
+I am slowly but surely converging to a new firmware release.
+The Hardware works fine and I have built 50 prototypes which all work smoothly.
+The firmware does:
+- speedup writes by a factor 7
+- speedup reads by a factor 4.7
+- It implements service request handling (Srq) which enables nice and efficient realization of getting notified once actions are finished on the instrument.
+- Also: I got a nice pull request which I merged. This one allows better user defined timing control of the startup behaviour.
+
+For me most noticeable effort went into passing an extensive 488.2 stresstest which runs in the meantime succesfully. This one exposed some corner cases which I have fixed. This might be the best firmware in terms of stability, compliance and speed so far (I hope :-)).
+
+While reaching feature completness, I started working on a variant with High speed USB interface (a bit more speed, but huge latency improvement) and Ethernet VXI-11 protocol support. This will likely take several months to complete the software in parallel to my work, but use the same design philosophies as this project.
+
 # Hardware
 
 ## Microcontroller choice
