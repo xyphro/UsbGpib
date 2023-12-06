@@ -19,11 +19,11 @@ I've got frustrated and tried to turn it into something positive - Here a video 
 
 Some goals of the project were:
 - Work based on the standard USBTMC protocol. This allows the GPIB test equipment to look like a normal USB based measurement device and work flawless with e.g. NI VISA, Labview, Matlab or PyVisa.
-- Have a small length - otherwise my eqipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short.
+- Have a small length - otherwise my equipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short.
 - It should be cheap but still versatile (you can build a single one of these for only 14 USD!)
 - It should support ALL my test equipments, from many different GPIB implementation generations and different GPIB flavors
 - The Firmware should be upgradeable over USB
-- It should be rock-solid (!) I don't want to end up in a very long measurement beeing interrupted because of a software issue of my USB GPIB converter.
+- It should be rock-solid (!) I don't want to end up in a very long measurement being interrupted because of a software issue of my USB GPIB converter.
 - It should support additional features like serial poll, remote enabling/disabling
 - If there is no GPIB device connected to the USBGpib converter, or the GPIB device is powered down, there should be no USB device visible on the PC.
 
@@ -58,7 +58,7 @@ While reaching feature completness, I started working on a variant with High spe
 
 ## Microcontroller choice
 
-Allthough I typically would prefer nowadays an ARM Cortex M0/3/4/7 controller, there is an issue with it. Available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level shifter towards the GPIB Bus.
+Although I typically would prefer nowadays an ARM Cortex M0/3/4/7 controller, there is an issue with it. Available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level shifter towards the GPIB Bus.
 GPIB is based on 5V (not exactly true, but a first iteration).
 
 This limited the microcontroller choice to e.g. AVR or PIC controllers. Because of very good availability I ended up in ATMEGA32U4 controllers.
@@ -82,7 +82,7 @@ The PCB can be ordered at nearly any PCB pool production service (e.g. 10 PCBs f
 
 ## Mounting the PCB
 
-Mounting is fairly simple, as there are no extremly small components. I suggest to mount first all the SMD components, followed by the bulky connectors.
+Mounting is fairly simple, as there are no extremely small components. I suggest to mount first all the SMD components, followed by the bulky connectors.
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/mounting.jpg" width="80%"/>
 
 
@@ -142,9 +142,9 @@ Only, if a GPIB device is connected, you can see the device on your PC too.
 
 The reason behind the feature is simple: Instead of having a standard GPIB wiring, where you have a single GPIB controller and lots of GPIB devices interconnected, USBGPIB supports only a direct connection of the USBGPIB device to your measurement device. If you have like me e.g. 14 Instruments you don't want all to show up in the device manager, if the measurement device itself is powered down - you won't anyway be able to communicate with a powered down device.
 
-When USB and the GPIB side is connected, the device enumerates. The USBGPIB device reads out the ID of the instrument and constructs a unique USB Serial number out of it. It is thus easily possible to assiate multiple connected USBGPIB devices with the measurement instrument.
+When USB and the GPIB side is connected, the device enumerates. The USBGPIB device reads out the ID of the instrument and constructs a unique USB Serial number out of it. It is thus easily possible to associate multiple connected USBGPIB devices with the measurement instrument.
 
-The VISA ressource name is constructed from this USB Serial number. You can identify easily e.g. in NiMax, which device is connected:
+The VISA resource name is constructed from this USB Serial number. You can identify easily e.g. in NiMax, which device is connected:
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/NiMaxExample.png" width="90%"/>
 
@@ -193,30 +193,62 @@ As this converter implements the standard USBTMC Test and measurement class, you
 - USB1.1, USB2.0 and USB3.x ports tested, with and without USB HUB in between.
 - The connection stays responsive, when power cycling the PC, or hibernating/sleeping it
 - Different connection cycles (GPIB side connected first, USB side connected first, swapping GPIB side equipment, ...)
-- Extensive testing of timeout scenarious. E.g. making an illegal query and testing, if the USBTMC handles the timeouts properly. This was a very tricky part to get right.
+- Extensive testing of timeout scenarios. E.g. making an illegal query and testing, if the USBTMC handles the timeouts properly. This was a very tricky part to get right.
 - Tested special transfer modes. E.g. capturing screenshots from different equipments is usually something, which will drive other GPIB adapters to the limits, because binary data of unknown length needs to be transported successfully.
 
 # Setting Parameters
+Since 26th April 2020 update, there are additional options implemented to configure the behaviour of GPIBUSB.
 
-Since 26th April 2020 update, there is are additional options implemented to configure the behaviour of GPIBUSB.
+All parameters are applied immediately after setting them and are stored in a non voltatile way in the EEPROM of the microcontroller. Anyway, some of them requires a reboot of the GPIBUSB to be effective.
 
-First of all, it turned out, that some old test equipment is not capable to support EOI generation when reading data. So GPIBUSB would not be capable to sense, when the instrument finished talking. This old test eqipment terminates talking by generating e.g. \n (line feed) or \r\n (CRLF) or \r as termination.
-
-To support those instruments an option to select the termination method is implemented - see section "read termination".
-
-Furthermore it is now possible to turn off the automatic readout of the instruments *IDN? or ID? response after power on. This mechanism works fine on most test equipments, but again there is test equipment, that does not support this, which would end up in generating a different VISA ressource name every time you power on.
-If this automatic ID readout is turned off, the VISA ressource name will be just generated based on the detected GPIB address and the USB serial number of GPIBUSB.
-
-All parameters are applied immediately after setting them and are stored in a non voltatile way in the EEProm of the microcontroller.
-
-To enter the mode to set the setting the indicator pulse command has to be send to GPIBUSB followed by a textstring as explained below.
-
-To generate a indicator pulse (which blinks the LED of only the addressed USBTMC device), the following pyvisa snippet can be used (VM is the opened VISA ressource):
-
+To enter into the options set mode, the indicator pulse command has to be send to GPIBUSB. In order to do that, the following pyvisa snippet can be used (VM is an open VISA resource):
+```
 VM.control_in(0xa1, 0x40, 0, 0, 1);
-This makes the LED blink once, but also check, if the next command is a set parameter command, starting with '!' character.
+```
 
-## read termination method
+The LED on the addressed device will blink once. The device will also check if the next command is a set parameter command, i.e., starting with '!' character:
+```
+VM.write('!XXYY')
+```
+
+`XX` is the command number and `YY` is the value to be set.
+
+In the next sections the list of available commands is discussed.
+
+## VISA resource name selection - Command 00
+It is possible to select among different VISA resource names;
+the default one it's in the form:
+```
+USB0::0x03EB::0x2065::ID_STRING::INSTR
+```
+
+where the two first 4-characters hex numbers are the fixed VID and PID of the GPIBUSB, whilst the `ID_STRING` is the instrument reply to the `*IDN?` or `ID?` command. The instrument is queried at the startup. This mechanism works fine on most test equipments, but there are some that do not support these commands, resulting in a different VISA resource at every startup or even at invalid strings.
+In addition, the response to the identification command is not standardized and can contain in addition to the instrument name, the name of the manufacturer, firmware version, supported SCPI version, etc. This can lead to very long VISA names, difficult to manage and not fully supported by some softwares. For example, the MATLAB USB-VISA object supports names only up to 50 characters. For all these reasons, the automatic ID readout can be turned off, and alternative VISA resource names can be generated according to the detected GPIB address and/or the USB serial number of GPIBUSB.
+
+Here a list of the available options:
+|  Value (YY)  | VISA resource name example                                  |
+|:------------:|-------------------------------------------------------------|
+| `00` or `FF` | `USB0::0x03EB::0x2065::ID_STRING::INSTR`                    |
+| `01`         | `USB0::0x03EB::0x2065::GPIB_NN_SSSSSSSSSSSSSSSSSSSS::INSTR` |
+| `02`         | `USB0::0x03EB::0x2065::GPIB_NN_SSSSSS::INSTR`               |
+| `03`         | `USB0::0x03EB::0x2065::GPIB_NN::INSTR`                      |
+| `04`         | `USB0::0x03EB::0x2065::SSSSSSSSSSSS::INSTR`                 |
+
+The `ID_STRING` is used only in the first case. In the other cases, other strings are used to discriminate between different GPIBUSBs. In particular:
+- `NN` is the GPIB address of the connected instrument. This is also determined at the startup, and it is compatible with 100% of the instruments. 
+- `SS...SS` is the 20-characters MCU unique signature. Some of the available VISA resource name options, employ only a reduced number of characters, keeping the first ones.
+Note: if option `00` is selected and the device does not replay at all to the identification request, the option `01` will be used automatically.
+
+As an example, to turn off the automatic instrument ID readout after power up, and select the GPIB number plus short USB serial number format, execute:
+```
+VM.control_in(0xa1, 0x40, 0, 0, 1)
+VM.write('!0002')
+```
+
+After a power cycle, the USB device VISA resource name and USB serial number string will change, based on the selected setting.
+
+## Read termination method - Command 01
+Some old test equipment is not capable to support EOI generation when reading data. So GPIBUSB would not be capable to sense, when the instrument finished talking. This old test equipment terminates talking by generating e.g. \n (line feed) or \r\n (CRLF) or \r as termination.
 
 The following read termination method options are available:
 - Option 0: (default): EOI only (the normal way GPIB works)
@@ -226,22 +258,27 @@ The following read termination method options are available:
 If your device terminates with \r\n, select Option #2.
 
 To set these options execute (Pyvisa example):
+```
 VM.control_in(0xa1, 0x40, 0, 0, 1)
-VM.write('!01XX')
+VM.write('!01YY')
+```
 
-for XX enter either:
-- 00 for Option 0 (EOI only) => VM.write('!0100')
-- 01 for Option 1 (EOI and \n) => VM.write('!0101')
-- 02 for Option 2 (EOI and \r) => VM.write('!0102')
+for `YY` enter either:
+- `00` for Option 0 (EOI only) => `VM.write('!0100')`
+- `01` for Option 1 (EOI and \n) => `VM.write('!0101')`
+- `02` for Option 2 (EOI and \r) => `VM.write('!0102')`
 
-## Automatic instrument identification readout
+## Startup delay - Command 02
+Some instruments may exhibit undesired reactions if addressed immediately after powering on. This scenario, particularly when the USB-GPIB is powered and connected to a switched-off instrument that is subsequently powered on, could for instance inadvertently trigger bootloader functions. To mitigate this issue, a delay feature has been implemented: upon the instrument's power-up, any interaction with it is delayed for a certain period of time.
+Users can program the delay time in 0.5-second increments, up to 60 s, or disable this feature if not required.
 
-To turn off the automatic instrument ID readout after power up, execute:
+To choose the desired delay, execute (Pyvisa example):
+```
 VM.control_in(0xa1, 0x40, 0, 0, 1)
-VM.write('!0001')
+VM.write('!02YY')
+```
 
-To turn on the automatic instrument ID readout (this is the default behaviour of GPIBUSB), execute:
-VM.control_in(0xa1, 0x40, 0, 0, 1)
-VM.write('!0000')
-
-After a power cycle the USB device VISA ressource name and USB serial number string will change, based on this setting
+`YY` is the required delay time in half seconds (hexadecimal value).
+For example `0A` is 10 in decimal and means 5 second delay.
+Maximum value is `78` = 120 = 60 seconds.
+To disable this feature set `YY` to 0 or FF.

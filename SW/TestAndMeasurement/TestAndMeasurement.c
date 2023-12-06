@@ -186,7 +186,7 @@ bool is_timedout(void)
 	return false;
 }
 
-static void TMC_SetInternalSerial(bool addGPIBAddress);
+static void TMC_SetInternalSerial(bool addGPIBAddress, uint8_t signatureLen);
 
 /* returns TRUE only if a GPIB device responses to any GPIB address */
 bool findGpibdevice(void)
@@ -296,18 +296,16 @@ bool identifyGpibDevice(void)
 		
 		if ((timeout_val == 0) || (len == 0)  || (!hascomma) ) /* timeout happened or length is 0 => build a serial number based on GPIB address */
 		{
-			TMC_SetInternalSerial(true);
+			TMC_SetInternalSerial(true, 20);
 			gotStringViaGPIB = false;
 		}
 	}
 	else
 	{ /* no gpib address found => use normal serial number */
-		TMC_SetInternalSerial(true);
+		TMC_SetInternalSerial(true, 20);
 		gotStringViaGPIB = false;
 	}
-	
-	//TMC_SetInternalSerial(false);
-	
+
 	gpib_ren(false);
 	_delay_ms(100);
 	gpib_ren(true);
@@ -317,7 +315,7 @@ bool identifyGpibDevice(void)
 
 
 
-static void TMC_SetInternalSerial(bool addGPIBAddress)
+static void TMC_SetInternalSerial(bool addGPIBAddress, uint8_t signatureLen) /* max signatureLen = 20 */
 {
 	uint_reg_t CurrentGlobalInt = GetGlobalInterruptMask();
 	uint8_t    len;
@@ -336,9 +334,12 @@ static void TMC_SetInternalSerial(bool addGPIBAddress)
 		tmc_serial_string.UnicodeString[len++] = cpu_to_le16('_');
 		tmc_serial_string.UnicodeString[len++] = cpu_to_le16('0' + (gpib_addr/10));
 		tmc_serial_string.UnicodeString[len++] = cpu_to_le16('0' + (gpib_addr%10));
-		tmc_serial_string.UnicodeString[len++] = cpu_to_le16('_');
+		if (signatureLen)
+		{
+			tmc_serial_string.UnicodeString[len++] = cpu_to_le16('_');
+		}
 	}
-	for (uint8_t SerialCharNum = 0; SerialCharNum < (80 / 4); SerialCharNum++)
+	for (uint8_t SerialCharNum = 0; SerialCharNum < signatureLen; SerialCharNum++)
 	{
 		uint8_t SerialByte = boot_signature_byte_get(SigReadAddress);
 
@@ -381,6 +382,7 @@ void eeprom_update_if_changed(uint16_t addr, uint8_t value)
 int main(void)
 {
 	uint8_t prevaddr;
+	int8_t startupCntHalfSec = -2;
 
 	//mcusr_mirror = MCUSR; 
 	MCUSR = 0; 
@@ -401,6 +403,7 @@ int main(void)
 	//LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
 	GlobalInterruptEnable();
 	
+	/* stop here until a gpib device is connected (checked in Timer0 ISR) */
 	while (!gpib_is_connected())
 	{
 		_delay_ms(250);
@@ -408,6 +411,27 @@ int main(void)
 		_delay_ms(250);
 		LED(0);
 		check_bootloaderEntry();
+		if (startupCntHalfSec != 0)
+		{
+			startupCntHalfSec++;
+		}
+	}
+
+	/* if the instrument has been just powered-on */
+	if(startupCntHalfSec==0)
+	{
+		startupCntHalfSec=eeprom_read_byte(106);
+		if(startupCntHalfSec > 0)
+		{
+			/* wait here until complete power-up */
+			while((startupCntHalfSec--) != 0)
+			{
+				_delay_ms(100);
+				LED(1);
+				_delay_ms(400);
+				LED(0);
+			}
+		}
 	}
 	
 	/* physically GPIB is connected, now check if any GPIB address is responsive */
@@ -428,9 +452,10 @@ int main(void)
 	}; /* Identify the GPIB Address of the connected GPIB device */
 	
 	eeprom_busy_wait();
-	if (eeprom_read_byte((const uint8_t *)104) != 0x01)
+	/* found a responsive GPIB address */
+	uint8_t ee_visa_name = eeprom_read_byte(104);
+	if (ee_visa_name == 0x00 || ee_visa_name == 0xFF) /* setup USB descriptor with *IDN? or ID? command response */
 	{
-		/* found a responsive GPIB address, now setup USB descriptor with *IDN? or ID? command response */
 		eeprom_busy_wait();
 		prevaddr = eeprom_read_byte((uint8_t*)0); /* read previous gpib address */
 		if (identifyGpibDevice())
@@ -463,7 +488,22 @@ int main(void)
 	}
 	else /* user disabled fully automated detection mode */
 	{
-		TMC_SetInternalSerial(true);
+		if (eeprom_read_byte(104) == 0x01) /* use GPIB_NN_SSSSSSSSSSSSSSSSSSSS as descriptor */
+		{
+			TMC_SetInternalSerial(true, 20);
+		}
+		else if (eeprom_read_byte(104) == 0x02) /* use GPIB_NN_SSSSSS as descriptor */
+		{
+			TMC_SetInternalSerial(true, 6);
+		}
+		else if (eeprom_read_byte(104) == 0x03) /* use GPIB_NN as descriptor */
+		{
+			TMC_SetInternalSerial(true, 0);
+		}
+		else if (eeprom_read_byte(104) == 0x04) /* use SSSSSSSSSSSS as descriptor */
+		{
+			TMC_SetInternalSerial(false, 12);
+		}
 		gpib_ren(false);
 		_delay_ms(100);
 		gpib_ren(true);
@@ -510,7 +550,7 @@ void SetupHardware(void)
 
 	
 	/* update the TMC default serial number*/
-	TMC_SetInternalSerial(false);
+	TMC_SetInternalSerial(false, 20);
 	
 	/* LED to output and turn on */
 	DDRF |= (1<<5);
@@ -837,15 +877,22 @@ Process an internal command. This is triggered, if a indicator pulse command was
 by a write of a command starting with an exclamation mark (!).
 Syntax:
 !XXYY
-XX = index (hex) 00 for GPIB automatic dection:
+XX = command (hex)
+				00 for VISA resource name:
 					YY selects the method:
 					0x00 or 0xff => Fully automatic (also try to sense ID? or *IDN? string and use it as serial number string)
-					0x01         => Only detect GPIB address automatically and use the GPIB address as serial number string
-                 01 for Termination method for READs:
+					0x01         => Only detect GPIB address automatically and use it together with the 20 chars MCU signature as serial number string
+					0x02         => Only detect GPIB address automatically and use it together with 6 chars MCU signature as serial number string
+					0x03         => Only detect GPIB address automatically and use it as serial number string
+					0x04         => Serial number string is only composed by 12 chars of the MCU signature
+				01 for Termination method for READs:
 					YY selects the method:
 					0x00 or 0xff => EOI termination
 					0x01         => EOI or '\n' (LF = linefeed)
 					0x02         => EOI or '\r' (CR = carriage return)
+				02 for startup delay (only when device is powered-on after the GPIBUSB):
+					YY is the delay in half seconds.
+					Max value = 120 == 60 sec. Set to 0 or 0xff to disable.
 */
 void ProcessInternalCommand(uint8_t* const Data, uint8_t Length)
 {
@@ -874,6 +921,12 @@ void ProcessInternalCommand(uint8_t* const Data, uint8_t Length)
 					eeprom_update_if_changed(105, '\0');
 					gpib_set_readtermination('\0');
 					break;
+			}
+			break;
+		case 0x02: /* power-on delay */
+			if (yy <= 120 || yy == 0xFF)
+			{
+				eeprom_update_if_changed(106, yy);
 			}
 			break;
 	}
