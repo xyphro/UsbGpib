@@ -34,7 +34,7 @@ All those goals are met.
 Finally I made it - the new HW design is on this page. As I had to restructure the repository a bit it took quite a while.
 The software image is always the same and runs on both HW revisions.
 
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.jpg" width="40%"/>
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="40%"/>
 
 I also have put a binary for a new Firmware image in there. I am still busy optimizing certain things but want to give you a try before doing a next release.
 Please if you test it: Feed it back to me - does it work / does it break anything -> sharing is caring. 
