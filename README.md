@@ -29,30 +29,30 @@ Some goals of the project were:
 
 All those goals are met.
 
-# 12 November '23 update!!!
+# 19th December '23 update
 
-The new revision PCBs arrived and I mounted them off. They worked out of the box. Still will do a bit more testing before making it available online.
-Also designed a small but stable 3d printable housing, fixed together with 2 screws and 2 nuts. Fits perfect. 
+Finally I made it - the new HW design is on this page. As I had to restructure the repository a bit it took quite a while.
+The software image is always the same and runs on both HW revisions.
 
-It is REALLY tiny compared to the first REV 1. Despite beeing tiny, it is thanks to the housing possible to easily plug it to instruments (those Centronics style connectors require a lot of force).
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/BootLoaderEnterTrick.jpg" width="40%"/>
 
-As you can see, it will have a USB type-C connector. For easier bootloader entering a push button is placed, which can be pressed down with a paperclip through a hole in the housing.
+I also have put a binary for a new Firmware image in there. I am still busy optimizing certain things but want to give you a try before doing a next release.
+Please if you test it: Feed it back to me - does it work / does it break anything -> sharing is caring. 
 
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="40%"/>
+Mail me at xyphro@gmail.com or raise an issue under the issue section.
 
-# 5 December '23 update!!!
+[FW image location: SW/binaries](SW/binaries)
+The file TestAndMeasurementReleaseCandidate.bin is the new improved firmware. The TestAndMeasurement.bin is the older stable firmware.
 
-I am slowly but surely converging to a new firmware release.
-The Hardware works fine and I have built 50 prototypes which all work smoothly.
-The firmware does:
-- speedup writes by a factor 7
-- speedup reads by a factor 4.7
-- It implements service request handling (Srq) which enables nice and efficient realization of getting notified once actions are finished on the instrument.
-- Also: I got a nice pull request which I merged. This one allows better user defined timing control of the startup behaviour.
+Changes in this release candidate are as announced previously:
+- 488.2 support further roled out. This means Status bytes are automatically read out and reported via interrupt transfers to PC as foreseen in the standard.
+- FASTER (!) 7 x write speed improvement and 4.x times read speed improvement. As reference: On an FSW I get 310kbytes/s as write transfer speed and 240kBytes/s as read transfer speed.
+- a fix for read status byte readout leading to issues on my CMU200
+- several smaller race conditions identified and fixed. A lot of work went into stress testing 488.2.
 
-For me most noticeable effort went into passing an extensive 488.2 stresstest which runs in the meantime succesfully. This one exposed some corner cases which I have fixed. This might be the best firmware in terms of stability, compliance and speed so far (I hope :-)).
+As said, I feel this is the best Firmware image so far, but I changed so much that I want to go first for this small betatest phase asking you explicitely for positive and negative feedback.
 
-While reaching feature completness, I started working on a variant with High speed USB interface (a bit more speed, but huge latency improvement) and Ethernet VXI-11 protocol support. This will likely take several months to complete the software in parallel to my work, but use the same design philosophies as this project.
+After further testing I will also push the sourcecode of this image.
 
 # Hardware
 
@@ -73,7 +73,7 @@ The GPIB side of the schematic can be directly connected to the ATMega32U4 IO pi
 All components are easy to source, so I only specify the potential critical ones:
 
 - 16 MHz Crystal: Farnell 2853867 - MCSJK-7E-16.00-8-30-100-B-30 
-- GPIB connector: Farnell 2421095 - NORCOMP 112-024-113R001
+- REV 1 GPIB connector: Farnell 2421095 - NORCOMP 112-024-113R001. For REV 2 use a straight 24P male solder type connector e.g. from AliExpress.
 - USB connector: Farnell 2668483 - Amphenol ICC 61729-1011BLF
 
 ## PCB
@@ -82,12 +82,15 @@ The PCB can be ordered at nearly any PCB pool production service (e.g. 10 PCBs f
 
 ## Mounting the PCB
 
-Mounting is fairly simple, as there are no extremly small components. I suggest to mount first all the SMD components, followed by the bulky connectors.
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/mounting.jpg" width="80%"/>
+The PCB is available in 2 revisions.
+- [REV 1](HW/REV1) is the most popularely used right now due to age. It has a USB Type-B connector and an L-shaped housing visible on a few photos of this page.
+- [REV 2](HW/REV2) has some improvements like beeing smaller, better fit and USB Type-C connector.
 
+Choose whatever you prefer. The software images, but also the external behavior is the same.
 
-# Housing
+# Housings
 
+## REV 1
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/housing.png" width="33%"/><img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/housing_snap.png" width="50%"/>
 
 I created a sophisticated 3D printable housing for this adapter. The design was made with Fusion 360. The project file + the STL files are included in the "Housing" subdirectory.
@@ -99,6 +102,14 @@ Take care, that you rotate the TOP part of the housing by 180 degrees, so that t
 Printing works fine, several iterations of the design were made to ensure good printability.
 I printed so far 15 housings, without a single fail.
 
+## REV 2
+
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UpcomingHWRevision.png" width="40%"/>
+
+The REV 2 housing is a lot smaller, but requires 2 screws.
+The housing is quite important to be able to connect and disconnect the board without breaking anything. It is key for mechanical stability of the adapter.
+When operating the device without housing, take very well care when plugging in and out the board in case the GPIB connector has a very tight fit.
+
 # Software
 
 ## Source code
@@ -106,32 +117,11 @@ I printed so far 15 housings, without a single fail.
 The source code of the Boot loader (slightly modified LUFA MassStorage Boot loader) and the main USBGPIB converter are located in the "SW" subdirectory.
 At the time of publication LUFA 170418 release was used, with GCC as compiler.
 
+Note: The Software is compatible with any HW revision in this repository. For REV 1 and REV 2 hardware you don't need different SW images.
+
 ## Binaries
 
 For those, that just want to create their own device, I've included the binary output in the "SW/binaries" subdirectory.
-
-## Flashing the Microcontroller first time
-
-For initial programming an AVR ISP adapter is needed to program the "Bootloader.hex" file.
-
-It is very important, that the Fuses of the AVR are programmed.
-
-Here an example how to program the bootloader using avrdude (using usbasp programmer):
-avrdude -c usbasp -p m32u4 -e -Ulock:w:0x3F:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xff:m
-avrdude -c usbasp -p m32u4 -U flash:w:BootLoader.hex
-
-After programming the file, disconnect and connect the device and a USB drive will show up. Copy the TestAndMeasurement.bin file to this USB drive - ideally using the command line. Example: `copy TestAndMeasurement.bin F:\FLASH.BIN`.
-On Linux, there is a bug with the LUFA mass storage that means it is required to use `dd if=TestAndMeasurement.bin of=/mnt/FLASH.BIN bs=512 conv=notrunc oflag=direct,sync`.
-
-When done, disconnect and connect USB again and you're ready to use it!
-
-## Updating the firmware at later stages
-
-To enter the boot loader at later stages for updates, short circuit the 2 pins of the ISP header, as shown in below picture for about 3 seconds:
-
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/BootLoaderEnterTrick.jpg" width="40%"/>
-
-Afterwards, a USB drive will show up and you can copy the firmware again to the device, as described in the previous section.
 
 # Using the device
 
@@ -213,7 +203,7 @@ To enter the mode to set the setting the indicator pulse command has to be send 
 
 To generate a indicator pulse (which blinks the LED of only the addressed USBTMC device), the following pyvisa snippet can be used (VM is the opened VISA ressource):
 
-VM.control_in(0xa1, 0x40, 0, 0, 1);
+VM.control_in(0xa1, 0x40, 0, 0);
 This makes the LED blink once, but also check, if the next command is a set parameter command, starting with '!' character.
 
 ## read termination method
@@ -226,7 +216,7 @@ The following read termination method options are available:
 If your device terminates with \r\n, select Option #2.
 
 To set these options execute (Pyvisa example):
-VM.control_in(0xa1, 0x40, 0, 0, 1)
+VM.control_in(0xa1, 0x40, 0, 0)
 VM.write('!01XX')
 
 for XX enter either:
@@ -237,11 +227,11 @@ for XX enter either:
 ## Automatic instrument identification readout
 
 To turn off the automatic instrument ID readout after power up, execute:
-VM.control_in(0xa1, 0x40, 0, 0, 1)
+VM.control_in(0xa1, 0x40, 0, 0)
 VM.write('!0001')
 
 To turn on the automatic instrument ID readout (this is the default behaviour of GPIBUSB), execute:
-VM.control_in(0xa1, 0x40, 0, 0, 1)
+VM.control_in(0xa1, 0x40, 0, 0)
 VM.write('!0000')
 
 After a power cycle the USB device VISA ressource name and USB serial number string will change, based on this setting
