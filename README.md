@@ -104,7 +104,7 @@ I printed so far 15 housings, without a single fail.
 
 ## REV 2
 
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UpcomingHWRevision.png" width="40%"/>
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="40%"/>
 
 The REV 2 housing is a lot smaller, but requires 2 screws.
 The housing is quite important to be able to connect and disconnect the board without breaking anything. It is key for mechanical stability of the adapter.
