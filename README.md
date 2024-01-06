@@ -83,8 +83,8 @@ The PCB can be ordered at nearly any PCB pool production service (e.g. 10 PCBs f
 ## Mounting the PCB
 
 The PCB is available in 2 revisions.
-- [REV 1](HW/REV1) is the most popularely used right now due to age. It has a USB Type-B connector and an L-shaped housing visible on a few photos of this page.
-- [REV 2](HW/REV2) has some improvements like beeing smaller, better fit and USB Type-C connector.
+- [REV 1](HW/REV1/README.md) is the most popularely used right now due to age. It has a USB Type-B connector and an L-shaped housing visible on a few photos of this page.
+- [REV 2](HW/REV2/README.md) has some improvements like beeing smaller, better fit and USB Type-C connector.
 
 Choose whatever you prefer. The software images, but also the external behavior is the same.
 
@@ -102,6 +102,9 @@ Take care, that you rotate the TOP part of the housing by 180 degrees, so that t
 Printing works fine, several iterations of the design were made to ensure good printability.
 I printed so far 15 housings, without a single fail.
 
+More information on this REV 1 can be found here: [REV 1](HW/REV1/README.md).
+Note, that also the programming/build instructions moved to this location.
+
 ## REV 2
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="40%"/>
@@ -109,6 +112,9 @@ I printed so far 15 housings, without a single fail.
 The REV 2 housing is a lot smaller, but requires 2 screws.
 The housing is quite important to be able to connect and disconnect the board without breaking anything. It is key for mechanical stability of the adapter.
 When operating the device without housing, take very well care when plugging in and out the board in case the GPIB connector has a very tight fit.
+
+Information on how to build it can be found in the HW/REV 2 folder: [REV 2](HW/REV2/README.md).
+Note, that also the programming/build instructions moved to this location.
 
 # Software
 
