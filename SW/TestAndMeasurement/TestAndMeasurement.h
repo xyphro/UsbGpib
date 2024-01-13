@@ -74,6 +74,8 @@
 
 		#define TMC_STATUS_SUCCESS                    0x01
 		#define TMC_STATUS_PENDING                    0x02
+		#define TMC_STATUS_INTERRUPT_IN_BUSY		  0x20
+
 		#define TMC_STATUS_FAILED                     0x80
 		#define TMC_STATUS_TRANSFER_NOT_IN_PROGRESS   0x81
 		#define TMC_STATUS_SPLIT_NOT_IN_PROGRESS      0x82
@@ -158,7 +160,7 @@
 
 	/* Function Prototypes: */
 		void SetupHardware(void);
-		void TMC_Task(void);
+		//void TMC_Task(void);
 		bool ReadTMCHeader(TMC_MessageHeader_t* const MessageHeader);
 		bool WriteTMCHeader(TMC_MessageHeader_t* const MessageHeader);
 
@@ -166,6 +168,12 @@
 		void EVENT_USB_Device_Disconnect(void);
 		void EVENT_USB_Device_ConfigurationChanged(void);
 		void EVENT_USB_Device_ControlRequest(void);
+		
+		void eeprom_update_if_changed(uint16_t addr, uint8_t value);
+		
+		void set_internal_response(uint8_t *pdat, uint8_t len);
+		
+		void Jump_To_Bootloader(void);
 
 #endif
 

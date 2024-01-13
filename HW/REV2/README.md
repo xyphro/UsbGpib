@@ -27,8 +27,13 @@ For initial programming an AVR ISP adapter is needed to program the "Bootloader.
 It is very important, that the Fuses of the AVR are programmed.
 
 Here an example how to program the bootloader using avrdude (using usbasp programmer):
-avrdude -c usbasp -p m32u4 -e -Ulock:w:0x3F:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xff:m
+avrdude -c usbasp -p m32u4 -e -Ulock:w:0xFF:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xde:m
 avrdude -c usbasp -p m32u4 -U flash:w:BootLoader.hex
+
+To program bootloader and application image at the same time using AvrDude, you can use this command:
+..\avrdude -c usbasp -p m32u4 -e -Ulock:w:0x3F:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xde:m -U flash:w:TestAndMeasurement.hex -U flash:w:BootLoader.hex
+
+Note, that some programmers use a quite high clock frequency on the programming interface. In case of failures try to decrease the SCK clock frequency!
 
 After programming the file, disconnect and connect the device and a USB drive will show up. Copy the TestAndMeasurement.bin file to this USB drive - ideally using the command line. Example: `copy TestAndMeasurement.bin F:\FLASH.BIN`.
 On Linux, there is a bug with the LUFA mass storage that means it is required to use `dd if=TestAndMeasurement.bin of=/mnt/FLASH.BIN bs=512 conv=notrunc oflag=direct,sync`.

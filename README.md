@@ -29,6 +29,16 @@ Some goals of the project were:
 
 All those goals are met.
 
+# 13th Januart '24 update
+
+New year, new update :-)
+
+I realized a user suggestion, which is a better human readable interface to the internal instrument settings.
+This also exposes new functionality, e.g. shortening of the visa ressource string, adjustable delayed application of AutoID featured, ...
+The read termination setting can now be set in a volatile way and also be read back.
+
+A slight issue sneaked in also and got fixed: After an instrument clear the next GPIB transfer timed out. Nobody found it so far though :-) But I fixed it.
+
 # 19th December '23 update
 
 Finally I made it - the new HW design is on this page. As I had to restructure the repository a bit it took quite a while.
@@ -194,50 +204,151 @@ As this converter implements the standard USBTMC Test and measurement class, you
 
 # Setting Parameters
 
-Since 26th April 2020 update, there is are additional options implemented to configure the behaviour of GPIBUSB.
+The firmware version from 13th January 2024 onwards has the ability for human readable text base configuration of several parameters.
+The previous methods are still supported, but won't be further documented. You can look them back in the history of this file.
 
-First of all, it turned out, that some old test equipment is not capable to support EOI generation when reading data. So GPIBUSB would not be capable to sense, when the instrument finished talking. This old test eqipment terminates talking by generating e.g. \n (line feed) or \r\n (CRLF) or \r as termination.
+The command parser is quite simpel. For that reason follow the exact syntax as shown below. 
+Don't add extra spaces or make other modifications or concatenate commands.
 
-To support those instruments an option to select the termination method is implemented - see section "read termination".
+## Read termination method
 
-Furthermore it is now possible to turn off the automatic readout of the instruments *IDN? or ID? response after power on. This mechanism works fine on most test equipments, but again there is test equipment, that does not support this, which would end up in generating a different VISA ressource name every time you power on.
-If this automatic ID readout is turned off, the VISA ressource name will be just generated based on the detected GPIB address and the USB serial number of GPIBUSB.
+While most GPIB interfaces use the hardware signal EOI to signal the end of a message, not all old equipment supports it. Some older instruments even don't have the EOI pin hardware wise wired and use \r or \n termination.
 
-All parameters are applied immediately after setting them and are stored in a non voltatile way in the EEProm of the microcontroller.
+The following commands are available:
 
-To enter the mode to set the setting the indicator pulse command has to be send to GPIBUSB followed by a textstring as explained below.
+### Set read termination to CR (\r):
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!term cr')
+```
+Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
 
-To generate a indicator pulse (which blinks the LED of only the addressed USBTMC device), the following pyvisa snippet can be used (VM is the opened VISA ressource):
+### Set read termination to LF (\n):
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!term lf')
+```
+Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
 
-VM.control_in(0xa1, 0x40, 0, 0, 1);
-This makes the LED blink once, but also check, if the next command is a set parameter command, starting with '!' character.
+### Set read termination to EOI only (default setting):
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!term eoi')
+```
+Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
 
-## read termination method
+### Save readtermination setting in eeprom (make them non-volatile)
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!term store')
+```
 
-The following read termination method options are available:
-- Option 0: (default): EOI only (the normal way GPIB works)
-- Option 1: EOI + \n (LF / line feed)
-- Option 2: EOI + \r (CR / carriage return)
+### Query current termination setting from device
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+print(dev.query('!term?'))
+```
+This returns a text string containing "lf", "cr" or "eoi"
 
-If your device terminates with \r\n, select Option #2.
 
-To set these options execute (Pyvisa example):
-VM.control_in(0xa1, 0x40, 0, 0, 1)
-VM.write('!01XX')
+## AutoID setting
 
-for XX enter either:
-- 00 for Option 0 (EOI only) => VM.write('!0100')
-- 01 for Option 1 (EOI and \n) => VM.write('!0101')
-- 02 for Option 2 (EOI and \r) => VM.write('!0102')
+Default wise the GPIB adapter tries during power on of the instrument to query using *IDN? or ID? commands the instrument name automatically.
+This is used to build the USB serial number, which finally gets part of the VISA ressource string.
 
-## Automatic instrument identification readout
+Not all instruments support this *IDN / ID? query. For this reason this feature can be turned off.
+The serial number will then be built based on the GPIB address of the instrument.
 
-To turn off the automatic instrument ID readout after power up, execute:
-VM.control_in(0xa1, 0x40, 0, 0, 1)
-VM.write('!0001')
+### Turn AutoID feature off
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!autoid off')
+```
+This setting is stored in eeprom = non volatile memory, so will survive a power cycle
 
-To turn on the automatic instrument ID readout (this is the default behaviour of GPIBUSB), execute:
-VM.control_in(0xa1, 0x40, 0, 0, 1)
-VM.write('!0000')
+### turn AutoID feature on
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!autoid on')
+```
+This setting is stored in eeprom = non volatile memory, so will survive a power cycle
 
-After a power cycle the USB device VISA ressource name and USB serial number string will change, based on this setting
+### turn auto ID on with delay
+
+Some instruments need after turn on some seconds before GPIB is responsive.
+
+With below 3 settings you can set a delay which is applied before the instrument ID is queried after power on.
+Note that it will take then also more time, before the USB device is recognized by the PC.
+
+Also this setting is non-volatile.
+
+Delay 5 seconds:
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!autoid slow')
+```
+
+Delay 15 seconds:
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!autoid slower')
+```
+
+Delay 30 seconds:
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!autoid slowest')
+```
+
+### read autoid setting
+
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # 
+print(dev.query('!autoid?'))
+```
+Returns as text string either: "off", "on", "slow", "slower" or "slowest".
+
+## Firmware version
+
+Finally I implemented a command to query the USB adapters firmware version :-)
+
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+print(dev.query('!ver?'))
+```
+
+## Shorten ressource strings (Matlab)
+
+A user discovered that Matlab has a limitation in the VISA ressource string length and shared a pull request to reduce the length.
+I expose this now first time in the baseline firmware with the following options.
+
+This setting is stored in eeprom = non volatile.
+
+### Limit the USB serial number to a length of 20 characters
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!string short')
+```
+
+### disable limitation of USB serial number length (default behavior)
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+dev.write('!string normal')
+```
+
+### query the string length setting.
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
+print(dev.query('!string?'))
+```
+
+This returns as text string either "normal" or "short".
+
+## reset the adapter
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1); 
+dev.write('!reset')
+```
+
+Do a reset of the adapter. Note that due to the reset you have to close the visa session and start a new one.
+

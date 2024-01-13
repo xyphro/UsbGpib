@@ -11,6 +11,7 @@ extern bool gpib_timedout; /* TRUE, if a writedat transfer timed out */
 
 /* check, if a GPIB device is physically connected or not*/
 bool gpib_is_connected(void);
+bool gpib_is_connected_twice(void);
 
 void gpib_init(void); /* init gpib, do remote enable and send clear interface instruction */
 void gpib_interface_clear(void);
@@ -30,6 +31,7 @@ bool gpib_ATN_HIGH(void);
 uint8_t gpib_search(void);
 
 void gpib_set_readtermination(char terminator);
+char gpib_get_readtermination(void);
 
 /* selective device clear */
 bool gpib_sdc(uint8_t addr, gpibtimeout_t ptimeoutfunc);
@@ -47,5 +49,6 @@ bool gpib_gotoLocal(uint8_t addr, gpibtimeout_t ptimeoutfunc);
 bool gpib_trigger(uint8_t addr, gpibtimeout_t ptimeoutfunc);
 
 
+#include "gpib_priv.h" 
 
 #endif /* INCFILE1_H_ */

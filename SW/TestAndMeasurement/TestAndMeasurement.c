@@ -31,8 +31,12 @@
 #include "TestAndMeasurement.h"
 #include "gpib.h"
 #include <avr/eeprom.h>
+#include "global.h"
+#include "miniparser.h"
 
 #define LED(s) {if(s) PORTF |= (1<<5); else PORTF &= ~(1<<5);}
+
+static inline void TMC_Task(void);
 
 /** Contains the (usually static) capabilities of the TMC device. This table is requested by the
  *  host upon enumeration to give it information on what features of the Test and Measurement USB
@@ -67,7 +71,7 @@ TMC_Capabilities_t Capabilities =
 			},
 		.USB488IfCap2 = // device capabilities
 			{
-				.DT1Capable                 = 1,//0 => Device trigger no capability / full capability		=> send *TRG command
+				.DT1Capable                 = 1,//0 => Device trigger no capability / full capability
 				.RL1Capable					= 1,//0 => Remote Local   no capability / full capability
 				.SR1Capable					= 1,//0 => service request 
 				.MandatorySCPI				= 0,//0
@@ -88,10 +92,26 @@ static bool IsTMCBulkOUTReset = false;
 /** Flag that a selective device clear should be executed */
 static bool handleSDC = false;
 
+/** Flag that a local lockout should be executed */
+static bool handleLocalLockout = false;
+
+/** Flag that a goto local should be executed */
+static bool handleGoToLocal = false;
+
+/** Flag that a ReadStatusByte should be executed */
+static bool    handleReadStatusByte = false;
+static uint8_t handleReadStatusByte_btagvalue = 0;
+
 /** Flag that a status byte should be read */
 static bool handleRSTB = false;
 static uint8_t RSTB_btag;
 static uint8_t RSTB_status;
+
+/** a global flag to indicate that a gpib write transfer triggered via usb is active
+  * This is required to solve a prevent read status byte triggered by control transfers to
+  * result in unsynchronized GPIB transfers.
+  */
+bool gpib_write_is_busy = false;
 
 /** Last used tag value for data transfers */
 static uint8_t CurrentTransferTag = 0;
@@ -99,16 +119,34 @@ static uint8_t CurrentTransferTag = 0;
 /** Length of last data transfer, for reporting to the host in case an in-progress transfer is aborted */
 static uint16_t LastTransferLength = 0;
 
-/** Buffer to hold the next message to sent to the TMC host */
-static uint8_t NextResponseBuffer[64];
-
 /** This will be set true after a indicator pulse command is received. If the next GPIB command starts with '!', a parameter has to be set */
 static bool s_nextwrite_mightbeparameterset = false;
-
 
 static uint32_t s_remaining_bytes_receive=0;
 
 static uint8_t gpib_addr = 1;
+
+/** This readbuffer is used to buffer GPIB read data.
+ *  As the message header in USBTMC indicates how much data is read and the instrument
+ *  does not tell us over GPIB how much data it is, we have to buffer it in ram
+ *  if the data transfer over USB should be efficient.
+ * The size is decreased by 12 because this is the TMC header length for the first Bulk packate.
+ * It is not necessary to substract it, but it does not make sense performance wise.
+ */
+static uint8_t readbuffer[1024 - 12];
+
+/**
+ * When SRQ is asserted the status byte is automatically read and transfered as interrupt transfer to Host.
+ * However, the Host Visa might not have events enabled and then a status byte can be lost.
+ * The Visa will for that reason issue normally after that interrupt transfer a control in transfer to read
+ * the status byte again. Or this is issued manually by the application.
+ * The below byte is ored during control transfer to the status byte and then cleared after read to ensure
+ * that no data is lost.
+ */
+static uint8_t srq_statusbyte = 0x00;
+
+
+static volatile bool transfer_busy = false;
 
 /*
 #define FLASH_SIZE_BYTES         32768
@@ -128,6 +166,11 @@ void Bootloader_Jump_Check(void)
     }
 }
 */
+
+/* Buffer for responses from internal command queries*/
+uint8_t internal_response_buffer_rpos = 0;
+uint8_t internal_response_buffer_len = 0;
+uint8_t internal_response_buffer[8];
 
 void Jump_To_Bootloader(void)
 {
@@ -151,9 +194,8 @@ void Jump_To_Bootloader(void)
 /** Main program entry point. This routine contains the overall program flow, including initial
  *  setup of all components and the main program loop.
  */
- 
+
 uint32_t cnt=0;
-int dbg = 0;
 
 bool tmc_gpib_write_timedout(void)
 {
@@ -163,7 +205,7 @@ bool tmc_gpib_write_timedout(void)
 
 bool tmc_gpib_read_timedout(void)
 {
-	USB_USBTask();
+	USB_USBTask(); /* it is safe to handle the gpib read timeout during usb read transfers - readstatusbyte cannot cause a race condition here */
 	return IsTMCBulkINReset | IsTMCBulkOUTReset;
 }
 
@@ -358,7 +400,7 @@ static void TMC_SetInternalSerial(bool addGPIBAddress)
 	SetGlobalInterruptMask(CurrentGlobalInt);
 }
 
-void check_bootloaderEntry(void)
+static inline void check_bootloaderEntry(void)
 {
 	if ( !(PINB & (1<<2)) ) /* check if PB2 is LOW*/
 	{
@@ -397,7 +439,6 @@ int main(void)
 	eeprom_busy_wait();	
 	gpib_set_readtermination(eeprom_read_byte((const uint8_t *)105));
 	
-	
 	//LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
 	GlobalInterruptEnable();
 	
@@ -410,7 +451,23 @@ int main(void)
 		check_bootloaderEntry();
 	}
 	
+	uint8_t autoid = eeprom_read_byte((const uint8_t *)104);
+	if ( (autoid >= 0x02) && (autoid <= 0x04) ) // check if SLOW AUTOID mode is activated
+	{ // yes, it is active, so wait 10 seconds
+		uint8_t seconds;
+		seconds = 5;
+		if (autoid == 0x03)
+			seconds = 15;
+		if (autoid == 0x04)
+			seconds = 30;
+		for (uint8_t i=0; i<seconds; i++)
+		{
+			Delay_MS(1000);
+		}
+	}
+	
 	/* physically GPIB is connected, now check if any GPIB address is responsive */
+#ifndef SPEEDTEST_DUMMY_DEVICE
 	while (!findGpibdevice())
 	{
 		_delay_ms(100);
@@ -419,16 +476,21 @@ int main(void)
 		LED(0);
 		if (!gpib_is_connected()) /* we want to reset here if the device is unplugged */
 		{
-			LED(0);
+			LED(0);	
+			
 			_delay_ms(500);
 			wdt_enable(WDTO_250MS);	
 			while (1);
 		}
 		check_bootloaderEntry();
 	}; /* Identify the GPIB Address of the connected GPIB device */
-	
+#endif
 	eeprom_busy_wait();
-	if (eeprom_read_byte((const uint8_t *)104) != 0x01)
+#ifdef SPEEDTEST_DUMMY_DEVICE	
+	if ( false )
+#else
+	if (autoid != 0x01) // check if AUTOID feature is enabled
+#endif
 	{
 		/* found a responsive GPIB address, now setup USB descriptor with *IDN? or ID? command response */
 		eeprom_busy_wait();
@@ -468,6 +530,19 @@ int main(void)
 		_delay_ms(100);
 		gpib_ren(true);
 	}
+	
+	/* if activated: shorten the USB serial number string. This is just for Matlab which does not allow ressource strings to be longer than */
+	if (eeprom_read_byte((const uint8_t *)106) == 0x01) // check if serial string shortening is on
+	{
+		uint16_t len;
+		
+		len = (tmc_serial_string.Header.Size - sizeof(USB_Descriptor_Header_t)) >> 1;
+		if (len > 20)
+		{
+			len = 20;
+			tmc_serial_string.Header.Size = len*2 + sizeof(USB_Descriptor_Header_t);
+		}
+	}
 
 	/* all fine, now kickoff connect to USB to be able to communicate! */
 	LED(1);
@@ -475,8 +550,7 @@ int main(void)
 	
 	for (;;)
 	{
-		TMC_Task();
-		
+		TMC_Task(); // this task is 9.42us active when nothing is triggered, the rest takes 3.3us
 		check_bootloaderEntry();
 		
 		if (!gpib_is_connected()) /* check, if gpib is disconnected */
@@ -543,8 +617,8 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 
 	/* Setup TMC In, Out and Notification Endpoints */
 	ConfigSuccess &= Endpoint_ConfigureEndpoint(TMC_NOTIFICATION_EPADDR, EP_TYPE_INTERRUPT, TMC_NOTIFICATION_EPSIZE, 1);
-	ConfigSuccess &= Endpoint_ConfigureEndpoint(TMC_IN_EPADDR,  EP_TYPE_BULK, TMC_IO_EPSIZE, 1);
-	ConfigSuccess &= Endpoint_ConfigureEndpoint(TMC_OUT_EPADDR, EP_TYPE_BULK, TMC_IO_EPSIZE, 1);
+	ConfigSuccess &= Endpoint_ConfigureEndpoint(TMC_IN_EPADDR,  EP_TYPE_BULK, TMC_IO_EPSIZE, 2 );
+	ConfigSuccess &= Endpoint_ConfigureEndpoint(TMC_OUT_EPADDR, EP_TYPE_BULK, TMC_IO_EPSIZE, 2 );
 }
 
 void TMC_resetstates(void);
@@ -553,11 +627,41 @@ void TMC_resetstates(void);
  *  the device from the USB host before passing along unhandled control requests to the library for processing
  *  internally.
  */
+
+void handle_control_Req_ReadStatusByte(void)
+{
+	uint8_t btag, statusReg;
+	uint8_t PrevEndpoint = Endpoint_GetCurrentEndpoint();
+
+	Endpoint_SelectEndpoint(ENDPOINT_CONTROLEP);
+	btag = handleReadStatusByte_btagvalue;
+
+	gpib_ren(1); /* ensure that remote control is enabled */
+	timeout_start(150000); /* 1.5s timeout*/
+	statusReg =  gpib_readStatusByte(gpib_addr, is_timedout);
+	statusReg |= srq_statusbyte; // or previously read autoread status byte (Visa will issue a read status byte after receiving a SRQ interrupt transfer)
+	srq_statusbyte = 0x00; // clear previously read autoread status byte
+	
+	/* Write the request response byte */
+	Endpoint_Write_8(TMC_STATUS_SUCCESS);
+	Endpoint_Write_8(btag);
+	Endpoint_Write_8(statusReg);
+	
+	/* prepare interrupt response */
+	RSTB_btag = btag;
+	RSTB_status = statusReg;
+	handleRSTB = true;
+
+	Endpoint_ClearIN();
+	Endpoint_ClearStatusStage();
+	
+	handleReadStatusByte = false; /* no matter what - we can cancel the pending transfer handling */
+	Endpoint_SelectEndpoint(PrevEndpoint);
+}
+
 void EVENT_USB_Device_ControlRequest(void)
 {
-	uint8_t TMCRequestStatus = TMC_STATUS_SUCCESS;
-	uint8_t btag, statusReg;
-	
+	uint8_t TMCRequestStatus = TMC_STATUS_SUCCESS;	
 	
 	if ( ((USB_ControlRequest.wIndex == INTERFACE_ID_TestAndMeasurement) && ((USB_ControlRequest.bmRequestType & REQREC_INTERFACE)!=0)) ||
 	     (((USB_ControlRequest.wIndex == TMC_IN_EPADDR) || (USB_ControlRequest.wIndex == TMC_OUT_EPADDR)) && ((USB_ControlRequest.bmRequestType & REQREC_ENDPOINT)!=0))     )
@@ -566,26 +670,17 @@ void EVENT_USB_Device_ControlRequest(void)
 		switch (USB_ControlRequest.bRequest)
 		{
 			case Req_ReadStatusByte:
-				btag = USB_ControlRequest.wValue;
-
-				gpib_ren(1); /* ensure that remote control is enabled */
-				timeout_start(50000); /* 0.5s timeout*/
-				statusReg =  gpib_readStatusByte(gpib_addr, is_timedout);
 				Endpoint_ClearSETUP();
-
-				
-				/* Write the request response byte */
-				Endpoint_Write_8(TMC_STATUS_SUCCESS);
-				Endpoint_Write_8(btag);
-				Endpoint_Write_8(statusReg);
-				
-				/* prepare interrupt response*/
-				RSTB_btag = btag;
-				RSTB_status = statusReg;
-				handleRSTB = true;
-
-				Endpoint_ClearIN();
-				Endpoint_ClearStatusStage();
+				handleReadStatusByte_btagvalue = USB_ControlRequest.wValue;
+				if ( !gpib_write_is_busy )
+				{ /* no write transfer active, thus handle the request immediately */
+					handle_control_Req_ReadStatusByte();
+				}
+				else
+				{ /* a USB triggered GPIB write transfer is active. Mark the handling of this request for later */
+					handleReadStatusByte = true;
+				}
+			
 				break;
 			case Req_InitiateAbortBulkOut:
 				if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_ENDPOINT))
@@ -607,14 +702,12 @@ void EVENT_USB_Device_ControlRequest(void)
 						/* Save the split request for later checking when a new request is received */
 						RequestInProgress = Req_InitiateAbortBulkOut;
 					}
-IsTMCBulkOUTReset = true;
+					IsTMCBulkOUTReset = true;
 					
-
 					Endpoint_ClearSETUP();
-
+					
 					/* Write the request response byte */
 					Endpoint_Write_8(TMCRequestStatus);
-
 					Endpoint_ClearIN();
 					Endpoint_ClearStatusStage();
 				}
@@ -701,8 +794,10 @@ IsTMCBulkOUTReset = true;
 
 				break;
 			case Req_InitiateClear:
+			
 				if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE))
 				{
+					Endpoint_ClearSETUP();
 					/* Check that no split transaction is already in progress */
 					if (RequestInProgress != 0)
 					{
@@ -715,12 +810,10 @@ IsTMCBulkOUTReset = true;
 						IsTMCBulkOUTReset = true;
 						handleSDC = true; // trigger handling of SDC command to device
 						
-
 						/* Save the split request for later checking when a new request is received */
 						RequestInProgress = Req_InitiateClear;
 					}
 
-					Endpoint_ClearSETUP();
 
 					/* Write the request response byte */
 					Endpoint_Write_8(TMCRequestStatus);
@@ -796,9 +889,9 @@ IsTMCBulkOUTReset = true;
 				Endpoint_ClearIN();
 				Endpoint_ClearStatusStage();
 				break;
+				
 			case Req_LocalLockout:
-				timeout_start(50000); /* 0.5s timeout*/
-				gpib_localLockout(is_timedout);
+				handleLocalLockout = true; // trigger handling of local lockout within TMC_TASK
 				
 				Endpoint_ClearSETUP();
 				/* USBTMC Status response (1 Byte) */
@@ -806,10 +899,10 @@ IsTMCBulkOUTReset = true;
 				Endpoint_ClearIN();
 				Endpoint_ClearStatusStage();
 				break;
-			case Req_GoToLocal:
-				timeout_start(50000); /* 0.5s timeout*/
-				gpib_gotoLocal(gpib_addr, is_timedout);
 				
+			case Req_GoToLocal:
+				handleGoToLocal = true; // trigger handling of local lockout within TMC_TASK
+
 				Endpoint_ClearSETUP();
 				/* USBTMC Status response (1 Byte) */
 				Endpoint_Write_8(TMC_STATUS_SUCCESS);
@@ -832,6 +925,18 @@ static uint8_t charToval(char c)
 		val = c-'A'+10;
 	return val;
 }
+
+void set_internal_response(uint8_t *pdat, uint8_t len)
+{
+	if (len < sizeof(internal_response_buffer))
+	{
+		memcpy(internal_response_buffer, pdat, len);
+		internal_response_buffer_len = len;
+		internal_response_buffer_rpos = 0;
+	}
+}
+
+
 /*
 Process an internal command. This is triggered, if a indicator pulse command was received, followed
 by a write of a command starting with an exclamation mark (!).
@@ -847,53 +952,40 @@ XX = index (hex) 00 for GPIB automatic dection:
 					0x01         => EOI or '\n' (LF = linefeed)
 					0x02         => EOI or '\r' (CR = carriage return)
 */
-void ProcessInternalCommand(uint8_t* const Data, uint8_t Length)
+void ProcessInternalCommand(uint8_t Length)
 {
-	uint8_t xx, yy;
+	bool cmd_executed;
+
+	// clear any old response
+	internal_response_buffer_len = 0;
+	internal_response_buffer_rpos = 0; 
 	
-	xx = charToval(Data[1])*16 + charToval(Data[2]);
-	yy = charToval(Data[3])*16 + charToval(Data[4]);
-	
-	switch (xx)
+	parser_reset();
+	cmd_executed = false;
+	while ( (Length--) && (!cmd_executed) )
 	{
-		case 0x00: /* automatic detection y */
-			eeprom_update_if_changed(104, yy);
-			break;
-		case 0x01: /* select termination method */
-			switch (yy)
-			{
-				case 0x01: /* \n */
-					eeprom_update_if_changed(105, '\n');
-					gpib_set_readtermination('\n');
-					break;
-				case 0x02: /* \r */
-					eeprom_update_if_changed(105, '\r');
-					gpib_set_readtermination('\r');
-					break;
-				default:
-					eeprom_update_if_changed(105, '\0');
-					gpib_set_readtermination('\0');
-					break;
-			}
-			break;
+		uint8_t dat = Endpoint_Read_8();
+		cmd_executed = parser_add( dat );
 	}
 }
 
-void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfer, bool isLastTransfer, gpibtimeout_t ptimeoutfunc)
+void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfer, bool isLastTransfer, bool sendEom, gpibtimeout_t ptimeoutfunc)
 {
-	uint8_t i, dat;
+	uint8_t dat;
 	bool timedout, isinternalcommand;
 	
+	gpib_write_is_busy = true; /* required to handle read status byte synchronization issue */
+	timedout = false;
 	
-	/* check, if this is an internal command */ 
-	isinternalcommand = isFirstTransfer && isFirstTransfer && s_nextwrite_mightbeparameterset && (Data[0] == '!');
+	dat = Endpoint_Read_8();
+	/* check, if this is an internal command (=sidechannel for configuration settings )*/ 
+	isinternalcommand = isFirstTransfer && s_nextwrite_mightbeparameterset && (dat == '!');
 	if (isinternalcommand)
 	{
-		ProcessInternalCommand(Data, Length);
+		ProcessInternalCommand(Length);
 	}
 	else
 	{
-		timedout = false;
 		
 		gpib_ren(1); /* ensure that remote control is enabled */
 		
@@ -901,12 +993,28 @@ void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfe
 		if (isFirstTransfer)
 			timedout = gpib_make_listener(gpib_addr, ptimeoutfunc);
 			
-		i = 0;
+		if (handleReadStatusByte && !timedout)
+		{
+			gpib_untalk_unlisten(ptimeoutfunc);
+			handle_control_Req_ReadStatusByte();
+			timedout = gpib_make_listener(gpib_addr, ptimeoutfunc);
+		}
+
 		while ( (Length > 0) && !timedout)
 		{
+			if (handleReadStatusByte)
+			{
+				gpib_untalk_unlisten(ptimeoutfunc);
+				handle_control_Req_ReadStatusByte();
+				timedout = gpib_make_listener(gpib_addr, ptimeoutfunc);
+			}
 			Length--;
-			dat = Data[i++];
-			timedout = gpib_writedat(dat, (Length == 0)  && isLastTransfer, ptimeoutfunc);
+			timedout = gpib_writedat_quick(dat, (Length == 0)  && sendEom, ptimeoutfunc, false);
+			if (Length > 0)
+			{
+				dat = Endpoint_Read_8();
+			}
+			
 		}
 		
 		if (isLastTransfer && !timedout) /* in case of timeout the interface is cleared within the writedat function, no need to untalk!*/
@@ -914,11 +1022,22 @@ void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfe
 		LED(1);
 	}
 	s_nextwrite_mightbeparameterset = false;
+	gpib_write_is_busy = !isLastTransfer; /* required to handle read status byte synchronization issue */
+	
+	if (handleReadStatusByte && !timedout)
+	{
+		if (!(isLastTransfer && !timedout))
+			gpib_untalk_unlisten(ptimeoutfunc);
+		handle_control_Req_ReadStatusByte();
+		if (!(isLastTransfer && !timedout))
+			timedout = gpib_make_listener(gpib_addr, ptimeoutfunc);
+	}	
 }
 
-uint8_t GetNextMessage(uint8_t* const Data, uint8_t maxlen, bool isFirstMessage, bool *pisLastMessage, gpibtimeout_t ptimeoutfunc)
+uint16_t GetNextMessage(uint8_t* const Data, uint16_t maxlen, bool isFirstMessage, bool *pisLastMessage, gpibtimeout_t ptimeoutfunc)
 {
-	uint8_t c, i;
+	uint8_t c;
+	uint16_t i;
 	bool    Eoi, timedout;
 	
 	gpib_ren(1); /* ensure that remote control is enabled */
@@ -926,8 +1045,10 @@ uint8_t GetNextMessage(uint8_t* const Data, uint8_t maxlen, bool isFirstMessage,
 	LED(0);	
 	
 	timedout = false;
+#ifndef SPEEDTEST_DUMMY_DEVICE
 	if (isFirstMessage)
 		timedout = gpib_make_talker(gpib_addr, ptimeoutfunc);
+#endif
 
 	i = 0;
 	Eoi = false;
@@ -935,19 +1056,18 @@ uint8_t GetNextMessage(uint8_t* const Data, uint8_t maxlen, bool isFirstMessage,
 	while (!Eoi && (i < maxlen) && !timedout)
 	{
 	
-		c = gpib_readdat(&Eoi, &timedout, ptimeoutfunc); 
-		if (!timedout)
-			NextResponseBuffer[i++] = c;
+		c = gpib_readdat_quick(&Eoi, &timedout, ptimeoutfunc, false); 
+		Data[i++] = c;
 	}
 		
+#ifndef SPEEDTEST_DUMMY_DEVICE
 	if (Eoi && !timedout) /* in case of timeout, no need to unlisten => interface clear done in readdat function! */
 		gpib_untalk_unlisten(ptimeoutfunc);
+#endif
 
 	if (timedout) /* in case of timedout, simulate an end of message */
 		Eoi = true;
 	*pisLastMessage = Eoi;
-	
-	memcpy((char*)Data, (char*)NextResponseBuffer, i);
 	
 	LED(1);
 
@@ -960,15 +1080,58 @@ bool TMC_InLastMessageComplete = true;
 
 void TMC_resetstates(void)
 {
+	internal_response_buffer_len = 0;
+	handleGoToLocal = false;
+	handleSDC = false;
+	handleLocalLockout = false;
+	handleReadStatusByte = false;
 	TMC_LastMessageComplete = true;
 	TMC_InLastMessageComplete = true;
 	s_remaining_bytes_receive = 0;
-	gpib_interface_clear();
+	gpib_interface_clear(); 
 //	gpib_untalk_unlisten();
 }
 
+/** Speed optimized of Lufa Endpoint_Write_Stream_LE function (it was 1.5 times slower than this one) */
+static inline uint8_t Endpoint_Write_Stream_LE_quick(const void* const Buffer,
+                            uint16_t Length,
+                            uint8_t firstchunksize, uint8_t chunksize)
+{
+	uint8_t* DataStream      = ((uint8_t*)Buffer);
+	uint8_t  ErrorCode;
+	uint16_t chunklength = firstchunksize;
+
+	if ((ErrorCode = Endpoint_WaitUntilReady()))
+	  return ErrorCode;
+
+	while (Length)
+	{
+		if (!(Endpoint_IsReadWriteAllowed()))
+		{
+			Endpoint_ClearIN();
+
+			#if !defined(INTERRUPT_CONTROL_ENDPOINT)
+			//USB_USBTask();
+			#endif
+
+			if ((ErrorCode = Endpoint_WaitUntilReady()))
+			  return ErrorCode;
+		}
+		else
+		{
+			if (chunklength > Length)
+				chunklength = Length;
+			Length -= chunklength;
+			while (chunklength--)
+				Endpoint_Write_8(*DataStream++);
+			chunklength = chunksize;
+		}
+	}
+	return ENDPOINT_RWSTREAM_NoError;
+}
+
 /** Function to manage TMC data transmission and reception to and from the host. */
-void TMC_Task(void)
+static inline void TMC_Task(void)
 {
 	bool lastmessage;
 	/* Device must be connected and configured for the task to run */
@@ -977,17 +1140,58 @@ void TMC_Task(void)
 
 	TMC_MessageHeader_t MessageHeader;
 	uint8_t             MessagePayload[128], curlen;
+	uint16_t            curlen16;
 	
 	
-
 	if (s_remaining_bytes_receive == 0)
 	{
-	
+		/* handle service request (SRQ line goes down) */
+		if (gpib_is_srq_active())
+		{ /* SRQ is now and we are outside of a GPIB transfer here. So: Handle it by reading status byte and push it over the interrupt channel! */
+			uint8_t statusReg;
+			uint8_t notdata[2];
+			timeout_start(50000); /* 0.5s timeout*/
+			statusReg =  gpib_readStatusByte(gpib_addr, is_timedout) | 0x40;
+			srq_statusbyte |= (statusReg & ~0x40);
+			notdata[0] = 0x80 | 0x01;
+			notdata[1] = statusReg;
+			Endpoint_SelectEndpoint(TMC_NOTIFICATION_EPADDR);
+			while ( Endpoint_Write_Stream_LE(notdata, sizeof(notdata), NULL) ==
+					ENDPOINT_RWSTREAM_IncompleteTransfer)
+			{
+				if (IsTMCBulkINReset)
+				  break;
+			}
+			Endpoint_ClearIN();		
+		}
+
+		/* handle actions triggered by control transfer in a synchronous manner here */
+		if (handleSDC)
+		{
+			gpib_ren(1); /* ensure that remote control is enabled */
+			timeout_start(50000); /* 0.5s timeout*/
+			gpib_sdc(gpib_addr, is_timedout);
+			handleSDC = false;
+		}
+		
+		if (handleLocalLockout)
+		{
+			timeout_start(50000); /* 0.5s timeout*/
+			gpib_localLockout(is_timedout);
+			handleLocalLockout = false;
+		}
+		
+		if (handleGoToLocal)
+		{
+			timeout_start(50000); /* 0.5s timeout*/
+			gpib_gotoLocal(gpib_addr, is_timedout);
+			handleGoToLocal = false;
+		}
+		
+
 		/* Try to read in a TMC message from the interface, process if one is available */
 		if (ReadTMCHeader(&MessageHeader))
 		{
-		dbg++;
-		
 			/* Indicate busy */
 			//LEDs_SetAllLEDs(LEDMASK_USB_BUSY);
 
@@ -1002,21 +1206,13 @@ void TMC_Task(void)
 				case TMC_MESSAGEID_DEV_DEP_MSG_OUT:
 					s_remaining_bytes_receive = MessageHeader.TransferSize;
 					
-					LastTransferLength = 0;
 					curlen = MIN(TMC_IO_EPSIZE-sizeof(TMC_MessageHeader_t), MessageHeader.TransferSize);
-					//
-					while (Endpoint_Read_Stream_LE(MessagePayload, curlen, &LastTransferLength) ==
-						   ENDPOINT_RWSTREAM_IncompleteTransfer)
-					{
-						if (IsTMCBulkOUTReset)
-						  break;
-					}					
-					
+
 					s_remaining_bytes_receive -= curlen;
 					
 					TMC_eom = (MessageHeader.MessageIDSpecific.DeviceOUT.LastMessageTransaction != 0);
-					lastmessage =  TMC_eom && (s_remaining_bytes_receive==0);
-					ProcessSentMessage(MessagePayload, curlen, TMC_LastMessageComplete, lastmessage, tmc_gpib_write_timedout);
+					lastmessage =  (s_remaining_bytes_receive==0);
+					ProcessSentMessage(MessagePayload, curlen, TMC_LastMessageComplete, lastmessage, TMC_eom && lastmessage, tmc_gpib_write_timedout);
 					
 					/* Select the Data Out endpoint, this has to be done because the timeout function cal select the control endpoint */
 					Endpoint_SelectEndpoint(TMC_OUT_EPADDR);
@@ -1026,34 +1222,60 @@ void TMC_Task(void)
 					break;
 				case TMC_MESSAGEID_DEV_DEP_MSG_IN:
 					Endpoint_ClearOUT();
-					curlen = MIN(TMC_IO_EPSIZE-sizeof(TMC_MessageHeader_t) -1, MessageHeader.TransferSize);
-					MessageHeader.TransferSize = GetNextMessage(MessagePayload, curlen, TMC_InLastMessageComplete, &lastmessage, tmc_gpib_read_timedout);
-					TMC_InLastMessageComplete = lastmessage;
 					
+					curlen16 = sizeof(readbuffer);// -1;
+					if (curlen16 > MessageHeader.TransferSize)
+						curlen16 = MessageHeader.TransferSize;
+					
+					/* Check if a response from an internal query is in the buffer */
+					if (internal_response_buffer_len) 
+					{ // internal response present
+						// Add response to buffers... This might look too complicated, but handles also partial reads properly (e.g. responses could be read byte by byte)
+						curlen16 = internal_response_buffer_len-internal_response_buffer_rpos; // count of unsent bytes from internal response buffer
+						if (curlen16 > MessageHeader.TransferSize)
+							curlen16 = MessageHeader.TransferSize;
+						
+						MessageHeader.TransferSize = curlen16;
+						memcpy(readbuffer, &(internal_response_buffer[internal_response_buffer_rpos]), curlen16);
+						
+						internal_response_buffer_rpos += curlen16;
+						lastmessage = (internal_response_buffer_rpos >= internal_response_buffer_len);
+						if (lastmessage)
+						{
+							internal_response_buffer_len = 0; // Mark internal response as "sent"
+							internal_response_buffer_rpos = 0;
+						}
+					}
+					else
+					{ // no internal response present, read from device!
+						MessageHeader.TransferSize = GetNextMessage(readbuffer, curlen16, TMC_InLastMessageComplete, &lastmessage, tmc_gpib_read_timedout);
+					}
+					TMC_InLastMessageComplete = lastmessage;
+
 					MessageHeader.MessageIDSpecific.DeviceOUT.LastMessageTransaction = lastmessage;
 					if (!IsTMCBulkINReset)
 						WriteTMCHeader(&MessageHeader);					
-					
-					LastTransferLength = 0;
+
 					if (!IsTMCBulkINReset)
 					{
-						while (Endpoint_Write_Stream_LE(MessagePayload, MessageHeader.TransferSize, &LastTransferLength) ==
-							   ENDPOINT_RWSTREAM_IncompleteTransfer)
-						{
-							if (IsTMCBulkINReset)
-							  break;
-						}
+						Endpoint_Write_Stream_LE_quick(readbuffer, MessageHeader.TransferSize, TMC_IO_EPSIZE-sizeof(TMC_MessageHeader_t), TMC_IO_EPSIZE);
 					}
-
+					
 					/* Also in case of a timeout, the host does not expire a Bulk IN IRP, so we still need to commit an empty endpoint to retire the IRP */
 					Endpoint_SelectEndpoint(TMC_IN_EPADDR);
 					Endpoint_ClearIN();
+
+					/* commit zero length package in case the last package was exactly the size of the endpoint (Lufa does not handle this) */
+					if ( ((MessageHeader.TransferSize + sizeof(TMC_MessageHeader_t)) & (TMC_IO_EPSIZE-1)) == 0)
+					{ 
+						Endpoint_WaitUntilReady(); // wait until an endpoint buffer got free
+						Endpoint_ClearIN();
+					}
 					
 					if (IsTMCBulkINReset)
 					{
 						TMC_resetstates();
 					}
-
 					
 					break;
 				default:
@@ -1064,7 +1286,6 @@ void TMC_Task(void)
 	}
 	else
 	{ /* receiving further bytes to be sent over GPIB */
-	
 			/* Select the Data Out endpoint */
 		Endpoint_SelectEndpoint(TMC_OUT_EPADDR);
 
@@ -1079,62 +1300,63 @@ void TMC_Task(void)
 				curlen = s_remaining_bytes_receive;
 			}
 			
-			//
-			while (Endpoint_Read_Stream_LE(MessagePayload, curlen, &LastTransferLength) ==
-				   ENDPOINT_RWSTREAM_IncompleteTransfer)
-			{
-				if (IsTMCBulkOUTReset)
-				  break;
-			}
 			s_remaining_bytes_receive -= curlen;
 
-			Endpoint_ClearOUT();
 			
-			lastmessage = TMC_eom && (s_remaining_bytes_receive==0);
+			lastmessage = (s_remaining_bytes_receive==0);
 			TMC_LastMessageComplete = lastmessage;
-			ProcessSentMessage(MessagePayload, curlen, false, lastmessage, tmc_gpib_write_timedout);
+			ProcessSentMessage(MessagePayload, curlen, false, lastmessage, TMC_eom && lastmessage, tmc_gpib_write_timedout);
+			Endpoint_ClearOUT();
 		}
-	}
-	
-	if (handleSDC)
-	{
-		gpib_ren(1); /* ensure that remote control is enabled */
-		timeout_start(50000); /* 0.5s timeout*/
-		gpib_sdc(gpib_addr, is_timedout);
-
-		handleSDC = false;
 	}
 	
 	if (handleRSTB)
 	{
-		uint8_t  ErrorCode;
-		uint16_t BytesTransferred;
 		uint8_t  notdata[2];
 		
 		handleRSTB = false;
 		
-		//Endpoint_ClearOUT();
-		
 		notdata[0] = RSTB_btag | 0x80;
 		notdata[1] = RSTB_status;
 		Endpoint_SelectEndpoint(TMC_NOTIFICATION_EPADDR);
-		Endpoint_Write_Stream_LE(notdata, sizeof(notdata), NULL);
-		//while ((ErrorCode = Endpoint_Write_Stream_LE(notdata, sizeof(notdata), &BytesTransferred)) ==
-//			   ENDPOINT_RWSTREAM_IncompleteTransfer)
-		//{
-//			if (IsTMCBulkINReset)
-			  //break;
-		//}
-		//Endpoint_SelectEndpoint(TMC_NOTIFICATION_EPADDR);
+		while ( Endpoint_Write_Stream_LE(notdata, sizeof(notdata), NULL) ==
+				ENDPOINT_RWSTREAM_IncompleteTransfer)
+		{
+			if (IsTMCBulkINReset)
+			  break;
+		}
 		Endpoint_ClearIN();		
 	}
-
+	
+	
 	if (IsTMCBulkOUTReset || IsTMCBulkINReset)
+	{
+	
+		Endpoint_SelectEndpoint(TMC_OUT_EPADDR);
+		Endpoint_ClearOUT();
+		Endpoint_ClearOUT();
+
+		Endpoint_SelectEndpoint(TMC_IN_EPADDR);
+		Endpoint_AbortPendingIN();
+
+		/* SDC has to be sent before clearing state, because SDC request is stopped in reset states */
+		if (handleSDC)
+		{
+			gpib_ren(1); /* ensure that remote control is enabled */
+			timeout_start(50000); /* 0.5s timeout*/
+			gpib_sdc(gpib_addr, is_timedout);
+			handleSDC = false;
+		}
+
 		TMC_resetstates();
+			
+	}
 	
 	/* All pending data has been processed - reset the data abort flags */
 	IsTMCBulkINReset  = false;
 	IsTMCBulkOUTReset = false;
+	
+	transfer_busy = (s_remaining_bytes_receive != 0);
 }
 
 /** Attempts to read in the TMC message header from the TMC interface.
@@ -1145,8 +1367,7 @@ void TMC_Task(void)
  */
 bool ReadTMCHeader(TMC_MessageHeader_t* const MessageHeader)
 {
-	uint16_t BytesTransferred;
-	uint8_t  ErrorCode;
+	uint8_t *pdat = (uint8_t *)MessageHeader;
 
 	/* Select the Data Out endpoint */
 	Endpoint_SelectEndpoint(TMC_OUT_EPADDR);
@@ -1155,27 +1376,49 @@ bool ReadTMCHeader(TMC_MessageHeader_t* const MessageHeader)
 	if (!(Endpoint_IsOUTReceived()))
 	  return false;
 
-	/* Read in the header of the command from the host */
-	BytesTransferred = 0;
-	while ((ErrorCode = Endpoint_Read_Stream_LE(MessageHeader, sizeof(TMC_MessageHeader_t), &BytesTransferred)) ==
-	       ENDPOINT_RWSTREAM_IncompleteTransfer)
+	/* on purpose Endpoint_Read_Stream_LE it not used here, because it handles USB control requests which is useless here */
+	for (uint8_t i=0; i<sizeof(TMC_MessageHeader_t); i++)
 	{
-		if (IsTMCBulkOUTReset)
-		  break;
+		*pdat++ = Endpoint_Read_8();
 	}
-
+	
 	/* Store the new command tag value for later use */
 	CurrentTransferTag = MessageHeader->Tag;
 
 	/* Indicate if the command has been aborted or not */
-	return (!(IsTMCBulkOUTReset) && (ErrorCode == ENDPOINT_RWSTREAM_NoError));
+	return !IsTMCBulkOUTReset;
+}
+
+/** Speed optimized of Lufa Endpoint_Write_Stream_LE function (it was 1.5 times slower than this one) */
+static inline uint8_t Endpoint_Write_Stream_LE_noUsbTask(const void* const Buffer,
+                            uint16_t Length)
+{
+	uint8_t* DataStream      = ((uint8_t*)Buffer);
+	uint8_t  ErrorCode;
+
+	if ((ErrorCode = Endpoint_WaitUntilReady()))
+	  return ErrorCode;
+
+	while (Length)
+	{
+		if (!(Endpoint_IsReadWriteAllowed()))
+		{
+			Endpoint_ClearIN();
+
+			if ((ErrorCode = Endpoint_WaitUntilReady()))
+			  return ErrorCode;
+		}
+		else
+		{
+			Endpoint_Write_8(*DataStream++);
+			Length--;
+		}
+	}
+	return ENDPOINT_RWSTREAM_NoError;
 }
 
 bool WriteTMCHeader(TMC_MessageHeader_t* const MessageHeader)
 {
-	uint16_t BytesTransferred;
-	uint8_t  ErrorCode;
-
 	/* Set the message tag of the command header */
 	MessageHeader->Tag        =  CurrentTransferTag;
 	MessageHeader->InverseTag = ~CurrentTransferTag;
@@ -1184,18 +1427,12 @@ bool WriteTMCHeader(TMC_MessageHeader_t* const MessageHeader)
 	Endpoint_SelectEndpoint(TMC_IN_EPADDR);
 
 	/* Send the command header to the host */
-	BytesTransferred = 0;
-	while ((ErrorCode = Endpoint_Write_Stream_LE(MessageHeader, sizeof(TMC_MessageHeader_t), &BytesTransferred)) ==
-	       ENDPOINT_RWSTREAM_IncompleteTransfer)
-	{
-		if (IsTMCBulkINReset)
-		  break;
-	}
-
+	//Endpoint_Write_Stream_LE_quick(readbuffer, MessageHeader.TransferSize, TMC_IO_EPSIZE-sizeof(TMC_MessageHeader_t), TMC_IO_EPSIZE);
+	Endpoint_Write_Stream_LE_noUsbTask(MessageHeader, sizeof(TMC_MessageHeader_t));
+	
 	/* Indicate if the command has been aborted or not */
-	return (!(IsTMCBulkINReset) && (ErrorCode == ENDPOINT_RWSTREAM_NoError));
+	return !IsTMCBulkINReset;
 }
-
 
 
 

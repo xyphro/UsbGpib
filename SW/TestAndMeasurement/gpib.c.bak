@@ -155,7 +155,6 @@ uint8_t gpib_readStatusByte(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 	timedout = false;
 	status = 0;
 
-	s_gpib_transaction_active = true;
 	if (!timedout)
 		timedout = gpib_cmd_LAG(0, ptimeoutfunc);
 	if (!timedout)
@@ -172,7 +171,6 @@ uint8_t gpib_readStatusByte(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 		timedout = gpib_cmd_UNT(ptimeoutfunc); 
 	if (timedout)
 		gpib_recover();	
-	s_gpib_transaction_active = false;		
 	return status;
 }
 
@@ -194,13 +192,8 @@ bool gpib_gotoLocal(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 	if (!timedout)
 		timedout = gpib_cmd_GTL(ptimeoutfunc);
 		
-	_delay_ms(100);	// this is not done by the NIUSB adapter, but seems to be required for measurement devices using NI chipset
-		
 	if (!timedout)
 		timedout = gpib_cmd_UNL(ptimeoutfunc);
-		
-	//ATN_HIGH;
-	//_delay_us(14);
 		
 	if (timedout)
 		gpib_recover();
@@ -240,18 +233,15 @@ static bool gpib_cmd_SDC(gpibtimeout_t ptimeoutfunc) // selective device clear
 bool gpib_sdc(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
 	bool timedout;
-	
-	s_gpib_transaction_active = true;
+
 	timedout = gpib_cmd_LAG(addr, ptimeoutfunc); 
 	if (!timedout)
 		timedout = gpib_cmd_SDC(ptimeoutfunc);
 	if (!timedout)
 		timedout = gpib_cmd_UNL(ptimeoutfunc);
+		
 	if (timedout)
 		gpib_recover();
-	s_gpib_transaction_active = false;
-		
-	_delay_ms(150); // this is not done by the NI USB adapter, but seems to be required for products using NI USB adapter!
 	return timedout;
 }
 
@@ -262,7 +252,7 @@ bool gpib_sdc(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 
 void gpib_init(void)
 {
-	// PB5 = REN
+// PB5 = REN
 	DDRD  = 0x00;
 	PORTD = 0x00;
 	PORTB &= ~((1<<4) | (1<<5) | (1<<6));
@@ -308,7 +298,6 @@ void gpib_ren(bool enable)
 	{
 		REN_HIGH; /* remote disable */
 	}
-	//s_gpib_transaction_active = false;
 }
 
 
@@ -316,11 +305,10 @@ void gpib_ren(bool enable)
 
 void gpib_interface_clear(void)
 {
-	NRFD_HIGH;
 	IFC_LOW; /* interface clear */
-	_delay_us(120);
+	_delay_us(200);
 	IFC_HIGH; /* interface clear */
-	_delay_ms(10);
+	_delay_us(20);
 	s_gpib_transaction_active = false;
 }
 
@@ -387,11 +375,6 @@ bool gpib_make_listener(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 bool gpib_writedat(uint8_t dat, bool Eoi, gpibtimeout_t ptimeoutfunc)
 {
 	return gpib_writedat_quick(dat, Eoi, ptimeoutfunc, true);
-}
-
-char gpib_get_readtermination(void)
-{
-	return s_terminator;
 }
 
 void gpib_set_readtermination(char terminator)
