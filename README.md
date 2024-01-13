@@ -29,7 +29,7 @@ Some goals of the project were:
 
 All those goals are met.
 
-# 13th Januart '24 update
+# 13th January '24 update
 
 New year, new update :-)
 
@@ -38,6 +38,9 @@ This also exposes new functionality, e.g. shortening of the visa ressource strin
 The read termination setting can now be set in a volatile way and also be read back.
 
 A slight issue sneaked in also and got fixed: After an instrument clear the next GPIB transfer timed out. Nobody found it so far though :-) But I fixed it.
+
+Have fun using this!
+(would anybody volunteers to make a simple cross platform gui for the non volatile settings :-) ?)
 
 # 19th December '23 update
 
