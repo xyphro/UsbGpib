@@ -439,7 +439,6 @@ int main(void)
 	eeprom_busy_wait();	
 	gpib_set_readtermination(eeprom_read_byte((const uint8_t *)105));
 	
-	//LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
 	GlobalInterruptEnable();
 	
 	while (!gpib_is_connected())
@@ -468,11 +467,12 @@ int main(void)
 	
 	/* physically GPIB is connected, now check if any GPIB address is responsive */
 #ifndef SPEEDTEST_DUMMY_DEVICE
+//asdf
 	while (!findGpibdevice())
 	{
 		_delay_ms(100);
 		LED(1);
-		_delay_ms(100);
+		_delay_ms(1000);
 		LED(0);
 		if (!gpib_is_connected()) /* we want to reset here if the device is unplugged */
 		{
@@ -578,7 +578,6 @@ void SetupHardware(void)
 	
 
 	/* Hardware Initialization */
-	//LEDs_Init();
 	USB_Init();
 	USB_Detach();
 

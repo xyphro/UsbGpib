@@ -50,7 +50,7 @@ ISR (TIMER0_OVF_vect)
 			{
 				if (!ATN_STATE ) /* is ATN LOW? This can only happen if no GPIB device is connected/powered */
 				{
-					if (s_gpib_disconnect_counter == 2)
+					if (s_gpib_disconnect_counter >= 2)
 					{ /* after 100-200ms with ATN low, assume, that there is no GPIB device connected */
 						s_device_state = GPIB_DEVICE_CONNECTSTATE_DISCONNECTED;
 					}
@@ -286,16 +286,24 @@ bool gpib_is_connected(void)
 {
 	if ( (DDRF & (1<<6)) != 0 )
 	{
-		_delay_us(10);
-		ATN_HIGH; 
-		_delay_us(10);
-		return s_device_state == GPIB_DEVICE_CONNECTSTATE_CONNECTED;
+		if (!s_gpib_transaction_active) /* only check, if no GPIB transaction is active */
+		{
+			_delay_us(10);
+			ATN_HIGH; 
+			_delay_us(10);
+		}
+		else
+		{
+			return true;
+		}
+		
+		//return s_device_state == GPIB_DEVICE_CONNECTSTATE_CONNECTED;
 	}
 	else
 	{
-		return s_device_state == GPIB_DEVICE_CONNECTSTATE_CONNECTED;
 		//return s_device_state == GPIB_DEVICE_CONNECTSTATE_CONNECTED;
 	}
+	return !!ATN_STATE; /* is ATN LOW? This can only happen if no GPIB device is connected/powered */		
 }
 
 void gpib_ren(bool enable)
@@ -433,11 +441,12 @@ uint8_t gpib_search(void)
 {
 	uint8_t addr, foundaddr;
 	
+	s_gpib_transaction_active = true;
 	timeout_start(500);
 	gpib_tx(0x3F, true, is_timedout); // UNL
 	
 	foundaddr = 255;
-	addr = 255;
+	addr = 0; // start searching from GPIB Address 1 onwards as 0 is reserved for controller
 	do
 	{
 		addr++;
@@ -459,6 +468,7 @@ uint8_t gpib_search(void)
 	
 	timeout_start(500);
 	gpib_tx(0x3F, true, is_timedout); // UNL
+
 	
 	/* if the device needs a secondary address, ensure, that it really cannot be addressed without secondary address */
 	if (addr >= 32)
@@ -476,7 +486,7 @@ uint8_t gpib_search(void)
 		gpib_tx(0x3F, true, is_timedout); // UNL
 	}
 	
-	//return 1;
-		
+	s_gpib_transaction_active = false;
+	
 	return foundaddr;
 }

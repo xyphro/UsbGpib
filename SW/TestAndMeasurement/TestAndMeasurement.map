@@ -780,7 +780,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000     0x3526
+.text           0x00000000     0x351e
  *(.vectors)
  .vectors       0x00000000       0xac c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5/crtatmega32u4.o
                 0x00000000                __vector_default
@@ -953,205 +953,205 @@ END GROUP
  .text.is_timedout
                 0x00001aa8       0x26 obj/gpib.o
  .text.__vector_23
-                0x00001ace       0x80 obj/gpib.o
+                0x00001ace       0x70 obj/gpib.o
                 0x00001ace                __vector_23
  .text.gpib_init
-                0x00001b4e       0x70 obj/gpib.o
-                0x00001b4e                gpib_init
+                0x00001b3e       0x70 obj/gpib.o
+                0x00001b3e                gpib_init
  .text.gpib_recover
-                0x00001bbe        0x2 obj/gpib.o
-                0x00001bbe                gpib_recover
+                0x00001bae        0x2 obj/gpib.o
+                0x00001bae                gpib_recover
  .text.gpib_localLockout
-                0x00001bc0       0x82 obj/gpib.o
-                0x00001bc0                gpib_localLockout
+                0x00001bb0       0x82 obj/gpib.o
+                0x00001bb0                gpib_localLockout
  .text.gpib_cmd_LAG
-                0x00001c42      0x102 obj/gpib.o
+                0x00001c32      0x102 obj/gpib.o
  .text.gpib_cmd_TAG
-                0x00001d44      0x102 obj/gpib.o
+                0x00001d34      0x102 obj/gpib.o
  .text.gpib_trigger
-                0x00001e46       0xee obj/gpib.o
-                0x00001e46                gpib_trigger
+                0x00001e36       0xee obj/gpib.o
+                0x00001e36                gpib_trigger
  .text.gpib_gotoLocal
-                0x00001f34      0x11a obj/gpib.o
-                0x00001f34                gpib_gotoLocal
+                0x00001f24      0x11a obj/gpib.o
+                0x00001f24                gpib_gotoLocal
  .text.gpib_sdc
-                0x0000204e      0x10a obj/gpib.o
-                0x0000204e                gpib_sdc
+                0x0000203e      0x10a obj/gpib.o
+                0x0000203e                gpib_sdc
  .text.gpib_readStatusByte
-                0x00002158      0x1ec obj/gpib.o
-                0x00002158                gpib_readStatusByte
+                0x00002148      0x1ec obj/gpib.o
+                0x00002148                gpib_readStatusByte
  .text.gpib_is_connected
-                0x00002344       0x32 obj/gpib.o
-                0x00002344                gpib_is_connected
+                0x00002334       0x28 obj/gpib.o
+                0x00002334                gpib_is_connected
  .text.gpib_ren
-                0x00002376        0xc obj/gpib.o
-                0x00002376                gpib_ren
+                0x0000235c        0xc obj/gpib.o
+                0x0000235c                gpib_ren
  .text.gpib_interface_clear
-                0x00002382       0x24 obj/gpib.o
-                0x00002382                gpib_interface_clear
+                0x00002368       0x24 obj/gpib.o
+                0x00002368                gpib_interface_clear
  .text.gpib_readdat
-                0x000023a6       0xe0 obj/gpib.o
-                0x000023a6                gpib_readdat
+                0x0000238c       0xe0 obj/gpib.o
+                0x0000238c                gpib_readdat
  .text.gpib_untalk_unlisten
-                0x00002486       0xe8 obj/gpib.o
-                0x00002486                gpib_untalk_unlisten
+                0x0000246c       0xe8 obj/gpib.o
+                0x0000246c                gpib_untalk_unlisten
  .text.gpib_make_talker
-                0x0000256e       0xa8 obj/gpib.o
-                0x0000256e                gpib_make_talker
+                0x00002554       0xa8 obj/gpib.o
+                0x00002554                gpib_make_talker
  .text.gpib_make_listener
-                0x00002616      0x10a obj/gpib.o
-                0x00002616                gpib_make_listener
+                0x000025fc      0x10a obj/gpib.o
+                0x000025fc                gpib_make_listener
  .text.gpib_writedat
-                0x00002720       0x86 obj/gpib.o
-                0x00002720                gpib_writedat
+                0x00002706       0x86 obj/gpib.o
+                0x00002706                gpib_writedat
  .text.gpib_get_readtermination
-                0x000027a6        0x6 obj/gpib.o
-                0x000027a6                gpib_get_readtermination
+                0x0000278c        0x6 obj/gpib.o
+                0x0000278c                gpib_get_readtermination
  .text.gpib_set_readtermination
-                0x000027ac       0x14 obj/gpib.o
-                0x000027ac                gpib_set_readtermination
+                0x00002792       0x14 obj/gpib.o
+                0x00002792                gpib_set_readtermination
  .text.gpib_search
-                0x000027c0      0x216 obj/gpib.o
-                0x000027c0                gpib_search
+                0x000027a6      0x228 obj/gpib.o
+                0x000027a6                gpib_search
  .text.cmd_addr
-                0x000029d6        0x2 obj/miniparser.o
-                0x000029d6                cmd_addr
+                0x000029ce        0x2 obj/miniparser.o
+                0x000029ce                cmd_addr
  .text.cmd_autoid_slow
-                0x000029d8        0xa obj/miniparser.o
-                0x000029d8                cmd_autoid_slow
+                0x000029d0        0xa obj/miniparser.o
+                0x000029d0                cmd_autoid_slow
  .text.cmd_autoid_slower
-                0x000029e2        0xa obj/miniparser.o
-                0x000029e2                cmd_autoid_slower
+                0x000029da        0xa obj/miniparser.o
+                0x000029da                cmd_autoid_slower
  .text.cmd_autoid_slowest
-                0x000029ec        0xa obj/miniparser.o
-                0x000029ec                cmd_autoid_slowest
+                0x000029e4        0xa obj/miniparser.o
+                0x000029e4                cmd_autoid_slowest
  .text.cmd_0000
-                0x000029f6        0xa obj/miniparser.o
-                0x000029f6                cmd_0000
+                0x000029ee        0xa obj/miniparser.o
+                0x000029ee                cmd_0000
  .text.cmd_autoid_on
-                0x00002a00        0x2 obj/miniparser.o
-                0x00002a00                cmd_autoid_on
+                0x000029f8        0x2 obj/miniparser.o
+                0x000029f8                cmd_autoid_on
  .text.cmd_0001
-                0x00002a02        0xa obj/miniparser.o
-                0x00002a02                cmd_0001
+                0x000029fa        0xa obj/miniparser.o
+                0x000029fa                cmd_0001
  .text.cmd_autoid_off
-                0x00002a0c        0x2 obj/miniparser.o
-                0x00002a0c                cmd_autoid_off
+                0x00002a04        0x2 obj/miniparser.o
+                0x00002a04                cmd_autoid_off
  .text.cmd_string_short
-                0x00002a0e        0xa obj/miniparser.o
-                0x00002a0e                cmd_string_short
+                0x00002a06        0xa obj/miniparser.o
+                0x00002a06                cmd_string_short
  .text.cmd_string_normal
-                0x00002a18        0xa obj/miniparser.o
-                0x00002a18                cmd_string_normal
+                0x00002a10        0xa obj/miniparser.o
+                0x00002a10                cmd_string_normal
  .text.cmd_ver_query
-                0x00002a22        0xa obj/miniparser.o
-                0x00002a22                cmd_ver_query
+                0x00002a1a        0xa obj/miniparser.o
+                0x00002a1a                cmd_ver_query
  .text.cmd_string_query
-                0x00002a2c        0xa obj/miniparser.o
-                0x00002a2c                cmd_string_query
+                0x00002a24        0xa obj/miniparser.o
+                0x00002a24                cmd_string_query
  .text.cmd_term_cr
-                0x00002a36        0x4 obj/miniparser.o
-                0x00002a36                cmd_term_cr
+                0x00002a2e        0x4 obj/miniparser.o
+                0x00002a2e                cmd_term_cr
  .text.cmd_term_lf
-                0x00002a3a        0x4 obj/miniparser.o
-                0x00002a3a                cmd_term_lf
+                0x00002a32        0x4 obj/miniparser.o
+                0x00002a32                cmd_term_lf
  .text.cmd_term_eoi
-                0x00002a3e        0x4 obj/miniparser.o
-                0x00002a3e                cmd_term_eoi
+                0x00002a36        0x4 obj/miniparser.o
+                0x00002a36                cmd_term_eoi
  .text.cmd_0100
-                0x00002a42        0xe obj/miniparser.o
-                0x00002a42                cmd_0100
+                0x00002a3a        0xe obj/miniparser.o
+                0x00002a3a                cmd_0100
  .text.cmd_0101
-                0x00002a50        0xe obj/miniparser.o
-                0x00002a50                cmd_0101
+                0x00002a48        0xe obj/miniparser.o
+                0x00002a48                cmd_0101
  .text.cmd_0102
-                0x00002a5e        0xe obj/miniparser.o
-                0x00002a5e                cmd_0102
+                0x00002a56        0xe obj/miniparser.o
+                0x00002a56                cmd_0102
  .text.cmd_term_store
-                0x00002a6c        0xc obj/miniparser.o
-                0x00002a6c                cmd_term_store
+                0x00002a64        0xc obj/miniparser.o
+                0x00002a64                cmd_term_store
  .text.cmd_reset
-                0x00002a78        0x4 obj/miniparser.o
-                0x00002a78                cmd_reset
+                0x00002a70        0x4 obj/miniparser.o
+                0x00002a70                cmd_reset
  .text.cmd_autoid_query
-                0x00002a7c       0x2c obj/miniparser.o
-                0x00002a7c                cmd_autoid_query
+                0x00002a74       0x2c obj/miniparser.o
+                0x00002a74                cmd_autoid_query
  .text.cmd_term_query
-                0x00002aa8       0x28 obj/miniparser.o
-                0x00002aa8                cmd_term_query
+                0x00002aa0       0x28 obj/miniparser.o
+                0x00002aa0                cmd_term_query
  .text.parser_reset
-                0x00002ad0        0xe obj/miniparser.o
-                0x00002ad0                parser_reset
+                0x00002ac8        0xe obj/miniparser.o
+                0x00002ac8                parser_reset
  .text.parser_add
-                0x00002ade       0xb6 obj/miniparser.o
-                0x00002ade                parser_add
+                0x00002ad6       0xb6 obj/miniparser.o
+                0x00002ad6                parser_add
  .text.Endpoint_Write_Stream_LE
-                0x00002b94       0x96 obj/EndpointStream_AVR8.o
-                0x00002b94                Endpoint_Write_Stream_LE
+                0x00002b8c       0x96 obj/EndpointStream_AVR8.o
+                0x00002b8c                Endpoint_Write_Stream_LE
  .text.Endpoint_Write_Control_Stream_LE
-                0x00002c2a       0xcc obj/EndpointStream_AVR8.o
-                0x00002c2a                Endpoint_Write_Control_Stream_LE
+                0x00002c22       0xcc obj/EndpointStream_AVR8.o
+                0x00002c22                Endpoint_Write_Control_Stream_LE
  .text.Endpoint_Write_Control_PStream_LE
-                0x00002cf6       0xce obj/EndpointStream_AVR8.o
-                0x00002cf6                Endpoint_Write_Control_PStream_LE
+                0x00002cee       0xce obj/EndpointStream_AVR8.o
+                0x00002cee                Endpoint_Write_Control_PStream_LE
  .text.Endpoint_Write_Control_EStream_LE
-                0x00002dc4      0x106 obj/EndpointStream_AVR8.o
-                0x00002dc4                Endpoint_Write_Control_EStream_LE
+                0x00002dbc      0x106 obj/EndpointStream_AVR8.o
+                0x00002dbc                Endpoint_Write_Control_EStream_LE
  .text.Endpoint_ConfigureEndpoint_Prv
-                0x00002eca       0x28 obj/Endpoint_AVR8.o
-                0x00002eca                Endpoint_ConfigureEndpoint_Prv
+                0x00002ec2       0x28 obj/Endpoint_AVR8.o
+                0x00002ec2                Endpoint_ConfigureEndpoint_Prv
  .text.Endpoint_ClearStatusStage
-                0x00002ef2       0x42 obj/Endpoint_AVR8.o
-                0x00002ef2                Endpoint_ClearStatusStage
+                0x00002eea       0x42 obj/Endpoint_AVR8.o
+                0x00002eea                Endpoint_ClearStatusStage
  .text.Endpoint_WaitUntilReady
-                0x00002f34       0x70 obj/Endpoint_AVR8.o
-                0x00002f34                Endpoint_WaitUntilReady
+                0x00002f2c       0x70 obj/Endpoint_AVR8.o
+                0x00002f2c                Endpoint_WaitUntilReady
  .text.USB_Disable
-                0x00002fa4       0x30 obj/USBController_AVR8.o
-                0x00002fa4                USB_Disable
+                0x00002f9c       0x30 obj/USBController_AVR8.o
+                0x00002f9c                USB_Disable
  .text.USB_ResetInterface
-                0x00002fd4       0x80 obj/USBController_AVR8.o
-                0x00002fd4                USB_ResetInterface
+                0x00002fcc       0x80 obj/USBController_AVR8.o
+                0x00002fcc                USB_ResetInterface
  .text.USB_Init
-                0x00003054       0x20 obj/USBController_AVR8.o
-                0x00003054                USB_Init
+                0x0000304c       0x20 obj/USBController_AVR8.o
+                0x0000304c                USB_Init
  .text.USB_INT_DisableAllInterrupts
-                0x00003074       0x10 obj/USBInterrupt_AVR8.o
-                0x00003074                USB_INT_DisableAllInterrupts
+                0x0000306c       0x10 obj/USBInterrupt_AVR8.o
+                0x0000306c                USB_INT_DisableAllInterrupts
  .text.USB_INT_ClearAllInterrupts
-                0x00003084        0xa obj/USBInterrupt_AVR8.o
-                0x00003084                USB_INT_ClearAllInterrupts
+                0x0000307c        0xa obj/USBInterrupt_AVR8.o
+                0x0000307c                USB_INT_ClearAllInterrupts
  .text.__vector_10
-                0x0000308e      0x17e obj/USBInterrupt_AVR8.o
-                0x0000308e                __vector_10
+                0x00003086      0x17e obj/USBInterrupt_AVR8.o
+                0x00003086                __vector_10
  .text.USB_Device_ProcessControlRequest
-                0x0000320c      0x290 obj/DeviceStandardReq.o
-                0x0000320c                USB_Device_ProcessControlRequest
+                0x00003204      0x290 obj/DeviceStandardReq.o
+                0x00003204                USB_Device_ProcessControlRequest
  .text.USB_Event_Stub
-                0x0000349c        0x2 obj/Events.o
-                0x0000349c                USB_Event_Stub
-                0x0000349c                EVENT_USB_Device_Suspend
-                0x0000349c                EVENT_USB_Device_StartOfFrame
-                0x0000349c                EVENT_USB_Device_Reset
-                0x0000349c                EVENT_USB_Device_WakeUp
+                0x00003494        0x2 obj/Events.o
+                0x00003494                USB_Event_Stub
+                0x00003494                EVENT_USB_Device_Suspend
+                0x00003494                EVENT_USB_Device_StartOfFrame
+                0x00003494                EVENT_USB_Device_Reset
+                0x00003494                EVENT_USB_Device_WakeUp
  .text.USB_USBTask
-                0x0000349e       0x46 obj/USBTask.o
-                0x0000349e                USB_USBTask
+                0x00003496       0x46 obj/USBTask.o
+                0x00003496                USB_USBTask
  .text.avr-libc
-                0x000034e4       0x12 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(memcpy.o)
-                0x000034e4                memcpy
+                0x000034dc       0x12 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libc.a(memcpy.o)
+                0x000034dc                memcpy
  .text.avr-libc
-                0x000034f6       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libatmega32u4.a(eerd_byte.o)
-                0x000034f6                eeprom_read_byte
+                0x000034ee       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libatmega32u4.a(eerd_byte.o)
+                0x000034ee                eeprom_read_byte
  .text.avr-libc
-                0x00003506       0x1c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libatmega32u4.a(eewr_byte.o)
-                0x00003506                eeprom_write_byte
-                0x00003508                eeprom_write_r18
-                0x00003522                . = ALIGN (0x2)
+                0x000034fe       0x1c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libatmega32u4.a(eewr_byte.o)
+                0x000034fe                eeprom_write_byte
+                0x00003500                eeprom_write_r18
+                0x0000351a                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00003522        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x00003522                _exit
-                0x00003522                exit
+ .fini9         0x0000351a        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x0000351a                _exit
+                0x0000351a                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -1170,11 +1170,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00003522        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x0000351a        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00003526                _etext = .
+                0x0000351e                _etext = .
 
-.data           0x00800100       0x40 load address 0x00003526
+.data           0x00800100       0x40 load address 0x0000351e
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  .data          0x00800100       0x1b obj/TestAndMeasurement.o
@@ -1195,7 +1195,7 @@ END GROUP
                 0x00800140                _edata = .
                 0x00800140                PROVIDE (__data_end, .)
 
-.bss            0x00800140      0x499
+.bss            0x00800140      0x498
                 0x00800140                PROVIDE (__bss_start, .)
  *(.bss)
  .bss           0x00800140      0x410 obj/TestAndMeasurement.o
@@ -1203,34 +1203,34 @@ END GROUP
                 0x00800144                internal_response_buffer_len
                 0x00800145                internal_response_buffer_rpos
                 0x00800146                gpib_write_is_busy
- .bss           0x00800550        0x9 obj/gpib.o
+ .bss           0x00800550        0x8 obj/gpib.o
                 0x00800550                s_terminator
                 0x00800551                timer0_ticked
  *(.bss*)
  *(COMMON)
- COMMON         0x00800559        0xd obj/TestAndMeasurement.o
-                0x00800559                internal_response_buffer
-                0x00800561                timeout_val
-                0x00800565                TMC_eom
- COMMON         0x00800566       0x66 obj/Descriptors.o
-                0x00800566                tmc_serial_string
- COMMON         0x008005cc        0x3 obj/DeviceStandardReq.o
-                0x008005cc                USB_Device_ConfigurationNumber
-                0x008005cd                USB_Device_CurrentlySelfPowered
-                0x008005ce                USB_Device_RemoteWakeupEnabled
- COMMON         0x008005cf        0xa obj/USBTask.o
-                0x008005cf                USB_IsInitialized
-                0x008005d0                USB_DeviceState
-                0x008005d1                USB_ControlRequest
-                0x008005d9                PROVIDE (__bss_end, .)
-                0x00003526                __data_load_start = LOADADDR (.data)
-                0x00003566                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x00800558        0xd obj/TestAndMeasurement.o
+                0x00800558                internal_response_buffer
+                0x00800560                timeout_val
+                0x00800564                TMC_eom
+ COMMON         0x00800565       0x66 obj/Descriptors.o
+                0x00800565                tmc_serial_string
+ COMMON         0x008005cb        0x3 obj/DeviceStandardReq.o
+                0x008005cb                USB_Device_ConfigurationNumber
+                0x008005cc                USB_Device_CurrentlySelfPowered
+                0x008005cd                USB_Device_RemoteWakeupEnabled
+ COMMON         0x008005ce        0xa obj/USBTask.o
+                0x008005ce                USB_IsInitialized
+                0x008005cf                USB_DeviceState
+                0x008005d0                USB_ControlRequest
+                0x008005d8                PROVIDE (__bss_end, .)
+                0x0000351e                __data_load_start = LOADADDR (.data)
+                0x0000355e                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x008005d9        0x0
+.noinit         0x008005d8        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x008005d9                _end = .
+                0x008005d8                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
@@ -1333,20 +1333,20 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0xb08f
+.debug_info     0x00000000     0xb089
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x9f4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5/crtatmega32u4.o
  .debug_info    0x000009f4     0x30f6 obj/TestAndMeasurement.o
  .debug_info    0x00003aea      0x662 obj/Descriptors.o
- .debug_info    0x0000414c     0x32c3 obj/gpib.o
- .debug_info    0x0000740f      0x809 obj/miniparser.o
- .debug_info    0x00007c18     0x183d obj/EndpointStream_AVR8.o
- .debug_info    0x00009455      0x59c obj/Endpoint_AVR8.o
- .debug_info    0x000099f1      0x4e7 obj/USBController_AVR8.o
- .debug_info    0x00009ed8      0x619 obj/USBInterrupt_AVR8.o
- .debug_info    0x0000a4f1      0x84c obj/DeviceStandardReq.o
- .debug_info    0x0000ad3d       0xe4 obj/Events.o
- .debug_info    0x0000ae21      0x26e obj/USBTask.o
+ .debug_info    0x0000414c     0x32bd obj/gpib.o
+ .debug_info    0x00007409      0x809 obj/miniparser.o
+ .debug_info    0x00007c12     0x183d obj/EndpointStream_AVR8.o
+ .debug_info    0x0000944f      0x59c obj/Endpoint_AVR8.o
+ .debug_info    0x000099eb      0x4e7 obj/USBController_AVR8.o
+ .debug_info    0x00009ed2      0x619 obj/USBInterrupt_AVR8.o
+ .debug_info    0x0000a4eb      0x84c obj/DeviceStandardReq.o
+ .debug_info    0x0000ad37       0xe4 obj/Events.o
+ .debug_info    0x0000ae1b      0x26e obj/USBTask.o
 
 .debug_abbrev   0x00000000     0x22d6
  *(.debug_abbrev)
@@ -1363,20 +1363,20 @@ END GROUP
  .debug_abbrev  0x000020ba       0xa2 obj/Events.o
  .debug_abbrev  0x0000215c      0x17a obj/USBTask.o
 
-.debug_line     0x00000000     0x5f3e
+.debug_line     0x00000000     0x5f45
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000       0x1a c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5/crtatmega32u4.o
  .debug_line    0x0000001a     0x18e9 obj/TestAndMeasurement.o
  .debug_line    0x00001903      0x25b obj/Descriptors.o
- .debug_line    0x00001b5e     0x1778 obj/gpib.o
- .debug_line    0x000032d6      0x408 obj/miniparser.o
- .debug_line    0x000036de     0x1596 obj/EndpointStream_AVR8.o
- .debug_line    0x00004c74      0x44f obj/Endpoint_AVR8.o
- .debug_line    0x000050c3      0x32a obj/USBController_AVR8.o
- .debug_line    0x000053ed      0x475 obj/USBInterrupt_AVR8.o
- .debug_line    0x00005862      0x436 obj/DeviceStandardReq.o
- .debug_line    0x00005c98       0xda obj/Events.o
- .debug_line    0x00005d72      0x1cc obj/USBTask.o
+ .debug_line    0x00001b5e     0x177f obj/gpib.o
+ .debug_line    0x000032dd      0x408 obj/miniparser.o
+ .debug_line    0x000036e5     0x1596 obj/EndpointStream_AVR8.o
+ .debug_line    0x00004c7b      0x44f obj/Endpoint_AVR8.o
+ .debug_line    0x000050ca      0x32a obj/USBController_AVR8.o
+ .debug_line    0x000053f4      0x475 obj/USBInterrupt_AVR8.o
+ .debug_line    0x00005869      0x436 obj/DeviceStandardReq.o
+ .debug_line    0x00005c9f       0xda obj/Events.o
+ .debug_line    0x00005d79      0x1cc obj/USBTask.o
 
 .debug_frame    0x00000000      0xc58
  *(.debug_frame)
@@ -1418,18 +1418,18 @@ END GROUP
  .debug_str     0x000029ab       0x3b obj/USBTask.o
                                 0x3a1 (size before relaxing)
 
-.debug_loc      0x00000000     0x8a3f
+.debug_loc      0x00000000     0x8a55
  *(.debug_loc)
  .debug_loc     0x00000000     0x21a1 obj/TestAndMeasurement.o
  .debug_loc     0x000021a1      0x391 obj/Descriptors.o
- .debug_loc     0x00002532     0x32bd obj/gpib.o
- .debug_loc     0x000057ef      0x216 obj/miniparser.o
- .debug_loc     0x00005a05     0x26be obj/EndpointStream_AVR8.o
- .debug_loc     0x000080c3      0x36f obj/Endpoint_AVR8.o
- .debug_loc     0x00008432       0xd5 obj/USBController_AVR8.o
- .debug_loc     0x00008507      0x26f obj/USBInterrupt_AVR8.o
- .debug_loc     0x00008776      0x274 obj/DeviceStandardReq.o
- .debug_loc     0x000089ea       0x55 obj/USBTask.o
+ .debug_loc     0x00002532     0x32d3 obj/gpib.o
+ .debug_loc     0x00005805      0x216 obj/miniparser.o
+ .debug_loc     0x00005a1b     0x26be obj/EndpointStream_AVR8.o
+ .debug_loc     0x000080d9      0x36f obj/Endpoint_AVR8.o
+ .debug_loc     0x00008448       0xd5 obj/USBController_AVR8.o
+ .debug_loc     0x0000851d      0x26f obj/USBInterrupt_AVR8.o
+ .debug_loc     0x0000878c      0x274 obj/DeviceStandardReq.o
+ .debug_loc     0x00008a00       0x55 obj/USBTask.o
 
 .debug_macinfo
  *(.debug_macinfo)
