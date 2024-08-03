@@ -1,0 +1,16 @@
+"null","Sourced","Placed","References","Value","Footprint","Digi-Key_PN","Quantity"
+1,"","","C2, C3, C4","100nF","C_0603_1608Metric","CC0603ZRY5V9BB104",3
+2,"","","C5, C6","8pF","C_0603_1608Metric","1292-1549-1-ND",2
+3,"","","C1","4.7uF","C_0805_2012Metric","1276-1244-1-ND",1
+4,"","","C7","1uF","C_0603_1608Metric","311-1446-1-ND",1
+5,"","","R2, R3","22R","R_0603_1608Metric","311-22.0HRCT-ND",2
+6,"","","R4, R6","470R","R_0603_1608Metric","311-470HRCT-ND",2
+7,"","","R7, R8","5k1","R_0603_1608Metric","311-5.10KHRCT-ND",2
+8,"","","R1","10k","R_0603_1608Metric","311-10.0KHRCT-ND",1
+9,"","","R5","100k","R_0603_1608Metric","311-100KHRCT-ND",1
+10,"","","D1, D2","LED","LED_0805_2012Metric","732-4985-1-ND",2
+11,"","","U1","ATmega32U4-MU","QFN-44-1EP_7x7mm_P0.5mm_EP5.2x5.2mm","ATMEGA32U4-MU-ND",1
+12,"","","Y1","CX2016DB16000D0WZRC1","Crystal_SMD_2016-4Pin_2.0x1.6mm","478-CX2016DB16000D0WZRC1CT-ND",1
+13,"","","SW1","SW_Push","SW_Tactile_SPST_NO_Straight_CK_PTS636Sx25SMTRLFS","CKN12329-1-ND",1
+14,"","","GPIB1","112-024-113L001","112024113L001","1024PMA-ND",1
+15,"","","J1","USB_C_Receptacle_USB2.0","USB_C_Receptacle_XKB_U262-16XN-4BVC11","52-USB-CB16HTBTRCT-ND",1

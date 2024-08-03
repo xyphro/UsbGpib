@@ -1,12 +1,12 @@
-%TF.GenerationSoftware,KiCad,Pcbnew,7.0.1*%
-%TF.CreationDate,2023-12-19T17:12:56+01:00*%
-%TF.ProjectId,xyp-gpib,7879702d-6770-4696-922e-6b696361645f,rev?*%
+%TF.GenerationSoftware,KiCad,Pcbnew,8.0.4*%
+%TF.CreationDate,2024-08-03T15:01:38-07:00*%
+%TF.ProjectId,xyp-gpib,7879702d-6770-4696-922e-6b696361645f,2*%
 %TF.SameCoordinates,Original*%
 %TF.FileFunction,Paste,Bot*%
 %TF.FilePolarity,Positive*%
 %FSLAX46Y46*%
 G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
-G04 Created by KiCad (PCBNEW 7.0.1) date 2023-12-19 17:12:56*
+G04 Created by KiCad (PCBNEW 8.0.4) date 2024-08-03 15:01:38*
 %MOMM*%
 %LPD*%
 G01*

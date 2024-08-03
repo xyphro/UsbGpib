@@ -1,0 +1,11 @@
+For photos of the assembly process, please see:
+https://github.com/hharte/UsbGpib/tree/master/HW/REV2
+
+The following components may be available locally:
+GPIO1 - 24-position vertical "Centronics" Panel Type male plug:
+https://www.aliexpress.us/item/3256805450457140.html?spm=a2g0o.productlist.main.1.6e3872e5tUudMA&algo_pvid=3c848d5c-bbef-4a4a-b8ad-041402717ac1&algo_exp_id=3c848d5c-bbef-4a4a-b8ad-041402717ac1-0&pdp_npi=4%40dis%21EUR%211.21%211.21%21%21%219.17%21%21%40211b801616979974338462951e1d1e%2112000033838675279%21sea%21DE%210%21AB&curPageLogUid=Fdxeh4JTGSVM&gatewayAdapt=deu2usa4itemAdapt
+
+This connector installs on the bottom side of the PCB.
+
+USB-C connector:
+https://www.lcsc.com/product-detail/USB-Connectors_XKB-Connectivity-U262-161N-4BVC11_C319148.html
