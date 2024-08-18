@@ -6,8 +6,8 @@
 	(paper "A4")
 	(title_block
 		(title "UsbGpib")
-		(date "2024-08-03")
-		(rev "2")
+		(date "2024-08-18")
+		(rev "2.1")
 	)
 	(lib_symbols
 		(symbol "Connector:AVR-ISP-6"
@@ -2750,32 +2750,30 @@
 				)
 			)
 		)
-		(symbol "conn-gpib:112-024-113R001"
+		(symbol "ac125a_dtmf:111-024-113L001"
 			(pin_names
 				(offset 0.762)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "J"
-				(at 39.37 12.7 0)
+			(property "Reference" "GPIB1"
+				(at -4.5974 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left)
 				)
 			)
-			(property "Value" "112-024-113R001"
-				(at 39.37 10.16 0)
+			(property "Value" "112-024-113L001"
+				(at -2.286 0 90)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(justify left)
 				)
 			)
-			(property "Footprint" "112024113R001"
+			(property "Footprint" "gpib:112024113R001"
 				(at 39.37 7.62 0)
 				(effects
 					(font
@@ -2785,7 +2783,7 @@
 					(hide yes)
 				)
 			)
-			(property "Datasheet" "http://www.norcomp.net/rohspdfs/SCSI-050Ribbon/11Y/112/112-YYY-113R001.pdf"
+			(property "Datasheet" "https://de.aliexpress.com/item/1005005636771892.html?spm=a2g0o.productlist.main.1.6e3872e5tUudMA&algo_pvid=3c848d5c-bbef-4a4a-b8ad-041402717ac1&algo_exp_id=3c848d5c-bbef-4a4a-b8ad-041402717ac1-0&pdp_npi=4%40dis%21EUR%211.21%211.21%21%21%219.17%21%21%40211b801616979974338462951e1d1e%2112000033838675279%21sea%21DE%210%21AB&curPageLogUid=Fdxeh4JTGSVM"
 				(at 39.37 5.08 0)
 				(effects
 					(font
@@ -2825,7 +2823,7 @@
 					(hide yes)
 				)
 			)
-			(property "Manufacturer_Part_Number" "112-024-113R001"
+			(property "Manufacturer_Part_Number" "111-024-113L001"
 				(at 39.37 -5.08 0)
 				(effects
 					(font
@@ -2835,7 +2833,7 @@
 					(hide yes)
 				)
 			)
-			(property "Mouser Part Number" "636-112-024-113R001"
+			(property "Mouser Part Number" "636-111-024-113L001"
 				(at 39.37 -7.62 0)
 				(effects
 					(font
@@ -2845,7 +2843,7 @@
 					(hide yes)
 				)
 			)
-			(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/NorComp/112-024-113R001?qs=IGgAdOvCTsSdej4q2f%2Fo5Q%3D%3D"
+			(property "Mouser Price/Stock" "https://www.mouser.com/ProductDetail/NorComp/111-024-113L001?qs=IGgAdOvCTsTzuqCRtmjabw%3D%3D"
 				(at 39.37 -10.16 0)
 				(effects
 					(font
@@ -2875,7 +2873,50 @@
 					(hide yes)
 				)
 			)
-			(symbol "112-024-113R001_0_0"
+			(property "Digi-Key_PN" "1024PMA-ND"
+				(at 0 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "111-024-113L001_0_0"
+				(pin passive line
+					(at 35.56 12.7 270)
+					(length 5.08)
+					(name "24"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "24"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(symbol "111-024-113L001_0_1"
+				(polyline
+					(pts
+						(xy 5.08 7.62) (xy 38.1 7.62) (xy 38.1 -7.62) (xy 5.08 -7.62) (xy 5.08 7.62)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "111-024-113L001_1_0"
 				(pin passive line
 					(at 7.62 -12.7 90)
 					(length 5.08)
@@ -2895,7 +2936,7 @@
 					)
 				)
 				(pin passive line
-					(at 17.78 12.7 270)
+					(at 30.48 -12.7 90)
 					(length 5.08)
 					(name "10"
 						(effects
@@ -2913,7 +2954,7 @@
 					)
 				)
 				(pin passive line
-					(at 20.32 -12.7 90)
+					(at 33.02 -12.7 90)
 					(length 5.08)
 					(name "11"
 						(effects
@@ -2931,7 +2972,7 @@
 					)
 				)
 				(pin passive line
-					(at 20.32 12.7 270)
+					(at 35.56 -12.7 90)
 					(length 5.08)
 					(name "12"
 						(effects
@@ -2949,7 +2990,7 @@
 					)
 				)
 				(pin passive line
-					(at 22.86 -12.7 90)
+					(at 7.62 12.7 270)
 					(length 5.08)
 					(name "13"
 						(effects
@@ -2967,7 +3008,7 @@
 					)
 				)
 				(pin passive line
-					(at 22.86 12.7 270)
+					(at 10.16 12.7 270)
 					(length 5.08)
 					(name "14"
 						(effects
@@ -2985,7 +3026,7 @@
 					)
 				)
 				(pin passive line
-					(at 25.4 -12.7 90)
+					(at 12.7 12.7 270)
 					(length 5.08)
 					(name "15"
 						(effects
@@ -3003,7 +3044,7 @@
 					)
 				)
 				(pin passive line
-					(at 25.4 12.7 270)
+					(at 15.24 12.7 270)
 					(length 5.08)
 					(name "16"
 						(effects
@@ -3021,7 +3062,7 @@
 					)
 				)
 				(pin passive line
-					(at 27.94 -12.7 90)
+					(at 17.78 12.7 270)
 					(length 5.08)
 					(name "17"
 						(effects
@@ -3039,7 +3080,7 @@
 					)
 				)
 				(pin passive line
-					(at 27.94 12.7 270)
+					(at 20.32 12.7 270)
 					(length 5.08)
 					(name "18"
 						(effects
@@ -3057,7 +3098,7 @@
 					)
 				)
 				(pin passive line
-					(at 30.48 -12.7 90)
+					(at 22.86 12.7 270)
 					(length 5.08)
 					(name "19"
 						(effects
@@ -3075,7 +3116,7 @@
 					)
 				)
 				(pin passive line
-					(at 7.62 12.7 270)
+					(at 10.16 -12.7 90)
 					(length 5.08)
 					(name "2"
 						(effects
@@ -3093,7 +3134,7 @@
 					)
 				)
 				(pin passive line
-					(at 30.48 12.7 270)
+					(at 25.4 12.7 270)
 					(length 5.08)
 					(name "20"
 						(effects
@@ -3111,7 +3152,7 @@
 					)
 				)
 				(pin passive line
-					(at 33.02 -12.7 90)
+					(at 27.94 12.7 270)
 					(length 5.08)
 					(name "21"
 						(effects
@@ -3129,7 +3170,7 @@
 					)
 				)
 				(pin passive line
-					(at 33.02 12.7 270)
+					(at 30.48 12.7 270)
 					(length 5.08)
 					(name "22"
 						(effects
@@ -3147,7 +3188,7 @@
 					)
 				)
 				(pin passive line
-					(at 35.56 -12.7 90)
+					(at 33.02 12.7 270)
 					(length 5.08)
 					(name "23"
 						(effects
@@ -3165,25 +3206,7 @@
 					)
 				)
 				(pin passive line
-					(at 35.56 12.7 270)
-					(length 5.08)
-					(name "24"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "24"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 10.16 -12.7 90)
+					(at 12.7 -12.7 90)
 					(length 5.08)
 					(name "3"
 						(effects
@@ -3201,7 +3224,7 @@
 					)
 				)
 				(pin passive line
-					(at 10.16 12.7 270)
+					(at 15.24 -12.7 90)
 					(length 5.08)
 					(name "4"
 						(effects
@@ -3219,7 +3242,7 @@
 					)
 				)
 				(pin passive line
-					(at 12.7 -12.7 90)
+					(at 17.78 -12.7 90)
 					(length 5.08)
 					(name "5"
 						(effects
@@ -3237,7 +3260,7 @@
 					)
 				)
 				(pin passive line
-					(at 12.7 12.7 270)
+					(at 20.32 -12.7 90)
 					(length 5.08)
 					(name "6"
 						(effects
@@ -3255,7 +3278,7 @@
 					)
 				)
 				(pin passive line
-					(at 15.24 -12.7 90)
+					(at 22.86 -12.7 90)
 					(length 5.08)
 					(name "7"
 						(effects
@@ -3273,7 +3296,7 @@
 					)
 				)
 				(pin passive line
-					(at 15.24 12.7 270)
+					(at 25.4 -12.7 90)
 					(length 5.08)
 					(name "8"
 						(effects
@@ -3291,7 +3314,7 @@
 					)
 				)
 				(pin passive line
-					(at 17.78 -12.7 90)
+					(at 27.94 -12.7 90)
 					(length 5.08)
 					(name "9"
 						(effects
@@ -3306,56 +3329,6 @@
 								(size 1.27 1.27)
 							)
 						)
-					)
-				)
-				(pin passive line
-					(at 0 0 0)
-					(length 5.08)
-					(name "MH1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "MH1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 43.18 0 180)
-					(length 5.08)
-					(name "MH2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "MH2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(symbol "112-024-113R001_0_1"
-				(polyline
-					(pts
-						(xy 5.08 7.62) (xy 38.1 7.62) (xy 38.1 -7.62) (xy 5.08 -7.62) (xy 5.08 7.62)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
 					)
 				)
 			)
@@ -3620,6 +3593,12 @@
 		(uuid "7ac1f8ba-f1c1-423c-98d5-2d1169ad7eee")
 	)
 	(junction
+		(at 106.68 69.85)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7b004b0a-f108-4010-8011-f98e0c1847e7")
+	)
+	(junction
 		(at 252.73 99.06)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3654,12 +3633,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "9e1b837f-0d34-4a18-9644-9ee68f141f46")
-	)
-	(junction
-		(at 107.95 69.85)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "a6ccc556-da88-4006-ae1a-cc35733efef3")
 	)
 	(junction
 		(at 139.7 146.05)
@@ -3763,7 +3736,7 @@
 	)
 	(wire
 		(pts
-			(xy 107.95 69.85) (xy 91.44 69.85)
+			(xy 107.95 69.85) (xy 106.68 69.85)
 		)
 		(stroke
 			(width 0)
@@ -3810,6 +3783,16 @@
 			(type default)
 		)
 		(uuid "0ff508fd-18da-4ab7-9844-3c8a28c2587e")
+	)
+	(wire
+		(pts
+			(xy 106.68 69.85) (xy 91.44 69.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "129908f1-13ed-472d-94f4-3149db173fda")
 	)
 	(wire
 		(pts
@@ -4293,6 +4276,16 @@
 	)
 	(wire
 		(pts
+			(xy 106.68 74.93) (xy 106.68 69.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7af37e1a-7968-4530-acdb-bec073fe52fb")
+	)
+	(wire
+		(pts
 			(xy 99.06 73.66) (xy 113.03 73.66)
 		)
 		(stroke
@@ -4300,6 +4293,16 @@
 			(type default)
 		)
 		(uuid "7afa54c4-2181-41d3-81f7-39efc497ecae")
+	)
+	(wire
+		(pts
+			(xy 118.11 74.93) (xy 106.68 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7afcc885-c402-4947-ab0f-6212c558d92c")
 	)
 	(wire
 		(pts
@@ -4493,13 +4496,13 @@
 	)
 	(wire
 		(pts
-			(xy 118.11 69.85) (xy 107.95 69.85)
+			(xy 118.11 69.85) (xy 118.11 74.93)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "a24ddb4f-c217-42ca-b6cb-d12da84fb2b9")
+		(uuid "a210e77d-f70b-41a4-8245-a98982fe203f")
 	)
 	(wire
 		(pts
@@ -4811,6 +4814,16 @@
 		)
 		(uuid "f73fa8f9-fd84-420c-90d4-563667e3f478")
 	)
+	(text "Hold to enter Bootloader"
+		(exclude_from_sim no)
+		(at 89.662 31.496 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "3b917b5d-47d1-40cd-9600-33d70ff904c1")
+	)
 	(text "PF0 = GND\nfor HW revision detection"
 		(exclude_from_sim no)
 		(at 170.18 121.92 0)
@@ -4998,6 +5011,17 @@
 		)
 		(uuid "68877d35-b796-44db-9124-b8e744e7412e")
 	)
+	(label "~{HW_REV2}"
+		(at 158.75 123.19 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6ad93a92-dc5a-471c-9d02-855a4bcdbc63")
+	)
 	(label "REN"
 		(at 252.73 91.44 0)
 		(fields_autoplaced yes)
@@ -5041,6 +5065,17 @@
 			(justify left bottom)
 		)
 		(uuid "8412992d-8754-44de-9e08-115cec1a3eff")
+	)
+	(label "PF4"
+		(at 158.75 128.27 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "88d8e353-1432-49f7-b830-2e302288ec0d")
 	)
 	(label "DIO5"
 		(at 163.83 102.87 0)
@@ -5262,6 +5297,17 @@
 		)
 		(uuid "f202141e-c20d-4cac-b016-06a44f2ecce8")
 	)
+	(label "PF5"
+		(at 158.75 130.81 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f8d2f883-e2a3-45fa-8491-3f077f8040ec")
+	)
 	(label "NRFD"
 		(at 163.83 85.09 0)
 		(fields_autoplaced yes)
@@ -5274,9 +5320,8 @@
 		(uuid "ffd175d1-912a-4224-be1e-a8198680f46b")
 	)
 	(symbol
-		(lib_id "conn-gpib:112-024-113R001")
-		(at 232.41 73.66 90)
-		(mirror x)
+		(lib_id "ac125a_dtmf:111-024-113L001")
+		(at 232.41 73.66 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5299,8 +5344,8 @@
 				)
 			)
 		)
-		(property "Footprint" "gpib:112024113R001"
-			(at 224.79 113.03 0)
+		(property "Footprint" "ac125a_dtmf:111-024-113L001"
+			(at 240.03 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5310,7 +5355,7 @@
 			)
 		)
 		(property "Datasheet" "https://de.aliexpress.com/item/1005005636771892.html?spm=a2g0o.productlist.main.1.6e3872e5tUudMA&algo_pvid=3c848d5c-bbef-4a4a-b8ad-041402717ac1&algo_exp_id=3c848d5c-bbef-4a4a-b8ad-041402717ac1-0&pdp_npi=4%40dis%21EUR%211.21%211.21%21%21%219.17%21%21%40211b801616979974338462951e1d1e%2112000033838675279%21sea%21DE%210%21AB&curPageLogUid=Fdxeh4JTGSVM"
-			(at 227.33 113.03 0)
+			(at 237.49 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5320,7 +5365,7 @@
 			)
 		)
 		(property "Description" "I/O Connectors 24P Centronics male R/A dip solder"
-			(at 229.87 113.03 0)
+			(at 234.95 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5340,7 +5385,7 @@
 			)
 		)
 		(property "Manufacturer_Name" "NorComp"
-			(at 234.95 113.03 0)
+			(at 229.87 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5350,7 +5395,7 @@
 			)
 		)
 		(property "Manufacturer_Part_Number" "111-024-113L001"
-			(at 237.49 113.03 0)
+			(at 227.33 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5360,7 +5405,7 @@
 			)
 		)
 		(property "Mouser Part Number" "636-111-024-113L001"
-			(at 240.03 113.03 0)
+			(at 224.79 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5370,7 +5415,7 @@
 			)
 		)
 		(property "Mouser Price/Stock" "https://www.mouser.com/ProductDetail/NorComp/111-024-113L001?qs=IGgAdOvCTsTzuqCRtmjabw%3D%3D"
-			(at 242.57 113.03 0)
+			(at 222.25 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5380,7 +5425,7 @@
 			)
 		)
 		(property "Arrow Part Number" ""
-			(at 245.11 113.03 0)
+			(at 219.71 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5390,7 +5435,7 @@
 			)
 		)
 		(property "Arrow Price/Stock" ""
-			(at 247.65 113.03 0)
+			(at 217.17 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5479,12 +5524,6 @@
 		)
 		(pin "9"
 			(uuid "c124c07e-0c02-484c-a86c-cd4a118597df")
-		)
-		(pin "MH1"
-			(uuid "0db076c1-f65e-4854-855d-7daac5a738b9")
-		)
-		(pin "MH2"
-			(uuid "fcb5f267-5ab1-456a-8c17-8df53dc4793c")
 		)
 		(instances
 			(project "xyp-gpib"

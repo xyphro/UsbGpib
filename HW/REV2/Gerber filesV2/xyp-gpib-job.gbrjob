@@ -5,13 +5,13 @@
       "Application": "Pcbnew",
       "Version": "8.0.4"
     },
-    "CreationDate": "2024-08-03T15:01:39-07:00"
+    "CreationDate": "2024-08-18T12:20:09-07:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "xyp-gpib",
       "GUID": "7879702d-6770-4696-922e-6b696361645f",
-      "Revision": "2"
+      "Revision": "2.1"
     },
     "Size": {
       "X": 54.05,
