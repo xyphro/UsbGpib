@@ -1,4 +1,8 @@
-
-pictures/Thumbs.db
 pictures/Thumbs.db
 *.db
+*-bak
+*.bak
+*.lck
+.DS_Store
+HW/REV2/KicadV2/xyp-gpib-backups
+HW/REV2/KicadV2/fp-info-cache

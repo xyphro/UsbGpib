@@ -3,15 +3,15 @@
     "GenerationSoftware": {
       "Vendor": "KiCad",
       "Application": "Pcbnew",
-      "Version": "7.0.1"
+      "Version": "8.0.4"
     },
-    "CreationDate": "2023-12-19T17:12:57+01:00"
+    "CreationDate": "2024-08-18T12:20:09-07:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "xyp-gpib",
       "GUID": "7879702d-6770-4696-922e-6b696361645f",
-      "Revision": "rev?"
+      "Revision": "2.1"
     },
     "Size": {
       "X": 54.05,

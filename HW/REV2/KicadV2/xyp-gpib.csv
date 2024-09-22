@@ -1,0 +1,16 @@
+"Id";"Designator";"Footprint";"Quantity";"Designation";"Supplier and ref";
+1;"GPIB1";"112024113L001";1;"112-024-113L001";;;
+2;"C1";"C_0805_2012Metric";1;"4.7uF";;;
+3;"C2,C3,C4";"C_0603_1608Metric";3;"100nF";;;
+4;"C7";"C_0603_1608Metric";1;"1uF";;;
+5;"D1,D2";"LED_0805_2012Metric";2;"LED";;;
+6;"R1";"R_0603_1608Metric";1;"10k";;;
+7;"R2,R3";"R_0603_1608Metric";2;"22R";;;
+8;"R4,R6";"R_0603_1608Metric";2;"470R";;;
+9;"R5";"R_0603_1608Metric";1;"100k";;;
+10;"U1";"QFN-44-1EP_7x7mm_P0.5mm_EP5.2x5.2mm";1;"ATmega32U4-MU";;;
+11;"C5,C6";"C_0603_1608Metric";2;"8pF";;;
+12;"Y1";"Crystal_SMD_2016-4Pin_2.0x1.6mm";1;"CX2016DB16000D0WZRC1";;;
+13;"J1";"USB_C_Receptacle_XKB_U262-16XN-4BVC11";1;"USB_C_Receptacle_USB2.0";;;
+14;"SW1";"SW_Tactile_SPST_NO_Straight_CK_PTS636Sx25SMTRLFS";1;"SW_Push";;;
+15;"R7,R8";"R_0603_1608Metric";2;"5k1";;;

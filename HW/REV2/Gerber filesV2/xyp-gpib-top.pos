@@ -1,0 +1,29 @@
+### Footprint positions - created on 2024-08-18T12:20:27-0700 ###
+### Printed by KiCad version 8.0.4
+## Unit = mm, Angle = deg.
+## Side : top
+# Ref     Val                      Package                                                PosX       PosY       Rot  Side
+C1        4.7uF                    C_0805_2012Metric                                  194.5640   -77.3430   90.0000  top
+C2        100nF                    C_0603_1608Metric                                  191.0080   -77.0890   90.0000  top
+C3        100nF                    C_0603_1608Metric                                  192.6590   -77.0890   90.0000  top
+C4        100nF                    C_0603_1608Metric                                  186.3090   -88.0110  180.0000  top
+C5        8pF                      C_0603_1608Metric                                  183.0070   -79.8830    0.0000  top
+C6        8pF                      C_0603_1608Metric                                  182.4990   -84.7090  180.0000  top
+C7        1uF                      C_0603_1608Metric                                  187.7060   -77.3430  180.0000  top
+D1        LED                      LED_0805_2012Metric                                200.0504   -82.6008  180.0000  top
+D2        LED                      LED_0805_2012Metric                                208.5848   -82.5500  180.0000  top
+FID1      Fiducial                 Fiducial_0.5mm_Mask1mm                             224.8916   -89.1540    0.0000  top
+FID2      Fiducial                 Fiducial_0.5mm_Mask1mm                             181.6100   -76.4032    0.0000  top
+J1        USB_C_Receptacle_USB2.0  USB_C_Receptacle_XKB_U262-16XN-4BVC11              230.4412   -82.5968   90.0000  top
+R1        10k                      R_0603_1608Metric                                  185.0390   -77.0890  -90.0000  top
+R2        22R                      R_0603_1608Metric                                  201.2950   -77.9780    0.0000  top
+R3        22R                      R_0603_1608Metric                                  201.2950   -76.3270    0.0000  top
+R4        470R                     R_0603_1608Metric                                  204.1144   -82.6008    0.0000  top
+R5        100k                     R_0603_1608Metric                                  197.8660   -77.0890   90.0000  top
+R6        470R                     R_0603_1608Metric                                  212.3440   -82.5500    0.0000  top
+R7        5k1                      R_0603_1608Metric                                  224.8408   -84.6836  -90.0000  top
+R8        5k1                      R_0603_1608Metric                                  224.8408   -79.6036  -90.0000  top
+SW1       SW_Push                  SW_Tactile_SPST_NO_Straight_CK_PTS636Sx25SMTRLFS   221.8690   -82.5500  -90.0000  top
+U1        ATmega32U4-MU            QFN-44-1EP_7x7mm_P0.5mm_EP5.2x5.2mm                188.8490   -82.9310  -90.0000  top
+Y1        CX2016DB16000D0WZRC1     Crystal_SMD_2016-4Pin_2.0x1.6mm                    182.7530   -82.2960  -90.0000  top
+## End
