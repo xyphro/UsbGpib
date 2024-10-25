@@ -67,6 +67,20 @@ As said, I feel this is the best Firmware image so far, but I changed so much th
 
 After further testing I will also push the sourcecode of this image.
 
+## Firmware update to Version 2,  for 1 or 2 LEDs
+
+The source code has been modifed to run on the version 1 single red LED adapter, 
+or the version 2 red & green LED adapter.  The same source code is used for both 
+versions.  Any update to the source code will be available to run on versions 1 or 2.
+The source code includes a directive that will compile for version 1 or 2.  
+
+Version 1 firmware will run on version 2 hardware, and vice versa.  The only symptoms will be
+that the LEDs won't light up when expected.
+
+To compile version 1 or 2 firmware, comment in or out the VER2 directive found 
+in the TestAndMeasurement.c source code file.
+
+
 # Hardware
 
 ## Microcontroller choice
@@ -136,11 +150,13 @@ Note, that also the programming/build instructions moved to this location.
 The source code of the Boot loader (slightly modified LUFA MassStorage Boot loader) and the main USBGPIB converter are located in the "SW" subdirectory.
 At the time of publication LUFA 170418 release was used, with GCC as compiler.
 
-Note: The Software is compatible with any HW revision in this repository. For REV 1 and REV 2 hardware you don't need different SW images.
+Note: The Software is compatible with any HW revision in this repository. For REV 1 and REV 2 hardware you don't need different SW images.  
+The only effect of running a software version that doesn't match the hardware version is that the LEDs won't light up as expected.
 
 ## Binaries
 
 For those, that just want to create their own device, I've included the binary output in the "SW/binaries" subdirectory.
+The source code for version 1 and 2 is compiled from the same file, therefore the name of the compiled BIN or HEX files will be the same for both versions of the software.
 
 # Using the device
 
@@ -169,9 +185,20 @@ The only importance setting on the measurement device is, that the GPIB interfac
 
 The LED indicates different states:
 
+Version 1 : Red LED Only
 LED blinking: The USBGPIB converter is connected to a measurement instrument, it is powered off or its GPIB port is disabled. In this state, the device is also not connected to USB and will not show up in the device manager or lsusb.
 LED on: The device is connected to a measurement device and GPIB communication possible. It is also accessible over USB
 LED off: The device is not connected over USB, or the PC powered off :-)
+
+Version 2 : Red & Green LED
+RED LED slow blink : The USB-GPIB adapter is connected via USB, but not enumerated.  
+RED LED off : no power via usb cable.
+GREEN LED on: The USB-GPIB adapter is connected to a powered up measurement device.
+GREEN LED pulsing: Active GPIB communication with the measurement device.  
+
+The pulsing green LED indicates activity, not quantity.  
+The green and red LEDs are never on at the same time.
+
 
 ## Controlling GPIB devices
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/towerOfGpib.jpg" width="30%" align="right"/>
