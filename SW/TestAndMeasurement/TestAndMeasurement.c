@@ -4,6 +4,8 @@
 
   dean [at] fourwalledcubicle [dot] com
            www.lufa-lib.org
+
+     Modified for USB-GPIB adapter
 */
 
 /*
@@ -28,17 +30,73 @@
   this software.
 */
 
+/*  	LUFA library modified for USB-GPIB adapter
+	software developed by Xyphro 2022-2024
+	https://github.com/xyphro/UsbGpib
+
+	Hardware ###########
+	Version 1 : adapter with single red LED
+	Version 2 : adapter with one red and one green LED
+
+	Xyphro Version 2 hardware design includes 1x grounded pin to  provide hardware signal 
+	of 2x LEDs to software.
+	This feature was not used in this software because it would require a test on code to test for 
+	ver 1 or ver 2 LED.  This would take up machine cycles in places where that is not desirable.
+
+	Software ###########
+	Modified by D F Conway 2024 to be compatible with v1 or v2 hardware
+	Compiler directives are used to output executable code for v1 or v2.
+	This method used to allow a single version of source code to support 
+	v1 and v2 hardware.
+
+	Updates to the single source code will apply to both versions.
+	Both version 1 & 2 will run on version 1 & 2 hardware.
+	Only the LED indications may not act as expected.
+	Software Version 2.0 23 Oct 2024 by D F Conway
+
+
+	LED Signals  ###################
+
+	LED green ON : GPIB device connected
+	LED green fast flash : GPIB device actively communicating
+	LED red slow flash : USB connected but not enabled
+
+*/
+
+/*
+	TIP #######
+	HP 3457A: END,ALWAYS => turns on EOI signal!
+*/
+
 #include "TestAndMeasurement.h"
 #include "gpib.h"
 #include <avr/eeprom.h>
 #include "global.h"
 #include "miniparser.h"
 
-#define LED(s) {if(s) PORTF |= (1<<5); else PORTF &= ~(1<<5);}
+/*  Defines code for version 2 hardware.
+    Comment out the #define VER2 line to compile software for
+    single LED, version 1 hardware
+*/
+#define  VER2
+
+  /* Turn LEDs ON/OFF by switching port Hi/Lo */
+  #define LED_RED_ON  { PORTF |=  (1<<5); }
+  #define LED_RED_OFF { PORTF &= ~(1<<5); }
+  #define LED_RED_TGL { PORTF ^=  (1<<5); }   // Toggle RED LED 
+
+
+  #define LED_GRN_ON  { PORTF |=  (1<<4); }
+  #define LED_GRN_OFF { PORTF &= ~(1<<4); }
+
+  /* Set LED pins as always HI outputs to enable.   */
+  #define LED_RED_INIT  { (DDRF |= (1<<5)); }
+  #define LED_GRN_INIT  { (DDRF |= (1<<4)); }
+
 
 static inline void TMC_Task(void);
 
-/** Contains the (usually static) capabilities of the TMC device. This table is requested by the
+/*  Contains the (usually static) capabilities of the TMC device. This table is requested by the
  *  host upon enumeration to give it information on what features of the Test and Measurement USB
  *  Class the device supports.
  */
@@ -71,11 +129,11 @@ TMC_Capabilities_t Capabilities =
 			},
 		.USB488IfCap2 = // device capabilities
 			{
-				.DT1Capable                 = 1,//0 => Device trigger no capability / full capability
-				.RL1Capable					= 1,//0 => Remote Local   no capability / full capability
-				.SR1Capable					= 1,//0 => service request 
-				.MandatorySCPI				= 0,//0
-				.Reserved					= 0,//0
+				.DT1Capable          	= 1,//0 => Device trigger no capability / full capability
+				.RL1Capable		= 1,//0 => Remote Local   no capability / full capability
+				.SR1Capable		= 1,//0 => service request 
+				.MandatorySCPI		= 0,//0
+				.Reserved		= 0,//0
 			},
 		.Reserved3 = {0, 0, 0, 0, 0, 0, 0, 0},
 	};
@@ -96,7 +154,7 @@ static bool handleSDC = false;
 static bool handleLocalLockout = false;
 
 /** Flag that a goto local should be executed */
-static bool handleGoToLocal = false;
+	static bool handleGoToLocal = false;
 
 /** Flag that a ReadStatusByte should be executed */
 static bool    handleReadStatusByte = false;
@@ -176,13 +234,13 @@ void Jump_To_Bootloader(void)
 {
     // If USB is used, detach from the bus and reset it
     USB_Disable();
-    
+
     // Disable all interrupts
     cli();
-    
+
     // Wait two seconds for the USB detachment to register on the host
     Delay_MS(2000);
-    
+
     // Set the bootloader key to the magic value and force a reset
     //Boot_Key = MAGIC_BOOT_KEY;
     wdt_enable(WDTO_250MS);
@@ -223,7 +281,7 @@ bool is_timedout(void)
 	_delay_us(10);
 	if (timeout_val == 0)
 		return true;
-		
+
 	timeout_val--;
 	return false;
 }
@@ -235,16 +293,16 @@ bool findGpibdevice(void)
 {
 	uint8_t addr;
 	bool devicepresent;
-	
+
 	//gpib_interface_clear();
-	
+
 	devicepresent = false;
 	addr = gpib_search();
 	devicepresent = (addr < 255);
 	if (addr >= 255)	/* fallback to GPIB address 1, if no device was found */
 		addr = 1;
 	gpib_addr = addr; /* set global GPIB address to found address*/
-	
+
 	return devicepresent;
 }
 
@@ -254,9 +312,9 @@ bool identifyGpibDevice(void)
 	uint8_t c, len, hascomma;
 	bool    eoi, timedout;
 	bool    gotStringViaGPIB;
-	
+
 	gotStringViaGPIB = true;
-	
+
 	hascomma = false; /* does the response contain a , character? */
 
 	tmc_serial_string.Header.Size = 0;
@@ -270,8 +328,8 @@ bool identifyGpibDevice(void)
 	if (timeout_val != 0) gpib_writedat('?', false, is_timedout);
 	if (timeout_val != 0) gpib_writedat('\n', true, is_timedout);
 	gpib_untalk_unlisten(is_timedout);
-	
-	if (timeout_val != 0) 
+
+	if (timeout_val != 0)
 	{
 		timeout_start(100000); /* 1s timeout*/
 		gpib_make_talker(gpib_addr, is_timedout);
@@ -290,9 +348,9 @@ bool identifyGpibDevice(void)
 		while ((tmc_serial_string.UnicodeString[len-1] == '_') && (len > 1))
 			len--;
 		tmc_serial_string.Header.Size = len*2 + sizeof(USB_Descriptor_Header_t);
-		
+
 		gpib_untalk_unlisten(is_timedout);
-		
+
 		if ( (timeout_val == 0) || (len==0) ) /* no response to *IDN? string*/
 		{ /* so try out ID? query */
 			timeout_start(100000); /* 1s timeout*/
@@ -322,10 +380,10 @@ bool identifyGpibDevice(void)
 					len--;
 				tmc_serial_string.Header.Size = len*2 + sizeof(USB_Descriptor_Header_t);
 				gpib_untalk_unlisten(is_timedout);
-			}				
+			}
 		}
-		
-		
+
+
 		if (!hascomma)
 			if ( (tmc_serial_string.UnicodeString[0] == 'H') &&
 				 (tmc_serial_string.UnicodeString[1] == 'P') &&
@@ -334,8 +392,8 @@ bool identifyGpibDevice(void)
 			{
 				hascomma = true;
 			}
-		
-		
+
+
 		if ((timeout_val == 0) || (len == 0)  || (!hascomma) ) /* timeout happened or length is 0 => build a serial number based on GPIB address */
 		{
 			TMC_SetInternalSerial(true);
@@ -347,9 +405,9 @@ bool identifyGpibDevice(void)
 		TMC_SetInternalSerial(true);
 		gotStringViaGPIB = false;
 	}
-	
+
 	//TMC_SetInternalSerial(false);
-	
+
 	gpib_ren(false);
 	_delay_ms(100);
 	gpib_ren(true);
@@ -370,7 +428,7 @@ static void TMC_SetInternalSerial(bool addGPIBAddress)
 
 	len = 0;
 	if (addGPIBAddress)
-	{	
+	{
 		tmc_serial_string.UnicodeString[len++] = cpu_to_le16('G');
 		tmc_serial_string.UnicodeString[len++] = cpu_to_le16('P');
 		tmc_serial_string.UnicodeString[len++] = cpu_to_le16('I');
@@ -416,7 +474,7 @@ void eeprom_update_if_changed(uint16_t addr, uint8_t value)
 	if (oldval != value)
 	{
 		eeprom_busy_wait();
-		eeprom_write_byte((uint8_t*)addr, value);		
+		eeprom_write_byte((uint8_t*)addr, value);
 	}
 }
 
@@ -424,32 +482,37 @@ int main(void)
 {
 	uint8_t prevaddr;
 
-	//mcusr_mirror = MCUSR; 
-	MCUSR = 0; 
-	wdt_disable(); 
-	
+	//mcusr_mirror = MCUSR;
+	MCUSR = 0;
+	wdt_disable();
+
 	PORTB |=  (1<<2); /* PB2 = PULLUP */
 	DDRB  &= ~(1<<2); /* PB2 = input*/
-	
+
 	SetupHardware();
-	
+
 	gpib_init();
-	
+
 	/* apply settings from eeprom */
-	eeprom_busy_wait();	
+	eeprom_busy_wait();
 	gpib_set_readtermination(eeprom_read_byte((const uint8_t *)105));
-	
+
 	GlobalInterruptEnable();
-	
+
+
+	/* While no GPIB equipment is connected, medium fast flash red LED at 2Hz, green LED OFF.  version 1 and 2. */
 	while (!gpib_is_connected())
 	{
-		_delay_ms(250);
-		LED(1);
-		_delay_ms(250);
-		LED(0);
+		#ifdef VER2
+		  LED_GRN_OFF
+		#endif
+		LED_RED_ON
+		_delay_ms(200);
+		LED_RED_OFF
+		_delay_ms(300);
 		check_bootloaderEntry();
 	}
-	
+
 	uint8_t autoid = eeprom_read_byte((const uint8_t *)104);
 	if ( (autoid >= 0x02) && (autoid <= 0x04) ) // check if SLOW AUTOID mode is activated
 	{ // yes, it is active, so wait 10 seconds
@@ -464,29 +527,36 @@ int main(void)
 			Delay_MS(1000);
 		}
 	}
-	
+
 	/* physically GPIB is connected, now check if any GPIB address is responsive */
 #ifndef SPEEDTEST_DUMMY_DEVICE
 //asdf
 	while (!findGpibdevice())
-	{
-		_delay_ms(100);
-		LED(1);
-		_delay_ms(1000);
-		LED(0);
+	{  // if the Gpib device is unplugged, turn off green LED (ver2) or show a short red flash at 1Hz ( ver 1 )
+               #ifdef VER2
+                  LED_GRN_OFF
+                #else
+ 		  _delay_ms(100);
+		  LED_RED_ON;
+		  _delay_ms(1000);
+		  LED_RED_OFF;
+		#endif
 		if (!gpib_is_connected()) /* we want to reset here if the device is unplugged */
-		{
-			LED(0);	
-			
+		{   // turn off the green LED if the instrument is unplugged (ver 1) and set the watch dog timer to 250ms.
+                        #ifdef VER2
+                          LED_GRN_OFF
+			#else
+  			  LED_RED_OFF;
+                        #endif
 			_delay_ms(500);
-			wdt_enable(WDTO_250MS);	
+			wdt_enable(WDTO_250MS);
 			while (1);
 		}
 		check_bootloaderEntry();
 	}; /* Identify the GPIB Address of the connected GPIB device */
 #endif
 	eeprom_busy_wait();
-#ifdef SPEEDTEST_DUMMY_DEVICE	
+#ifdef SPEEDTEST_DUMMY_DEVICE
 	if ( false )
 #else
 	if (autoid != 0x01) // check if AUTOID feature is enabled
@@ -498,7 +568,7 @@ int main(void)
 		if (identifyGpibDevice())
 		{ /* received a string over GPIB => Store it in EEPROM, if it changed */
 			uint8_t *pdat, i;
-			
+
 			/* update gpib address and usb string descriptor in eeprom */
 			eeprom_update_if_changed(0, gpib_addr);
 			pdat = (void *)&tmc_serial_string;
@@ -518,8 +588,8 @@ int main(void)
 				for (i=0; i<sizeof(tmc_serial_string); i++)
 				{
 					*pdat++ = eeprom_read_byte((uint8_t*)(1+i));
-				}			
-				
+				}
+
 			}
 		}
 	}
@@ -530,12 +600,12 @@ int main(void)
 		_delay_ms(100);
 		gpib_ren(true);
 	}
-	
-	/* if activated: shorten the USB serial number string. This is just for Matlab which does not allow ressource strings to be longer than */
+
+	/* if activated: shorten the USB serial number string. This is just for Matlab which does not allow resource strings to be longer than 20 */
 	if (eeprom_read_byte((const uint8_t *)106) == 0x01) // check if serial string shortening is on
 	{
 		uint16_t len;
-		
+
 		len = (tmc_serial_string.Header.Size - sizeof(USB_Descriptor_Header_t)) >> 1;
 		if (len > 20)
 		{
@@ -545,23 +615,30 @@ int main(void)
 	}
 
 	/* all fine, now kickoff connect to USB to be able to communicate! */
-	LED(1);
+	/* Ver 1&2: turn OFF the red LED to indicate USB is connected  */
+ 	LED_RED_OFF
 	USB_Attach();
-	
+
 	for (;;)
 	{
 		TMC_Task(); // this task is 9.42us active when nothing is triggered, the rest takes 3.3us
 		check_bootloaderEntry();
-		
+
 		if (!gpib_is_connected()) /* check, if gpib is disconnected */
 		{ /* when we get here, reset the MCU and disconnect from USB ! It will reconnect once plugged in to GPIB again */
-			LED(0);
+		  /* turn ON the red LED when USB cable is disconnected and set the watch dog timer = 250ms  ver 1 */
+			LED_RED_ON
+			/* gpib not connected, so turn off green LED */
+	                #ifdef VER2
+        	          LED_GRN_OFF
+                	#endif
+
 			USB_Detach();
 			_delay_ms(500);
-			wdt_enable(WDTO_250MS);	
+			wdt_enable(WDTO_250MS);
 			while (1);
 		}
-		
+
 		USB_USBTask();
 	}
 }
@@ -575,20 +652,24 @@ void SetupHardware(void)
 
 	/* Disable clock division */
 	clock_prescale_set(clock_div_1);
-	
+
 
 	/* Hardware Initialization */
 	USB_Init();
 	USB_Detach();
 
-	
+
 	/* update the TMC default serial number*/
 	TMC_SetInternalSerial(false);
-	
-	/* LED to output and turn on */
-	DDRF |= (1<<5);
-	LED(1);
-	
+
+	/* Switch red LED pin to output and turn on ( ver 1 & 2 ) */
+	/* Initiate the LED pins*/
+ 	LED_RED_INIT
+	LED_RED_OFF      /* assume USB not connected even though it is */
+	#ifdef VER2
+	  LED_GRN_INIT  /* Initiate Green LED pin as output only for ver 2 */
+	  LED_GRN_OFF   /* assume no gpib connected */
+	#endif
 }
 
 /** Event handler for the USB_Connect event. This indicates that the device is enumerating via the status LEDs and
@@ -640,12 +721,12 @@ void handle_control_Req_ReadStatusByte(void)
 	statusReg =  gpib_readStatusByte(gpib_addr, is_timedout);
 	statusReg |= srq_statusbyte; // or previously read autoread status byte (Visa will issue a read status byte after receiving a SRQ interrupt transfer)
 	srq_statusbyte = 0x00; // clear previously read autoread status byte
-	
+
 	/* Write the request response byte */
 	Endpoint_Write_8(TMC_STATUS_SUCCESS);
 	Endpoint_Write_8(btag);
 	Endpoint_Write_8(statusReg);
-	
+
 	/* prepare interrupt response */
 	RSTB_btag = btag;
 	RSTB_status = statusReg;
@@ -653,15 +734,15 @@ void handle_control_Req_ReadStatusByte(void)
 
 	Endpoint_ClearIN();
 	Endpoint_ClearStatusStage();
-	
+
 	handleReadStatusByte = false; /* no matter what - we can cancel the pending transfer handling */
 	Endpoint_SelectEndpoint(PrevEndpoint);
 }
 
 void EVENT_USB_Device_ControlRequest(void)
 {
-	uint8_t TMCRequestStatus = TMC_STATUS_SUCCESS;	
-	
+	uint8_t TMCRequestStatus = TMC_STATUS_SUCCESS;
+
 	if ( ((USB_ControlRequest.wIndex == INTERFACE_ID_TestAndMeasurement) && ((USB_ControlRequest.bmRequestType & REQREC_INTERFACE)!=0)) ||
 	     (((USB_ControlRequest.wIndex == TMC_IN_EPADDR) || (USB_ControlRequest.wIndex == TMC_OUT_EPADDR)) && ((USB_ControlRequest.bmRequestType & REQREC_ENDPOINT)!=0))     )
 	{
@@ -679,7 +760,7 @@ void EVENT_USB_Device_ControlRequest(void)
 				{ /* a USB triggered GPIB write transfer is active. Mark the handling of this request for later */
 					handleReadStatusByte = true;
 				}
-			
+
 				break;
 			case Req_InitiateAbortBulkOut:
 				if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_ENDPOINT))
@@ -702,9 +783,9 @@ void EVENT_USB_Device_ControlRequest(void)
 						RequestInProgress = Req_InitiateAbortBulkOut;
 					}
 					IsTMCBulkOUTReset = true;
-					
+
 					Endpoint_ClearSETUP();
-					
+
 					/* Write the request response byte */
 					Endpoint_Write_8(TMCRequestStatus);
 					Endpoint_ClearIN();
@@ -756,7 +837,7 @@ void EVENT_USB_Device_ControlRequest(void)
 						RequestInProgress = Req_InitiateAbortBulkIn;
 					}
 					IsTMCBulkINReset = true;
-					
+
 
 					Endpoint_ClearSETUP();
 
@@ -793,7 +874,7 @@ void EVENT_USB_Device_ControlRequest(void)
 
 				break;
 			case Req_InitiateClear:
-			
+
 				if (USB_ControlRequest.bmRequestType == (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE))
 				{
 					Endpoint_ClearSETUP();
@@ -808,7 +889,7 @@ void EVENT_USB_Device_ControlRequest(void)
 						IsTMCBulkINReset  = true;
 						IsTMCBulkOUTReset = true;
 						handleSDC = true; // trigger handling of SDC command to device
-						
+
 						/* Save the split request for later checking when a new request is received */
 						RequestInProgress = Req_InitiateClear;
 					}
@@ -864,11 +945,15 @@ void EVENT_USB_Device_ControlRequest(void)
 				Endpoint_Write_8(TMC_STATUS_SUCCESS);
 				Endpoint_ClearIN();
 				Endpoint_ClearStatusStage();
-				
-				LED(0);
-				_delay_ms(250);
-				LED(1);
-				
+
+				#ifdef VER2
+				/*Turn off green LED = no gpib connected ver 2 */
+				   LED_GRN_OFF
+				#else
+				/*Toggle RED LED, slow flash = no gpib connected  ver 1 */
+				   LED_RED_TGL;
+				  _delay_ms(250);
+				#endif
 				s_nextwrite_mightbeparameterset = true;
 				break;
 
@@ -888,17 +973,17 @@ void EVENT_USB_Device_ControlRequest(void)
 				Endpoint_ClearIN();
 				Endpoint_ClearStatusStage();
 				break;
-				
+
 			case Req_LocalLockout:
 				handleLocalLockout = true; // trigger handling of local lockout within TMC_TASK
-				
+
 				Endpoint_ClearSETUP();
 				/* USBTMC Status response (1 Byte) */
 				Endpoint_Write_8(TMC_STATUS_SUCCESS);
 				Endpoint_ClearIN();
 				Endpoint_ClearStatusStage();
 				break;
-				
+
 			case Req_GoToLocal:
 				handleGoToLocal = true; // trigger handling of local lockout within TMC_TASK
 
@@ -912,6 +997,8 @@ void EVENT_USB_Device_ControlRequest(void)
 	}
 }
 
+/*
+Unused function
 static uint8_t charToval(char c)
 {
 	uint8_t val;
@@ -924,7 +1011,7 @@ static uint8_t charToval(char c)
 		val = c-'A'+10;
 	return val;
 }
-
+*/
 void set_internal_response(uint8_t *pdat, uint8_t len)
 {
 	if (len < sizeof(internal_response_buffer))
@@ -958,7 +1045,7 @@ void ProcessInternalCommand(uint8_t Length)
 	// clear any old response
 	internal_response_buffer_len = 0;
 	internal_response_buffer_rpos = 0; 
-	
+
 	parser_reset();
 	cmd_executed = false;
 	while ( (Length--) && (!cmd_executed) )
@@ -972,12 +1059,12 @@ void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfe
 {
 	uint8_t dat;
 	bool timedout, isinternalcommand;
-	
+
 	gpib_write_is_busy = true; /* required to handle read status byte synchronization issue */
 	timedout = false;
-	
+
 	dat = Endpoint_Read_8();
-	/* check, if this is an internal command (=sidechannel for configuration settings )*/ 
+	/* check, if this is an internal command (=sidechannel for configuration settings )*/
 	isinternalcommand = isFirstTransfer && s_nextwrite_mightbeparameterset && (dat == '!');
 	if (isinternalcommand)
 	{
@@ -985,13 +1072,15 @@ void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfe
 	}
 	else
 	{
-		
+
 		gpib_ren(1); /* ensure that remote control is enabled */
-		
-		LED(0);
+		/* Turn off the LED ver 1  */
+		#ifndef VER2
+		  LED_RED_OFF;
+		#endif
 		if (isFirstTransfer)
 			timedout = gpib_make_listener(gpib_addr, ptimeoutfunc);
-			
+
 		if (handleReadStatusByte && !timedout)
 		{
 			gpib_untalk_unlisten(ptimeoutfunc);
@@ -1013,16 +1102,18 @@ void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfe
 			{
 				dat = Endpoint_Read_8();
 			}
-			
+
 		}
-		
+
 		if (isLastTransfer && !timedout) /* in case of timeout the interface is cleared within the writedat function, no need to untalk!*/
 			gpib_untalk_unlisten(ptimeoutfunc);
-		LED(1);
+		#ifndef VER2
+  		  LED_RED_ON;  /* Turn on the LED ver 1 */
+		#endif
 	}
 	s_nextwrite_mightbeparameterset = false;
 	gpib_write_is_busy = !isLastTransfer; /* required to handle read status byte synchronization issue */
-	
+
 	if (handleReadStatusByte && !timedout)
 	{
 		if (!(isLastTransfer && !timedout))
@@ -1030,7 +1121,7 @@ void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfe
 		handle_control_Req_ReadStatusByte();
 		if (!(isLastTransfer && !timedout))
 			timedout = gpib_make_listener(gpib_addr, ptimeoutfunc);
-	}	
+	}
 }
 
 uint16_t GetNextMessage(uint8_t* const Data, uint16_t maxlen, bool isFirstMessage, bool *pisLastMessage, gpibtimeout_t ptimeoutfunc)
@@ -1038,11 +1129,13 @@ uint16_t GetNextMessage(uint8_t* const Data, uint16_t maxlen, bool isFirstMessag
 	uint8_t c;
 	uint16_t i;
 	bool    Eoi, timedout;
-	
+
 	gpib_ren(1); /* ensure that remote control is enabled */
-	
-	LED(0);	
-	
+	/* turn off the led ver 1 */
+	#ifndef VER2
+	  LED_RED_OFF;
+	#endif
+
 	timedout = false;
 #ifndef SPEEDTEST_DUMMY_DEVICE
 	if (isFirstMessage)
@@ -1054,11 +1147,11 @@ uint16_t GetNextMessage(uint8_t* const Data, uint16_t maxlen, bool isFirstMessag
 
 	while (!Eoi && (i < maxlen) && !timedout)
 	{
-	
+
 		c = gpib_readdat_quick(&Eoi, &timedout, ptimeoutfunc, false); 
 		Data[i++] = c;
 	}
-		
+
 #ifndef SPEEDTEST_DUMMY_DEVICE
 	if (Eoi && !timedout) /* in case of timeout, no need to unlisten => interface clear done in readdat function! */
 		gpib_untalk_unlisten(ptimeoutfunc);
@@ -1067,8 +1160,10 @@ uint16_t GetNextMessage(uint8_t* const Data, uint16_t maxlen, bool isFirstMessag
 	if (timedout) /* in case of timedout, simulate an end of message */
 		Eoi = true;
 	*pisLastMessage = Eoi;
-	
-	LED(1);
+
+        #ifndef VER2
+          LED_RED_ON;  /* Turn on the LED ver 1 */
+        #endif
 
 	return i;
 }
@@ -1140,8 +1235,8 @@ static inline void TMC_Task(void)
 	TMC_MessageHeader_t MessageHeader;
 	uint8_t             MessagePayload[128], curlen;
 	uint16_t            curlen16;
-	
-	
+
+
 	if (s_remaining_bytes_receive == 0)
 	{
 		/* handle service request (SRQ line goes down) */
@@ -1161,7 +1256,7 @@ static inline void TMC_Task(void)
 				if (IsTMCBulkINReset)
 				  break;
 			}
-			Endpoint_ClearIN();		
+			Endpoint_ClearIN();
 		}
 
 		/* handle actions triggered by control transfer in a synchronous manner here */
@@ -1172,21 +1267,21 @@ static inline void TMC_Task(void)
 			gpib_sdc(gpib_addr, is_timedout);
 			handleSDC = false;
 		}
-		
+
 		if (handleLocalLockout)
 		{
 			timeout_start(50000); /* 0.5s timeout*/
 			gpib_localLockout(is_timedout);
 			handleLocalLockout = false;
 		}
-		
+
 		if (handleGoToLocal)
 		{
 			timeout_start(50000); /* 0.5s timeout*/
 			gpib_gotoLocal(gpib_addr, is_timedout);
 			handleGoToLocal = false;
 		}
-		
+
 
 		/* Try to read in a TMC message from the interface, process if one is available */
 		if (ReadTMCHeader(&MessageHeader))
@@ -1200,32 +1295,32 @@ static inline void TMC_Task(void)
 					gpib_ren(1); /* ensure that remote control is enabled */
 					timeout_start(50000); /* 0.5s timeout*/
 					gpib_trigger(gpib_addr, is_timedout);
-					Endpoint_ClearOUT();					
+					Endpoint_ClearOUT();
 					break;
 				case TMC_MESSAGEID_DEV_DEP_MSG_OUT:
 					s_remaining_bytes_receive = MessageHeader.TransferSize;
-					
+
 					curlen = MIN(TMC_IO_EPSIZE-sizeof(TMC_MessageHeader_t), MessageHeader.TransferSize);
 
 					s_remaining_bytes_receive -= curlen;
-					
+
 					TMC_eom = (MessageHeader.MessageIDSpecific.DeviceOUT.LastMessageTransaction != 0);
 					lastmessage =  (s_remaining_bytes_receive==0);
 					ProcessSentMessage(MessagePayload, curlen, TMC_LastMessageComplete, lastmessage, TMC_eom && lastmessage, tmc_gpib_write_timedout);
-					
+
 					/* Select the Data Out endpoint, this has to be done because the timeout function cal select the control endpoint */
 					Endpoint_SelectEndpoint(TMC_OUT_EPADDR);
 					Endpoint_ClearOUT();
-					
+
 					TMC_LastMessageComplete = lastmessage;
 					break;
 				case TMC_MESSAGEID_DEV_DEP_MSG_IN:
 					Endpoint_ClearOUT();
-					
+
 					curlen16 = sizeof(readbuffer);// -1;
 					if (curlen16 > MessageHeader.TransferSize)
 						curlen16 = MessageHeader.TransferSize;
-					
+
 					/* Check if a response from an internal query is in the buffer */
 					if (internal_response_buffer_len) 
 					{ // internal response present
@@ -1233,10 +1328,10 @@ static inline void TMC_Task(void)
 						curlen16 = internal_response_buffer_len-internal_response_buffer_rpos; // count of unsent bytes from internal response buffer
 						if (curlen16 > MessageHeader.TransferSize)
 							curlen16 = MessageHeader.TransferSize;
-						
+
 						MessageHeader.TransferSize = curlen16;
 						memcpy(readbuffer, &(internal_response_buffer[internal_response_buffer_rpos]), curlen16);
-						
+
 						internal_response_buffer_rpos += curlen16;
 						lastmessage = (internal_response_buffer_rpos >= internal_response_buffer_len);
 						if (lastmessage)
@@ -1253,13 +1348,13 @@ static inline void TMC_Task(void)
 
 					MessageHeader.MessageIDSpecific.DeviceOUT.LastMessageTransaction = lastmessage;
 					if (!IsTMCBulkINReset)
-						WriteTMCHeader(&MessageHeader);					
+						WriteTMCHeader(&MessageHeader);
 
 					if (!IsTMCBulkINReset)
 					{
 						Endpoint_Write_Stream_LE_quick(readbuffer, MessageHeader.TransferSize, TMC_IO_EPSIZE-sizeof(TMC_MessageHeader_t), TMC_IO_EPSIZE);
 					}
-					
+
 					/* Also in case of a timeout, the host does not expire a Bulk IN IRP, so we still need to commit an empty endpoint to retire the IRP */
 					Endpoint_SelectEndpoint(TMC_IN_EPADDR);
 					Endpoint_ClearIN();
@@ -1270,12 +1365,12 @@ static inline void TMC_Task(void)
 						Endpoint_WaitUntilReady(); // wait until an endpoint buffer got free
 						Endpoint_ClearIN();
 					}
-					
+
 					if (IsTMCBulkINReset)
 					{
 						TMC_resetstates();
 					}
-					
+
 					break;
 				default:
 					Endpoint_StallTransaction();
@@ -1292,29 +1387,29 @@ static inline void TMC_Task(void)
 		if (Endpoint_IsOUTReceived())
 		{
 			LastTransferLength = 0;
-			
+
 			curlen = TMC_IO_EPSIZE;
 			if (s_remaining_bytes_receive < TMC_IO_EPSIZE)
 			{
 				curlen = s_remaining_bytes_receive;
 			}
-			
+
 			s_remaining_bytes_receive -= curlen;
 
-			
+
 			lastmessage = (s_remaining_bytes_receive==0);
 			TMC_LastMessageComplete = lastmessage;
 			ProcessSentMessage(MessagePayload, curlen, false, lastmessage, TMC_eom && lastmessage, tmc_gpib_write_timedout);
 			Endpoint_ClearOUT();
 		}
 	}
-	
+
 	if (handleRSTB)
 	{
 		uint8_t  notdata[2];
-		
+
 		handleRSTB = false;
-		
+
 		notdata[0] = RSTB_btag | 0x80;
 		notdata[1] = RSTB_status;
 		Endpoint_SelectEndpoint(TMC_NOTIFICATION_EPADDR);
@@ -1324,13 +1419,13 @@ static inline void TMC_Task(void)
 			if (IsTMCBulkINReset)
 			  break;
 		}
-		Endpoint_ClearIN();		
+		Endpoint_ClearIN();
 	}
-	
-	
+
+
 	if (IsTMCBulkOUTReset || IsTMCBulkINReset)
 	{
-	
+
 		Endpoint_SelectEndpoint(TMC_OUT_EPADDR);
 		Endpoint_ClearOUT();
 		Endpoint_ClearOUT();
@@ -1348,13 +1443,13 @@ static inline void TMC_Task(void)
 		}
 
 		TMC_resetstates();
-			
+
 	}
-	
+
 	/* All pending data has been processed - reset the data abort flags */
 	IsTMCBulkINReset  = false;
 	IsTMCBulkOUTReset = false;
-	
+
 	transfer_busy = (s_remaining_bytes_receive != 0);
 }
 
@@ -1380,7 +1475,7 @@ bool ReadTMCHeader(TMC_MessageHeader_t* const MessageHeader)
 	{
 		*pdat++ = Endpoint_Read_8();
 	}
-	
+
 	/* Store the new command tag value for later use */
 	CurrentTransferTag = MessageHeader->Tag;
 
@@ -1428,22 +1523,10 @@ bool WriteTMCHeader(TMC_MessageHeader_t* const MessageHeader)
 	/* Send the command header to the host */
 	//Endpoint_Write_Stream_LE_quick(readbuffer, MessageHeader.TransferSize, TMC_IO_EPSIZE-sizeof(TMC_MessageHeader_t), TMC_IO_EPSIZE);
 	Endpoint_Write_Stream_LE_noUsbTask(MessageHeader, sizeof(TMC_MessageHeader_t));
-	
+
 	/* Indicate if the command has been aborted or not */
 	return !IsTMCBulkINReset;
 }
 
 
 
-/*
-HP 3457A: END,ALWAYS => turns on EOI signal!
-
-ISSUES:
-  - short packet handling not OK!!!!! Commit an empty packet   
-  
-BOOT UPDATE:
-  V:
-  cd V:\Data\Projekt\Privat\gpibadapter\lufa-master\Demos\Device\Incomplete\TestAndMeasurement
-  copy TestAndMeasurement.bin G:\FLASH.BIN /Y
-  (usb.addr contains "1.3") and not (usb.src == "1.3.1")
-*/
