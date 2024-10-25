@@ -67,19 +67,32 @@ As said, I feel this is the best Firmware image so far, but I changed so much th
 
 After further testing I will also push the sourcecode of this image.
 
-## Firmware update to Version 2,  for 1 or 2 LEDs
-
+# Firmware update to Version 2,  for 1 or 2 LEDs
+by D F Conway Oct 2024
 The source code has been modifed to run on the version 1 single red LED adapter, 
 or the version 2 red & green LED adapter.  The same source code is used for both 
-versions.  Any update to the source code will be available to run on versions 1 or 2.
+versions.  Any future update to the source code will be available to run on versions 1 or 2.
 The source code includes a directive that will compile for version 1 or 2.  
+The source code for version 1 and 2 is compiled from the same files, 
+therefore the name of the compiled BIN or HEX files will be the same for both versions of the software.
 
-Version 1 firmware will run on version 2 hardware, and vice versa.  The only symptoms will be
-that the LEDs won't light up when expected.
+Version 1 firmware will run on version 2 hardware, and vice versa.  The only side effects will be
+that the LEDs won't light up when expected.  There will be no effect on the usb-gpib communications.
+
+The Xyphro version 2 hardware grounds a MCU pin to enable software detection of the hardware version.  
+This software does not use that feature because it would require a test for hardware version most times an LED is powered, or not.
+Adding tests has the potential to slow down gpib/usb communications.
 
 To compile version 1 or 2 firmware, comment in or out the VER2 directive found 
 in the TestAndMeasurement.c source code file.
 
+#Firmware Compile and Load Scripts
+by D F Conway Oct 2024
+Compiling the source code requires avr-gcc.  Loading the firmware onto the adapter requires avr-dude and a programmer.
+The Windows batch file will load the firmware onto the adapter.
+The Linux script will compile the source code, and load the firmware onto the adapter.  The script will attempt to 
+load the firmware regardless of the success or failure of the compilation attempt.  
+Modify both the batch and script to suit your file paths.
 
 # Hardware
 
@@ -156,7 +169,6 @@ The only effect of running a software version that doesn't match the hardware ve
 ## Binaries
 
 For those, that just want to create their own device, I've included the binary output in the "SW/binaries" subdirectory.
-The source code for version 1 and 2 is compiled from the same file, therefore the name of the compiled BIN or HEX files will be the same for both versions of the software.
 
 # Using the device
 
@@ -182,7 +194,7 @@ GPIBUSB does probe all GPIB primary addresses (and secondary address 0) for pres
 The only importance setting on the measurement device is, that the GPIB interface is enabled, which is typically the case.
 
 ## LED indicator
-
+by D Conway Oct 2024
 The LED indicates different states:
 
 Version 1 : Red LED Only
@@ -191,12 +203,12 @@ LED on: The device is connected to a measurement device and GPIB communication p
 LED off: The device is not connected over USB, or the PC powered off :-)
 
 Version 2 : Red & Green LED
-RED LED slow blink : The USB-GPIB adapter is connected via USB, but not enumerated.  
-RED LED off : no power via usb cable.
-GREEN LED on: The USB-GPIB adapter is connected to a powered up measurement device.
-GREEN LED pulsing: Active GPIB communication with the measurement device.  
+RED LED blinking : The USB-GPIB adapter is connected via USB, but the gpib port is not enabled.
+RED LED off: The device is not connected to USB, or the PC powered off.
+GREEN LED on: The USB-GPIB adapter is connected to a powered-up measurement device.
+GREEN LED pulsing: Active GPIB communication with the measurement device.
 
-The pulsing green LED indicates activity, not quantity.  
+The pulsing green LED indicates activity, not quantity of messages.
 The green and red LEDs are never on at the same time.
 
 
