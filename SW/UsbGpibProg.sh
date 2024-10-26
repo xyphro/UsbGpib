@@ -21,9 +21,10 @@ cd ~/git/UsbGpib/SW/TestAndMeasurement
 echo "Compiling the USB-GPIB firmware"
 echo "###########################################"
 make
-cd ~/git/UsbGpib/SW/binaries
-cp ~/git/UsbGpib/SW/TestAndMeasurement/TestAndMeasurement.hex .
+cd ~/git/DazzUsbGpib/SW/binaries
+cp ../TestAndMeasurement/TestAndMeasurement.hex .
 #  This assumes that bootloader.hex is already in the binaries folder: ~/git/UsbGpib/SW/TestAndMeasurement/bootloader.hex
+exit
 echo
 echo "Programing the USB-GPIB adapter"
 echo "###########################################"
