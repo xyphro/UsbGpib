@@ -3,7 +3,7 @@ GPIB to USB Adaptor
 by Xyphro 2024
 version 2.0
 
-Modified for version 2.0 hardware with two LEDs by D Conway 2024
+Modified for version 2.0 hardware with two LEDs by D Conway October 2024
 */
 
 
@@ -22,7 +22,7 @@ Modified for version 2.0 hardware with two LEDs by D Conway 2024
 
 /*  Defines code for version 2 hardware.
     Comment out the #define VER2 line to compile software for
-    single LED, version 1 hardware
+    single red LED, version 1 hardware
 */
 #define  VER2
 
