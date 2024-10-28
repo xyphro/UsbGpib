@@ -160,13 +160,18 @@ The LED indicates different states.  Version 1 hardware only has a red LED.  Ver
 
 ### Version 1 : Red LED Only
 LED blinking: The USBGPIB converter is connected to a measurement instrument, it is powered off or its GPIB port is disabled. In this state, the device is also not connected to USB and will not show up in the device manager or lsusb.
+
 LED on: The device is connected to a measurement device and GPIB communication possible. It is also accessible over USB
+
 LED off: The device is not connected over USB, or the PC powered off :-)
 
 ### Version 2/2e : Red & Green LED
 RED LED blinking : The USB-GPIB adapter is connected via USB, but the gpib port is not enabled.
+
 RED LED off: The device is not connected to USB, or the PC powered off.
+
 GREEN LED on: The USB-GPIB adapter is connected to a powered-up measurement device.
+
 GREEN LED pulsing: Active GPIB communication with the measurement device.
 
 ### Intermittent flashing of Green LED
@@ -282,12 +287,14 @@ Returns as text string either: "off", "on", "slow", "slower" or "slowest".
 
 ## Firmware version
 
-Finally I implemented a command to query the USB adapters firmware version :-)
+Finally a command has been implemented to query the USB adapters firmware version.  
 
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 print(dev.query('!ver?'))
 ```
+I have not tested this feature and I can't find it in the source code.
+
 
 ## Shorten resource strings (Matlab)
 
