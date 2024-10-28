@@ -169,7 +169,10 @@ RED LED off: The device is not connected to USB, or the PC powered off.
 GREEN LED on: The USB-GPIB adapter is connected to a powered-up measurement device.
 GREEN LED pulsing: Active GPIB communication with the measurement device.
 
-The pulsing green LED indicates activity, not quantity of messages.
+### Intermittent flashing of Green LED
+The pulsing green LED indicates activity, not quantity of messages.  The green LED is controlled from a running timer interupt.  As part of the timer interrupt service routine, a test is done to see if communications are active at that moment.  If so, then the LED is toggled on/off.  This method requires minimal processor time but messages transferred between the timer checks will not toggle the green LED.  
+Not every message is expected to toggle the green LED.    This is not a bug, the firware is written that way to minimise processor loading.
+
 The green and red LEDs are never on at the same time.
 
 # Setting Parameters
