@@ -25,7 +25,7 @@ I have been working on this project for quite a while and some of these features
 
 ## What you will find here
 
-This repository includes the hardware and software files and information needed to build the USB-GPIB version 2e enhanced adapter.
+This repository includes the hardware and software files and information needed to build the latest USB-GPIB enhanced adapter.
 
 ## Acknowledgment
 
@@ -40,7 +40,8 @@ There are three separate version numbers for the:
 2. PCB
 3. Enclosure
 
-This release incudes:
+To identify my versions, and reduce possible confusion, I have added the suffix "e" for enhanced.
+This release includes:
 
 1.  Firmware ver 2e
 2.  PCB ver 3e
@@ -49,22 +50,22 @@ This release incudes:
 ###  Firmware
 
 Xyphro wrote version 1 of the firmware but has not produced a version 2.
-I wrote modifications to the firmware that created version 2e.
-The version 2e source code can be compiled to produce version 1 or 2e firmware using complier directives.
+I wrote modifications to the firmware that created the enhanced version 2e.
+The version 2e source code can be compiled to produce version 1 or 2e firmware using a compilier directive.
 
 The version 2e firmware implements two LEDs (red and green).
 
 ###  PCB
 
 Xyphro produced version 1 and 2 PCBs.
-I have produced 3 versions of the PCB layout. To identify my versions, I have added the suffix "e" for enhanced.
+I have produced three versions of the PCB layout. 
 I have published versions 2e and 3e PCB.
 The Xyphro ver 1 firmware will run on the version 1 PCB.
-All firmware versions (1,2e,3e) will run on my PCB versions 3e.
+All firmware versions (1,2e) will run on my PCB version 3e.
 
-At the time of writing Xyphro has not written version 2 software to run on the version 2 hardware.  
-The Xyphro version 1 software runs on the versions 1/2/2e hardware, but does not make use of the green LED.  
-The version 2e software available on this repository runs on versions 1/2/2e hardware.
+At the time of writing Xyphro has not written version 2 software to run on his version 2 hardware.
+The Xyphro version 1 software runs on the versions 1/2/2e hardware, but does not make use of the green LED.
+The version 2e software available on this repository runs on versions 1/2/2e/3e hardware.
 
 ## Sucessfully tested measurement equipment:
 - R&S FSEM30
@@ -86,7 +87,7 @@ The version 2e software available on this repository runs on versions 1/2/2e har
 
 A key objective of this version 2e software  was to maintain full compatibility with the Xyphro firmware for versions 1,2 & 2e hardware.
 
-This is my way of contributing back to the good work done by Xyphro and the other contributors.  The source code includes compiler directives that will produce version 2e firmware for either version 1 or 2/2e hardware.  Any future enhancements to the firmware source code will apply to versions 1/2/2e hardware.
+This is my way of contributing back to the good work done by Xyphro and the other contributors.  The source code includes a compiler directive that will produce version 2e firmware for either version 1 or 2/2e/3e hardware.  Any future enhancements to the firmware source code will apply to versions 1/2/2e/3e hardware.
 
 # Hardware
 
@@ -104,8 +105,8 @@ The Centronic 24 pin connector can be sourced from Aliexpress.  These are low co
 
 The enclosure requires:
 
-1.  2x M3x20mm socket head screws,
-2.  2x M3 square (or alternatively hexagonal) nuts
+1.  2x M3x20mm SS socket head screws,
+2.  2x M3 square (or alternatively hexagonal) SS nuts
 3.  2x 10mm length  x  3mm ID plastic spacers and,
 4.  1x 3D printed enclosure (2x parts, one print).
 
@@ -124,7 +125,7 @@ The adapter can be tested by programming it.  If the red LED flashes, the adapte
 Lastly I soldered in the Centronic connector. 
 
 The two spacers then need to be glued in place to the top of the PCB.  The glue only needs to be strong enough to hold the spacer in place until the M3 screws are inserted.
-Contact or super glue are good choices.
+Contact adhesive or super glue are good choices.
 
 ## Enclosure
 
@@ -133,14 +134,14 @@ The enclosure consists of a cup style enclosure that the assembled PCB slides in
 The second piece is a spacer that slides under the Centronic GPIB connector.
 Two pockets are included for hex or square nuts.
 
+## Enclosure Assembly
+
 The complete adapter is assembled by:
 1.  inserting the nuts into the pockets,
 2.  sliding the PCB into the enclosure.
 3.  inserting the spacer and aligning the holes.
 4.  inserting the screws and lightly tightening.
 5.  standing back and admiring your new latest project, because no one else will care.
-
-## Enclosure Assembly
 
 
 # Software
@@ -150,18 +151,18 @@ The complete adapter is assembled by:
 The source code of the Boot loader (slightly modified LUFA MassStorage Boot loader) and the main USB-GPIB code are located in the "SW" subdirectory.
 At the time of publication LUFA 170418 release was used, with avr-gcc as compiler.  The hex or bin files are loaded onto the adapter using avr-dude.  
 
-The Software is compatible with version 1, 2 and 2e hardware.  Compiling for version 1 hardware requires the compiler directive VER2 to be commented out.  Compiling for versions 2/2e requires the VER2 compiler directive to be active. The core functionality is identical for all versions.  Any future improvements made to the source code will be available for versions 1/2/2e of the hardware.
+The Software is compatible with version 1, 2, 2e and 3e hardware.  Compiling for version 1 hardware requires the compiler directive VER2 to be commented out.  Compiling for versions 2/2e/3e requires the VER2 compiler directive to be active. The core functionality is identical for all versions.  Any future improvements made to the source code will be available for versions 1/2/2e of the hardware.
 
 The only effect of running a software version that doesn't match the hardware version is that the LEDs won't light up as expected.  
 
 ## Binaries
 
-For those, that just want to create their own device, I've included the binary output in the "SW/binaries" subdirectory.  The binaries are compiled for versions 2/2e of the hardware.
+For those, that just want to create their own device, I've included the binary output in the "SW/binaries" sub-directory. 
 
 ## Bootloader
 
 The boot loader allows the firmware to be loaded into the adapter via the USB connection. I have never used this feature.
-Activating this mode requires shorting of two pins (tweezers).   The pins are marked on the ver 2e PCB silk screen for the ISP connector.
+Activating this mode requires shorting of two pins (tweezers).   The pins are marked on the ver 2e/3e PCB silk screen for the ISP connector.
 
 ## Loading the Firmware with USB-ASP Programmer
 
@@ -212,7 +213,7 @@ The only importance setting on the measurement device is, that the GPIB interfac
 
 ## LED indicator
 
-The LED indicates different states.  Version 1 hardware only has a red LED.  Version 2/2e hardware has a red and green LED. Version 2e software can be compiled to run correctly on version 1 or 2/2e hardware.
+The LED indicates different states.  Version 1 hardware only has a red LED.  Version 2/2e/3e hardware has a red and green LED. Version 2e software can be compiled to run correctly on version 1 or 2/2e/3e hardware.
 
 ### Version 1 : Red LED Only
 LED blinking: The USBGPIB converter is connected to a measurement instrument, it is powered off or its GPIB port is disabled. In this state, the device is also not connected to USB and will not show up in the device manager or lsusb.
@@ -231,8 +232,8 @@ GREEN LED on: The USB-GPIB adapter is connected to a powered-up measurement devi
 GREEN LED pulsing: Active GPIB communication with the measurement device.
 
 ### Intermittent flashing of Green LED
-The pulsing green LED indicates activity, not quantity of messages.  The green LED is controlled from a running timer interupt.  As part of the timer interrupt service routine, a test is done to see if communications are active at that moment.  If so, then the LED is toggled on/off.  This method requires minimal processor time but messages transferred between the timer checks will not toggle the green LED.  
-Not every message is expected to toggle the green LED.    This is not a bug, the firmware is written that way to minimise processor loading.
+The pulsing green LED indicates activity, not quantity of messages.  The green LED is controlled from a running timer interrupt.  As part of the timer interrupt service routine, a test is done to see if communications are active at that moment.  If so, then the LED is toggled on/off.  This method requires minimal processor time but messages transferred in the period between the timer checks will not toggle the green LED.  
+As a result, not every message is expected to toggle the green LED.    This is not a bug, the firmware is written that way to minimise processor loading.
 
 The green and red LEDs are never on at the same time.
 
@@ -391,6 +392,6 @@ Do a reset of the adapter. Note that due to the reset you have to close the visa
 
 # What's Next ???
 
-I am presently working on a 3D enclosure design that will have more curves than straight lines.  The design will be consistent with my view that good engineering looks good.
-I will also upload the hardware design and pcb files.  People can then choose between the different flavours of adapter hardware designs to suit their needs.  
+At this stage, I have completed all of the things I want to do on this project. I have assembled my versions of the UsbGpib adapter and I am happy with those.
+Still open to suggestions, contributions and supporting efforts of others to improve the adapter.
 
