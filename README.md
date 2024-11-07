@@ -35,9 +35,36 @@ It is fantastic that Xyphro has chosen to release his design for others to build
 
 ## Version Confusion
 
-Xyphro has designed a version 1 and 2 adapter hardware.  I also have built two modified versions of the usb-gpib adapter.  To avoid confusion, I will refer to my latest design as version 2e because it is different to, and includes some enhancements not seen on, the Xyphro version 2 hardware design.
+There are three separate version numbers for the:
+1. Firmware
+2. PCB
+3. Enclosure
 
-At the time of writing Xyphro has not written version 2 software to run on the version 2 hardware.  The version 1 software runs on the versions 1/2/2e hardware, but does not make use of the green LED.  The version 2e software available on this repository runs on versions 1/2/2e hardware.
+This release incudes:
+
+1.  Firmware ver 2e
+2.  PCB ver 3e
+3.  Enclosure ver 3e.
+
+###  Firmware
+
+Xyphro wrote version 1 of the firmware but has not produced a version 2.
+I wrote modifications to the firmware that created version 2e.
+The version 2e source code can be compiled to produce version 1 or 2e firmware using complier directives.
+
+The version 2e firmware implements two LEDs (red and green).
+
+###  PCB
+
+Xyphro produced version 1 and 2 PCBs.
+I have produced 3 versions of the PCB layout. To identify my versions, I have added the suffix "e" for enhanced.
+I have published versions 2e and 3e PCB.
+The Xyphro ver 1 firmware will run on the version 1 PCB.
+All firmware versions (1,2e,3e) will run on my PCB versions 3e.
+
+At the time of writing Xyphro has not written version 2 software to run on the version 2 hardware.  
+The Xyphro version 1 software runs on the versions 1/2/2e hardware, but does not make use of the green LED.  
+The version 2e software available on this repository runs on versions 1/2/2e hardware.
 
 ## Sucessfully tested measurement equipment:
 - R&S FSEM30
@@ -75,17 +102,46 @@ For many parts, the Minimum Order Quantity (MOQ) is often greater than the numbe
 
 The Centronic 24 pin connector can be sourced from Aliexpress.  These are low cost and the quality is quite reasonable.
 
+The enclosure requires:
+
+1.  2x M3x20mm socket head screws,
+2.  2x M3 square (or alternatively hexagonal) nuts
+3.  2x 10mm length  x  3mm ID plastic spacers and,
+4.  1x 3D printed enclosure (2x parts, one print).
+
 ## PCB
 
 I used KiCAD to draw the circuit and design the PCB.  All the files are included here in the HW folder if you want to make further modifications.  The Gerber files are also here if you simply want to have PCBs made.
 
-## Assembly
+## PCB Assembly
 
-I just use a hand soldering iron to assemble the parts to the PCB. The parts were selected to ease hand assembly.  Start with pre-tinning the USB-C connector and MCU pins.  I fitted the MCU, then the USB-C connector.  I found that the MCU failed if a heat gun was used, most likely because of my bad technique, but using a soldering iron worked well.  Solder the remaining smd parts and the LEDs.  I then beeped all of the USB-C connector pins and the MCU pins looking for solder bridges and bad joints.  The adapter can be tested by programming it.  If the red LED flashes, the adapter is OK.  Lastly I soldered in the Centronic connector. 
+I just use a hand soldering iron to assemble the parts to the PCB. The parts were selected to ease hand assembly.  
+Start with pre-tinning the USB-C connector and MCU pins.  I fitted the MCU, then the USB-C connector.  
+I found that the MCU failed if a heat gun was used, most likely because of my bad technique, 
+but using a soldering iron worked well.  Solder the remaining smd parts and the LEDs.  
+I then beeped all of the USB-C connector pins and the MCU pins looking for solder bridges and bad joints.  
+The adapter can be tested by programming it.  If the red LED flashes, the adapter is OK.  
+Lastly I soldered in the Centronic connector. 
 
-## Enclosure TODO
+The two spacers then need to be glued in place to the top of the PCB.  The glue only needs to be strong enough to hold the spacer in place until the M3 screws are inserted.
+Contact or super glue are good choices.
 
-Often significant force is required to connect and separate the adapter from the instrument GPIB connector.  For this reason it is highly recommended that the pcb is fitted within an enclosure.  The enclosure is a custom two piece design.  FreeCAD was used to create the design.  The enclosure is printed with any good 3D printer. It requires 2x M3 screws to connect the PCB to the enclosure.
+## Enclosure
+
+The enclosure consists of a cup style enclosure that the assembled PCB slides into.  The enclosure is designed to be printed connector end pointed upward.
+
+The second piece is a spacer that slides under the Centronic GPIB connector.
+Two pockets are included for hex or square nuts.
+
+The complete adapter is assembled by:
+1.  inserting the nuts into the pockets,
+2.  sliding the PCB into the enclosure.
+3.  inserting the spacer and aligning the holes.
+4.  inserting the screws and lightly tightening.
+5.  standing back and admiring your new latest project, because no one else will care.
+
+## Enclosure Assembly
+
 
 # Software
 
