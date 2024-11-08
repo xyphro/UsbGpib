@@ -1,5 +1,5 @@
 # USB-GPIB Adapter 
-## Version 2e (enhanced)
+## Version 3e (enhanced)
 
 ## Project Introduction
 
