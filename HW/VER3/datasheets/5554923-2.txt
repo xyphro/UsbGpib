@@ -1,0 +1,16 @@
+﻿"Symbol";"Value";"Unit";
+"SUPPLIER_NAME";"RS Components";"";
+"TraceParts.PartVersion";"1.0.5";"";
+"SUPPLIER";"TE Connectivity";"";
+"TraceParts.PartStatus";"Published";"";
+"TraceParts.PartNumber";"10-26082019-088889";"";
+"TraceParts.PartLanguage";"en";"";
+"DESIGN";"TE Connectivity CHAMP Series 2.16mm Pitch 24 Way 2 Row Right Angle PCB Socket, PCB Mount, Solder Termination";"";
+"TraceParts.InstanceId";"10-26082019-0888895PCI4NFDI9SU2NK8JLOKGWISF";"";
+"TraceParts.PartTitle";"TE Connectivity CHAMP Series 2.16mm Pitch 24 Way 2 Row Right Angle PCB Socket, PCB Mount, Solder Termination";"";
+"REFERENCE";"5554923-2";"";
+"Buy_Now";"https://uk.rs-online.com/web/p/products/8236926?cm_mmc=en-ds-_-mcad-_-traceparts-_-8236926'";"";
+"TRACEPARTS";"TRACEPARTS";"";
+"TraceParts.PartStatusId";"";"";
+"rs_stock_number";"8236926";"";
+"TraceParts.ClassPath";"RS_COMPONENTS:10-26082019-088889";"";
