@@ -4,6 +4,12 @@
 # published 17 Jan 2024 here:
 # https://github.com/xyphro/UsbGpib/discussions/55
 
+# Usage: usbgpib_conf command
+# !autoid? off
+# !term? eoi
+# !string? normal
+# !ver? V1.6
+#
 # An example of running the script:
 # $ python3 usbgpib_conf.py autoid on
 #
