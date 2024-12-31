@@ -195,7 +195,7 @@ The VISA resource name is constructed from this USB Serial number. You can ident
 
 If you connect your USBGPIB device afterwards to another GPIB measurement device, it will disconnect and connect with a new serial number string, matching the other GPIB device *IDN? response again.
 
-## Scenarious
+## Scenarios
 
 - The adapter has been tested with operating systems Windows 7 and 10 so far only. But linux should also work out of the box.
 - USB1.1, USB2.0 and USB3.x ports tested, with and without USB HUB in between.
