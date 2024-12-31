@@ -1,3 +1,12 @@
+/*
+GPIB to USB Adaptor
+by Xyphro 2024
+*/
+
+/* 
+version 2.0
+Modified for version 2.0 hardware with two LEDs by D Conway October 2024
+*/
 
 #include "gpib.h"
 #include "gpib_priv.h" 
@@ -7,16 +16,29 @@
 #include <avr/interrupt.h>
 #include "global.h"
 
-
+/* Is a GPIB device connected?  */
 #define GPIB_DEVICE_CONNECTSTATE_UNKNOWN      (0)
 #define GPIB_DEVICE_CONNECTSTATE_DISCONNECTED (1)
 #define GPIB_DEVICE_CONNECTSTATE_CONNECTED    (2)
 
+/*  Defines code for version 2 hardware.
+    Comment out the #define VER2 line to compile software for
+    single red LED, version 1 hardware
+*/
+#define  VER2
+
+  /* Turn LEDs ON/OFF by switching port Hi/Lo */
+  #define LED_RED_ON  { PORTF |=  (1<<5); }
+  #define LED_RED_OFF { PORTF &= ~(1<<5); }
+
+  #define LED_GRN_ON  { PORTF |=  (1<<4); }
+  #define LED_GRN_OFF { PORTF &= ~(1<<4); }
+  #define LED_GRN_TGL { PORTF ^=  (1<<4); }   // Toggle Green LED 
 
 /**********************************************************************************************************
  * STATIC functions
  **********************************************************************************************************/
-static volatile uint8_t timer0_100mscounter;
+static volatile uint8_t timer0_100mscounter;  /*Int Timer count */
 volatile bool timer0_ticked = false; /* flag going high every 100ms */
 static uint8_t  timer0_div;
 static uint8_t  s_device_state = GPIB_DEVICE_CONNECTSTATE_UNKNOWN;
@@ -34,16 +56,19 @@ static void timer_init(void)
 	timer0_100mscounter = 0;
 }
 
-
+/* The timer tick controls the green LED (ver 2 only).
+If the gpib device is inactive and connected then the green LED is on  to indicate device is connected
+If the gpib device is inactive and disconnected then the green LED is off  to indicate nil device
+If the gpib device is active then the green LED is toggled to indicate activity */
 ISR (TIMER0_OVF_vect)
 {
 	timer0_div++;
 	timer0_ticked = true;
-	if (timer0_div >= 6) /* are 100ms passed? */
+	if (timer0_div >= 6) /* has 100ms passed? */
 	{
 		timer0_100mscounter++;
 		timer0_div = 0;
-		
+
 		if (!s_gpib_transaction_active) /* only check, if no GPIB transaction is active */
 		{
 			if ( !(DDRF & (1<<6)) ) /* is ATN line tristated? */
@@ -53,6 +78,10 @@ ISR (TIMER0_OVF_vect)
 					if (s_gpib_disconnect_counter >= 2)
 					{ /* after 100-200ms with ATN low, assume, that there is no GPIB device connected */
 						s_device_state = GPIB_DEVICE_CONNECTSTATE_DISCONNECTED;
+						#ifdef VER2
+						   // Turn off GPIB LED green if no gpib device connected.
+						   LED_GRN_OFF
+						#endif
 					}
 					else
 					{
@@ -63,12 +92,24 @@ ISR (TIMER0_OVF_vect)
 				{ /* device is connected */
 					s_gpib_disconnect_counter = 0;
 					s_device_state = GPIB_DEVICE_CONNECTSTATE_CONNECTED;
+					#ifdef VER2
+					   // Turn on GPIB LED green if gpib device connected but not active
+					   LED_GRN_ON
+					#endif
 				}
 			}
 			else
 			{
 				s_gpib_disconnect_counter = 0;
+
 			}
+		}
+		else
+		{
+			#ifdef VER2
+			  // if gpib is active, then toggle the green led at 5Hz to indicate activity.
+			  LED_GRN_TGL
+			#endif
 		}
 	}
 }
@@ -98,7 +139,6 @@ static bool gpib_cmd_SECADDR(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
 	return gpib_tx(addr | 0x60, true, ptimeoutfunc);
 }
-
 
 static bool gpib_cmd_TAG(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
@@ -151,7 +191,7 @@ uint8_t gpib_readStatusByte(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
 	bool timedout, eoi;
 	uint8_t status;
-	
+
 	timedout = false;
 	status = 0;
 
@@ -169,10 +209,10 @@ uint8_t gpib_readStatusByte(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 	if (!timedout)
 		timedout = gpib_cmd_SPD(ptimeoutfunc);
 	if (!timedout)
-		timedout = gpib_cmd_UNT(ptimeoutfunc); 
+		timedout = gpib_cmd_UNT(ptimeoutfunc);
 	if (timedout)
-		gpib_recover();	
-	s_gpib_transaction_active = false;		
+		gpib_recover();
+	s_gpib_transaction_active = false;
 	return status;
 }
 
@@ -189,19 +229,19 @@ bool gpib_localLockout(gpibtimeout_t ptimeoutfunc)
 bool gpib_gotoLocal(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
 	bool timedout;
-	
-	timedout = gpib_cmd_LAG(addr, ptimeoutfunc); 
+
+	timedout = gpib_cmd_LAG(addr, ptimeoutfunc);
 	if (!timedout)
 		timedout = gpib_cmd_GTL(ptimeoutfunc);
-		
+
 	_delay_ms(100);	// this is not done by the NIUSB adapter, but seems to be required for measurement devices using NI chipset
-		
+
 	if (!timedout)
 		timedout = gpib_cmd_UNL(ptimeoutfunc);
-		
+
 	//ATN_HIGH;
 	//_delay_us(14);
-		
+
 	if (timedout)
 		gpib_recover();
 	return timedout;
@@ -211,13 +251,13 @@ bool gpib_gotoLocal(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 bool gpib_trigger(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
 	bool timedout;
-	
+
 	timedout = gpib_cmd_LAG(addr, ptimeoutfunc); 
 	if (!timedout)
 		timedout = gpib_cmd_GET(ptimeoutfunc);
 	if (!timedout)
 		timedout = gpib_cmd_UNL(ptimeoutfunc);
-		
+
 	if (timedout)
 		gpib_recover();
 	return timedout;
@@ -240,7 +280,7 @@ static bool gpib_cmd_SDC(gpibtimeout_t ptimeoutfunc) // selective device clear
 bool gpib_sdc(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
 	bool timedout;
-	
+
 	s_gpib_transaction_active = true;
 	timedout = gpib_cmd_LAG(addr, ptimeoutfunc); 
 	if (!timedout)
@@ -250,7 +290,7 @@ bool gpib_sdc(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 	if (timedout)
 		gpib_recover();
 	s_gpib_transaction_active = false;
-		
+
 	_delay_ms(150); // this is not done by the NI USB adapter, but seems to be required for products using NI USB adapter!
 	return timedout;
 }
@@ -277,7 +317,7 @@ void gpib_init(void)
 
 	s_gpib_transaction_active = false;
 	s_gpib_disconnect_counter = 0;
-	
+
 	gpib_interface_clear();
 	timer_init(); /* init timeout timer */
 }
@@ -289,21 +329,21 @@ bool gpib_is_connected(void)
 		if (!s_gpib_transaction_active) /* only check, if no GPIB transaction is active */
 		{
 			_delay_us(10);
-			ATN_HIGH; 
+			ATN_HIGH;
 			_delay_us(10);
 		}
 		else
 		{
 			return true;
 		}
-		
+
 		//return s_device_state == GPIB_DEVICE_CONNECTSTATE_CONNECTED;
 	}
 	else
 	{
 		//return s_device_state == GPIB_DEVICE_CONNECTSTATE_CONNECTED;
 	}
-	return !!ATN_STATE; /* is ATN LOW? This can only happen if no GPIB device is connected/powered */		
+	return !!ATN_STATE; /* is ATN LOW? This can only happen if no GPIB device is connected/powered */
 }
 
 void gpib_ren(bool enable)
@@ -342,13 +382,13 @@ uint8_t gpib_readdat(bool *pEoi, bool *ptimedout, gpibtimeout_t ptimeoutfunc)
 
 bool gpib_untalk_unlisten(gpibtimeout_t ptimeoutfunc)
 {
-	bool timedout;	
+	bool timedout;
 	timedout = gpib_cmd_UNL(ptimeoutfunc);
 	if (!timedout)
 		timedout = gpib_cmd_UNT(ptimeoutfunc);
 	if (timedout)
 		gpib_recover();
-		
+
 	s_gpib_transaction_active = false;
 	return timedout;
 }
@@ -356,19 +396,19 @@ bool gpib_untalk_unlisten(gpibtimeout_t ptimeoutfunc)
 bool  gpib_make_talker(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
 	bool timedout;
-	
+
 	s_gpib_transaction_active = true;
-	
+
 	timedout = gpib_cmd_UNL(ptimeoutfunc);
 	if (!timedout)
 		timedout = gpib_cmd_LAG(0, ptimeoutfunc); /* signal that controller is listener */
 	if (!timedout)
 		timedout = gpib_cmd_TAG(addr, ptimeoutfunc); /* address as talker*/
 	//_delay_us(10);
-		
+
 	NDAC_LOW;   /* make NDAC L */
 	//NRFD_LOW;
-	
+
 	if (timedout)
 		gpib_recover();
 	return timedout;
@@ -386,7 +426,7 @@ bool gpib_make_listener(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 		timedout = gpib_cmd_UNL(ptimeoutfunc);
 	if (!timedout)
 		timedout = gpib_cmd_LAG(addr, ptimeoutfunc); /* address target as listener*/
-		
+
 	if (timedout)
 		gpib_recover();
 	return timedout;
@@ -431,20 +471,19 @@ static bool is_timedout(void)
 	_delay_us(10);
 	if (timeout_val == 0)
 		return true;
-		
+
 	timeout_val--;
 	return false;
 }
-#define LED(s) {if(s) PORTF |= (1<<5); else PORTF &= ~(1<<5);}
 
 uint8_t gpib_search(void)
 {
 	uint8_t addr, foundaddr;
-	
+
 	s_gpib_transaction_active = true;
 	timeout_start(500);
 	gpib_tx(0x3F, true, is_timedout); // UNL
-	
+
 	foundaddr = 255;
 	addr = 0; // start searching from GPIB Address 1 onwards as 0 is reserved for controller
 	do
@@ -454,7 +493,7 @@ uint8_t gpib_search(void)
 		{
 			timeout_start(500);
 			gpib_cmd_LAG(addr, is_timedout);
-			
+
 			ATN_HIGH; /* make ATN H */
 			_delay_ms(2);
 			if ( (NDAC_STATE == 0) && (ATN_STATE != 0))
@@ -462,14 +501,14 @@ uint8_t gpib_search(void)
 				foundaddr = addr;
 			}
 		}
-		
+
 	}
 	while ( (addr < 63) && (foundaddr == 255));
-	
+
 	timeout_start(500);
 	gpib_tx(0x3F, true, is_timedout); // UNL
 
-	
+
 	/* if the device needs a secondary address, ensure, that it really cannot be addressed without secondary address */
 	if (addr >= 32)
 	{
@@ -485,8 +524,8 @@ uint8_t gpib_search(void)
 		timeout_start(500);
 		gpib_tx(0x3F, true, is_timedout); // UNL
 	}
-	
+
 	s_gpib_transaction_active = false;
-	
+
 	return foundaddr;
 }
