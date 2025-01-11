@@ -37,7 +37,7 @@ I implemented a small GUI to change the non-volatile settings of the GpibUSB ada
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGpibGUI.png" width="80%"/>
 
-Please download it from this folder: [FW image location: SW/UsbGpibGUI](SW/UsbGpibGUI)
+Please download it from this folder: [SW/UsbGpibGUI](SW/UsbGpibGUI)
 
 The source code is included in the src subdirectory.
 
