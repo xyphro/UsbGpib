@@ -372,3 +372,7 @@ dev.write('!reset')
 
 Do a reset of the adapter. Note that due to the reset you have to close the visa session and start a new one.
 
+
+# If you got here and you want to support me, here is your chance :-)
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J7WPWSQ)
