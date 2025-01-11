@@ -29,6 +29,23 @@ Some goals of the project were:
 
 All those goals are met.
 
+# 12th January '25 update
+
+## New Gui available!
+
+I implemented a small GUI to change the non-volatile settings of the GpibUSB adapter. Sorry - it's windows only :-) 
+
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGpibGUI.png" width="80%"/>
+
+Please download it from this folder: [FW image location: SW/UsbGpibGUI](SW/UsbGpibGUI)
+
+The source code is included in the src subdirectory.
+
+## New Firmware
+
+I release also herewith Version 1.8 of the firmware. 
+Mainly a bugfix was done, that the string setting now also returns short, when it is actually set to short. (issue report #59).
+
 # 13th January '24 update
 
 New year, new update :-)

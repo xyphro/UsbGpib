@@ -966,6 +966,12 @@ void ProcessInternalCommand(uint8_t Length)
 		uint8_t dat = Endpoint_Read_8();
 		cmd_executed = parser_add( dat );
 	}
+	
+	// remove residual characters from the endpoint buffer
+	while ( (Length--) )
+	{
+		uint8_t dat = Endpoint_Read_8();
+	}
 }
 
 void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfer, bool isLastTransfer, bool sendEom, gpibtimeout_t ptimeoutfunc)

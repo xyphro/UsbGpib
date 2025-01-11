@@ -1,0 +1,169 @@
+object Form1: TForm1
+  Left = 321
+  Height = 328
+  Top = 299
+  Width = 815
+  Caption = 'XyphroLabs UsbGpibGUI'
+  ClientHeight = 328
+  ClientWidth = 815
+  Constraints.MinHeight = 310
+  Constraints.MinWidth = 653
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poMainFormCenter
+  LCLVersion = '2.0.4.0'
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 305
+    Width = 815
+    Panels = <>
+  end
+  object ListBox1: TListBox
+    Left = 0
+    Height = 305
+    Top = 0
+    Width = 480
+    Align = alLeft
+    ItemHeight = 0
+    OnSelectionChange = ListBox1SelectionChange
+    TabOrder = 1
+  end
+  object Splitter1: TSplitter
+    Left = 480
+    Height = 305
+    Top = 0
+    Width = 5
+  end
+  object GroupBox1: TGroupBox
+    Left = 485
+    Height = 305
+    Top = 0
+    Width = 330
+    Align = alClient
+    Caption = 'Device settings'
+    ClientHeight = 285
+    ClientWidth = 326
+    Constraints.MinHeight = 280
+    Constraints.MinWidth = 309
+    TabOrder = 3
+    object Label1: TLabel
+      Left = 8
+      Height = 15
+      Top = 7
+      Width = 96
+      Caption = 'Firmware version: '
+      ParentColor = False
+    end
+    object Label2: TLabel
+      Left = 128
+      Height = 15
+      Top = 7
+      Width = 5
+      Caption = '-'
+      ParentColor = False
+    end
+    object Label3: TLabel
+      Left = 8
+      Height = 15
+      Top = 36
+      Width = 40
+      Caption = 'AutoID:'
+      ParentColor = False
+    end
+    object ComboBox1: TComboBox
+      Left = 128
+      Height = 23
+      Hint = 'AutoID is a mechanism which can identify the connected '#13#10'GPIB device by sending *IDN? after powerup to include '#13#10'the device name in the ressource String.'#13#10#13#10'Some old devices don''t support *IDN? and will generate an error.'#13#10#13#10'For those devices select the setting off. But new devices will also '#13#10'work with off setting, just not show the device name.'#13#10#13#10'Some devices require a delayed execution of *IDN? after powerup'#13#10'for correct readout. For those devices select the setting slow.'#13#10#13#10'The most compatible setting is OFF.'
+      Top = 32
+      Width = 156
+      ItemHeight = 15
+      Items.Strings = (
+        'AutoID off'
+        'AutoID on'
+        'AutoID slow'
+      )
+      OnChange = ComboBox1Change
+      ParentShowHint = False
+      ShowHint = True
+      Style = csDropDownList
+      TabOrder = 0
+    end
+    object Label4: TLabel
+      Left = 8
+      Height = 15
+      Top = 68
+      Width = 94
+      Caption = 'Read termination:'
+      ParentColor = False
+    end
+    object ComboBox2: TComboBox
+      Left = 128
+      Height = 23
+      Hint = 'This selects the read termination setting of your GPIB device.'#13#10#13#10'MOST devices use EOI, which is also the default. But some'#13#10'old devices don''t have the EOI line connected and require '#13#10'a CR or LF read termination.'#13#10#13#10'For devices with EOI support (=most) select EOI.'#13#10#13#10'For devices with CR termination set CR.'#13#10'For devices with LF select LF.'#13#10'For devices with CR+LF termination select LF.'#13#10'And for those with LF+CR select CR.'
+      Top = 64
+      Width = 156
+      ItemHeight = 15
+      Items.Strings = (
+        'CR'
+        'LF'
+        'EOI'
+      )
+      OnChange = ComboBox2Change
+      ParentShowHint = False
+      ShowHint = True
+      Style = csDropDownList
+      TabOrder = 1
+    end
+    object Label5: TLabel
+      Left = 8
+      Height = 15
+      Top = 100
+      Width = 89
+      Caption = 'Ressource string:'
+      ParentColor = False
+    end
+    object ComboBox3: TComboBox
+      Left = 128
+      Height = 23
+      Hint = 'Select how long the VISA ressource string gets.'#13#10#13#10'This is mostly important for users of Matlab, because'#13#10'it has an artificial limitation of the length.'#13#10#13#10'Matlab users should select the option short.'#13#10#13#10'All other users can select normal.'#13#10#13#10'NOTE: Old firmware versions always show "normal".'#13#10'But if you change the setting it gets correctly applied.'
+      Top = 96
+      Width = 156
+      ItemHeight = 15
+      Items.Strings = (
+        'Short (28 characters)'
+        'Normal'
+      )
+      OnChange = ComboBox3Change
+      ParentShowHint = False
+      ShowHint = True
+      Style = csDropDownList
+      TabOrder = 2
+    end
+    object Button1: TButton
+      Left = 8
+      Height = 25
+      Hint = 'When you press this button the'#13#10'device firmware is reset. It disappears on USB bus'#13#10'and then enumerates again with the new settings.'
+      Top = 128
+      Width = 104
+      Caption = 'Restart Adapter'
+      OnClick = Button1Click
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 3
+    end
+    object Label6: TLabel
+      Left = 8
+      Height = 105
+      Top = 160
+      Width = 293
+      Caption = 'Note: When you change setting,they get applied'#13#10'immediately in non-volatile memory. '#13#10'But: You still need to restart the '#13#10'adapter or powercycle it to see the effect of it.'#13#10#13#10'Keep the mouse cursor a few seconds over the listboxes'#13#10'to see some more explanation (Hint).'
+      ParentColor = False
+    end
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    left = 24
+    top = 16
+  end
+end
