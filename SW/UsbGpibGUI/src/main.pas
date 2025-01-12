@@ -242,6 +242,7 @@ begin
     str := 'eoi';
   if str <> '' then
     FwWrite('!term '+str);
+  FwWrite('!term store');
 end;
 
 procedure TForm1.ComboBox3Change(Sender: TObject);
