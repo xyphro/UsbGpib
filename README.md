@@ -21,7 +21,7 @@ Some goals of the project were:
 - Work based on the standard USBTMC protocol. This allows the GPIB test equipment to look like a normal USB based measurement device and work flawless with e.g. NI VISA, Labview, Matlab or PyVisa.
 - Have a small length - otherwise my eqipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short.
 - It should be cheap but still versatile (you can build a single one of these for only 14 USD!)
-- It should support ALL my test equipments, from many different GPIB implementation generations and different GPIB flavors
+- It should support ALL my test equipment, from many different GPIB implementation generations and different GPIB flavors
 - The Firmware should be upgradeable over USB
 - It should be rock-solid (!) I don't want to end up in a very long measurement beeing interrupted because of a software issue of my USB GPIB converter.
 - It should support additional features like serial poll, remote enabling/disabling
@@ -51,13 +51,13 @@ Mainly a bugfix was done, that the string setting now also returns short, when i
 New year, new update :-)
 
 I realized a user suggestion, which is a better human readable interface to the internal instrument settings.
-This also exposes new functionality, e.g. shortening of the visa ressource string, adjustable delayed application of AutoID featured, ...
+This also exposes new functionality, e.g. shortening of the VISA resource string, adjustable delayed application of AutoID features, ...
 The read termination setting can now be set in a volatile way and also be read back.
 
-A slight issue sneaked in also and got fixed: After an instrument clear the next GPIB transfer timed out. Nobody found it so far though :-) But I fixed it.
+A slight issue snuck in also and got fixed: After an instrument clear the next GPIB transfer timed out. Nobody found it so far though :-) But I fixed it.
 
 Have fun using this!
-(would anybody volunteers to make a simple cross platform gui for the non volatile settings :-) ?)
+(would anybody volunteer to make a simple cross platform gui for the non volatile settings :-) ?)
 
 # 19th December '23 update
 
@@ -69,14 +69,14 @@ The software image is always the same and runs on both HW revisions.
 I also have put a binary for a new Firmware image in there. I am still busy optimizing certain things but want to give you a try before doing a next release.
 Please if you test it: Feed it back to me - does it work / does it break anything -> sharing is caring. 
 
-Mail me at xyphro@gmail.com or raise an issue under the issue section.
+Mail me at `xyphro@gmail.com` or raise an issue under the issue section.
 
 [FW image location: SW/binaries](SW/binaries)
-The file TestAndMeasurementReleaseCandidate.bin is the new improved firmware. The TestAndMeasurement.bin is the older stable firmware.
+The file `TestAndMeasurementReleaseCandidate.bin` is the new improved firmware. The `TestAndMeasurement.bin` is the older stable firmware.
 
 Changes in this release candidate are as announced previously:
-- 488.2 support further roled out. This means Status bytes are automatically read out and reported via interrupt transfers to PC as foreseen in the standard.
-- FASTER (!) 7 x write speed improvement and 4.x times read speed improvement. As reference: On an FSW I get 310kbytes/s as write transfer speed and 240kBytes/s as read transfer speed.
+- 488.2 support further rolled out. This means Status bytes are automatically read out and reported via interrupt transfers to PC as foreseen in the standard.
+- FASTER (!) 7x write speed improvement and 4x times read speed improvement. As reference: On an FSW I get 310kbytes/s as write transfer speed and 240kBytes/s as read transfer speed.
 - a fix for read status byte readout leading to issues on my CMU200
 - several smaller race conditions identified and fixed. A lot of work went into stress testing 488.2.
 
@@ -88,11 +88,11 @@ After further testing I will also push the sourcecode of this image.
 
 ## Microcontroller choice
 
-Allthough I typically would prefer nowadays an ARM Cortex M0/3/4/7 controller, there is an issue with it. Available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level shifter towards the GPIB Bus.
-GPIB is based on 5V (not exactly true, but a first iteration).
+Allthough I typically would prefer nowadays an ARM Cortex M0/3/4/7 controller, there is an issue with it. Most available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level shifter towards the GPIB Bus.
+GPIB is based on 5V (not exactly true, but a first approximation).
 
 This limited the microcontroller choice to e.g. AVR or PIC controllers. Because of very good availability I ended up in ATMEGA32U4 controllers.
-Apart of the device supporting 5V I/O voltages, it also does not require a regulator to be part of the application - it has an internal 3.3V regulator. This minimizes the full application schematic and BOM.
+In addition to the device supporting 5V I/O voltages, it also does not require a regulator to be part of the application - it has an internal 3.3V regulator. This minimizes the full application schematic and BOM.
 
 Apart from that, there is an excellent USB stack available [http://www.fourwalledcubicle.com/LUFA.php](http://www.fourwalledcubicle.com/LUFA.php).
 
@@ -163,14 +163,14 @@ For those, that just want to create their own device, I've included the binary o
 
 ## USB enumeration
 
-You might be surprised initially, that the device does not show up in your device manager (or lsusb), when you connect only the USB side. This is a feature, not a bug (really!).
-Only, if a GPIB device is connected, you can see the device on your PC too.
+You might be surprised initially, that the device does not show up in your device manager (or `lsusb`), when you connect only the USB side. This is a feature, not a bug (really!).
+Only if a GPIB device is connected can you see the device on your PC too.
 
 The reason behind the feature is simple: Instead of having a standard GPIB wiring, where you have a single GPIB controller and lots of GPIB devices interconnected, USBGPIB supports only a direct connection of the USBGPIB device to your measurement device. If you have like me e.g. 14 Instruments you don't want all to show up in the device manager, if the measurement device itself is powered down - you won't anyway be able to communicate with a powered down device.
 
 When USB and the GPIB side is connected, the device enumerates. The USBGPIB device reads out the ID of the instrument and constructs a unique USB Serial number out of it. It is thus easily possible to assiate multiple connected USBGPIB devices with the measurement instrument.
 
-The VISA ressource name is constructed from this USB Serial number. You can identify easily e.g. in NiMax, which device is connected:
+The VISA resource name is constructed from this USB Serial number. You can identify easily e.g. in NiMax, which device is connected:
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/NiMaxExample.png" width="90%"/>
 
@@ -213,21 +213,21 @@ As this converter implements the standard USBTMC Test and measurement class, you
 - HP 8596A spectrum analyzer
 - Agilent E3648A dual power supply
 
-## Scenarious
+## Scenarios
 
-- I tested as operating systems Windows 7 and 10 so far only. But linux should also work out of the box.
+- I tested as operating systems Windows 7 and 10 so far only. But Linux should also work out of the box.
 - USB1.1, USB2.0 and USB3.x ports tested, with and without USB HUB in between.
 - The connection stays responsive, when power cycling the PC, or hibernating/sleeping it
 - Different connection cycles (GPIB side connected first, USB side connected first, swapping GPIB side equipment, ...)
-- Extensive testing of timeout scenarious. E.g. making an illegal query and testing, if the USBTMC handles the timeouts properly. This was a very tricky part to get right.
-- Tested special transfer modes. E.g. capturing screenshots from different equipments is usually something, which will drive other GPIB adapters to the limits, because binary data of unknown length needs to be transported successfully.
+- Extensive testing of timeout scenarious. E.g. making an illegal query and testing whether the USBTMC handles the timeouts properly. This was a very tricky part to get right.
+- Tested special transfer modes. E.g. capturing screenshots from different equipment is usually something which will drive other GPIB adapters to the limits, because binary data of unknown length needs to be transported successfully.
 
 # Setting Parameters
 
 The firmware version from 13th January 2024 onwards has the ability for human readable text base configuration of several parameters.
 The previous methods are still supported, but won't be further documented. You can look them back in the history of this file.
 
-The command parser is quite simpel. For that reason follow the exact syntax as shown below. 
+The command parser is quite simple. For that reason follow the exact syntax as shown below. 
 Don't add extra spaces or make other modifications or concatenate commands.
 
 ## Read termination method
@@ -257,7 +257,7 @@ dev.write('!term eoi')
 ```
 Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
 
-### Save readtermination setting in eeprom (make them non-volatile)
+### Save read termination setting in EEPROM (make them non-volatile)
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term store')
@@ -274,7 +274,7 @@ This returns a text string containing "lf", "cr" or "eoi"
 ## AutoID setting
 
 Default wise the GPIB adapter tries during power on of the instrument to query using *IDN? or ID? commands the instrument name automatically.
-This is used to build the USB serial number, which finally gets part of the VISA ressource string.
+This is used to build the USB serial number, which finally gets part of the VISA resource string.
 
 Not all instruments support this *IDN / ID? query. For this reason this feature can be turned off.
 The serial number will then be built based on the GPIB address of the instrument.
@@ -284,16 +284,16 @@ The serial number will then be built based on the GPIB address of the instrument
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!autoid off')
 ```
-This setting is stored in eeprom = non volatile memory, so will survive a power cycle
+This setting is stored in EEPROM = non volatile memory, so will survive a power cycle
 
-### turn AutoID feature on
+### Turn AutoID feature on
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!autoid on')
 ```
-This setting is stored in eeprom = non volatile memory, so will survive a power cycle
+This setting is stored in EEPROM = non volatile memory, so will survive a power cycle
 
-### turn auto ID on with delay
+### Turn auto ID on with delay
 
 Some instruments need after turn on some seconds before GPIB is responsive.
 
@@ -330,19 +330,19 @@ Returns as text string either: "off", "on", "slow", "slower" or "slowest".
 
 ## Firmware version
 
-Finally I implemented a command to query the USB adapters firmware version :-)
+Finally I implemented a command to query the USB adapters' firmware version :-)
 
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 print(dev.query('!ver?'))
 ```
 
-## Shorten ressource strings (Matlab)
+## Shorten resource strings (Matlab)
 
-A user discovered that Matlab has a limitation in the VISA ressource string length and shared a pull request to reduce the length.
+A user discovered that Matlab has a limitation in the VISA resource string length and shared a pull request to reduce the length.
 I expose this now first time in the baseline firmware with the following options.
 
-This setting is stored in eeprom = non volatile.
+This setting is stored in EEPROM = non volatile.
 
 ### Limit the USB serial number to a length of 20 characters
 ```
