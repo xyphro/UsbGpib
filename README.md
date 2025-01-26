@@ -215,49 +215,49 @@ As this converter implements the standard USBTMC Test and measurement class, you
 
 ## Scenarios
 
-- I tested as operating systems Windows 7 and 10 so far only. But Linux should also work out of the box.
-- USB1.1, USB2.0 and USB3.x ports tested, with and without USB HUB in between.
-- The connection stays responsive, when power cycling the PC, or hibernating/sleeping it
+- I tested under Windows 7 and 10 operating systems so far only. But Linux should also work out of the box.
+- USB1.1, USB2.0 and USB3.x ports tested, with and without a USB hub in between.
+- The connection stays responsive when power cycling, hibernating, or sleeping the PC.
 - Different connection cycles (GPIB side connected first, USB side connected first, swapping GPIB side equipment, ...)
-- Extensive testing of timeout scenarious. E.g. making an illegal query and testing whether the USBTMC handles the timeouts properly. This was a very tricky part to get right.
+- Extensive testing of timeout scenarios. E.g. making an illegal query and testing whether the USBTMC handles the timeouts properly. This was a very tricky part to get right.
 - Tested special transfer modes. E.g. capturing screenshots from different equipment is usually something which will drive other GPIB adapters to the limits, because binary data of unknown length needs to be transported successfully.
 
 # Setting Parameters
 
-The firmware version from 13th January 2024 onwards has the ability for human readable text base configuration of several parameters.
-The previous methods are still supported, but won't be further documented. You can look them back in the history of this file.
+The firmware version from 13th January 2024 onwards has the ability for human readable text based configuration of several parameters.
+The previous methods are still supported, but won't be further documented. You can view them in the prior history of this file.
 
 The command parser is quite simple. For that reason follow the exact syntax as shown below. 
 Don't add extra spaces or make other modifications or concatenate commands.
 
 ## Read termination method
 
-While most GPIB interfaces use the hardware signal EOI to signal the end of a message, not all old equipment supports it. Some older instruments even don't have the EOI pin hardware wise wired and use \r or \n termination.
+While most GPIB interfaces use the hardware signal `EOI` to signal the end of a message, not all old equipment supports it. Some older instruments even don't have the `EOI` pin implemented and use `\r` or `\n` termination instead.
 
 The following commands are available:
 
-### Set read termination to CR (\r):
+### Set read termination to CR (`\r`):
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term cr')
 ```
-Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
+Above setting is volatile. To make this a permanent setting call the below mentioned `!term store` command.
 
-### Set read termination to LF (\n):
+### Set read termination to LF (`\n`):
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term lf')
 ```
-Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
+Above setting is volatile. To make this a permanent setting call the below mentioned `!term store` command.
 
 ### Set read termination to EOI only (default setting):
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term eoi')
 ```
-Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
+Above setting is volatile. To make this a permanent setting call the below mentioned `!term store` command.
 
-### Save read termination setting in EEPROM (make them non-volatile)
+### Save read termination setting in EEPROM (making it non-volatile)
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term store')
@@ -268,15 +268,15 @@ dev.write('!term store')
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 print(dev.query('!term?'))
 ```
-This returns a text string containing "lf", "cr" or "eoi"
+This returns a text string containing `lf`, `cr` or `eoi`.
 
 
 ## AutoID setting
 
-Default wise the GPIB adapter tries during power on of the instrument to query using *IDN? or ID? commands the instrument name automatically.
-This is used to build the USB serial number, which finally gets part of the VISA resource string.
+By default the GPIB adapter tries during power on of the instrument to query the instrument name automatically using `*IDN?` or `ID?` commands.
+This is used to build the USB serial number, which finally becomes part of the VISA resource string.
 
-Not all instruments support this *IDN / ID? query. For this reason this feature can be turned off.
+Not all instruments support this `*IDN` / `ID?` query. For this reason this feature can be turned off.
 The serial number will then be built based on the GPIB address of the instrument.
 
 ### Turn AutoID feature off
@@ -302,26 +302,25 @@ Note that it will take then also more time, before the USB device is recognized 
 
 Also this setting is non-volatile.
 
-Delay 5 seconds:
+#### Delay 5 seconds:
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!autoid slow')
 ```
 
-Delay 15 seconds:
+#### Delay 15 seconds:
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!autoid slower')
 ```
 
-Delay 30 seconds:
+#### Delay 30 seconds:
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!autoid slowest')
 ```
 
-### read autoid setting
-
+### Read the AutoID setting
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # 
 print(dev.query('!autoid?'))
@@ -340,7 +339,7 @@ print(dev.query('!ver?'))
 ## Shorten resource strings (Matlab)
 
 A user discovered that Matlab has a limitation in the VISA resource string length and shared a pull request to reduce the length.
-I expose this now first time in the baseline firmware with the following options.
+I expose this now for the first time in the baseline firmware with the following options.
 
 This setting is stored in EEPROM = non volatile.
 
@@ -350,13 +349,13 @@ dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables i
 dev.write('!string short')
 ```
 
-### disable limitation of USB serial number length (default behavior)
+### Disable limitation of USB serial number length (default behavior)
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!string normal')
 ```
 
-### query the string length setting.
+### Query the string length setting.
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 print(dev.query('!string?'))
@@ -364,7 +363,7 @@ print(dev.query('!string?'))
 
 This returns as text string either "normal" or "short".
 
-## reset the adapter
+## Reset the adapter
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); 
 dev.write('!reset')
