@@ -33,13 +33,22 @@ All those goals are met.
 
 ## New Gui available!
 
-I implemented a small GUI to change the non-volatile settings of the GpibUSB adapter. Sorry - it's windows only :-) 
+I implemented a small GUI to change the non-volatile settings of the GpibUSB adapter. Sorry - it's windows only :-)
+It is a single .exe file without external dependencies. You can just download it, run it and immediately change settings.
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGpibGUI.png" width="80%"/>
 
 Please download it from this folder: [SW/UsbGpibGUI](SW/UsbGpibGUI)
 
 The source code is included in the src subdirectory.
+
+## Python GUI
+
+UsbGpib user Jim Houston created an impressive pure Python GUI similar to mine - and I believe he began working on it even before I released mine. His GUI stands out for its versatility and platform independence, requiring only Python to run. It can be executed directly with Python 3 and should run on most platforms.
+
+For details about it, have a look into this discussion thread: [https://github.com/xyphro/UsbGpib/discussions/55](https://github.com/xyphro/UsbGpib/discussions/55)
+
+The GUI can be found here: [SW/AlternativeUsbGpibGui](SW/AlternativeUsbGpibGui)
 
 ## New Firmware
 
