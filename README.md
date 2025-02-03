@@ -19,11 +19,11 @@ I've got frustrated and tried to turn it into something positive - Here a video 
 
 Some goals of the project were:
 - Work based on the standard USBTMC protocol. This allows the GPIB test equipment to look like a normal USB based measurement device and work flawless with e.g. NI VISA, Labview, Matlab or PyVisa.
-- Have a small length - otherwise my eqipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short.
+- Have a small length - otherwise my equipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short.
 - It should be cheap but still versatile (you can build a single one of these for only 14 USD!)
-- It should support ALL my test equipments, from many different GPIB implementation generations and different GPIB flavors
+- It should support ALL my test equipment, from many different GPIB implementation generations and different GPIB flavors
 - The Firmware should be upgradeable over USB
-- It should be rock-solid (!) I don't want to end up in a very long measurement beeing interrupted because of a software issue of my USB GPIB converter.
+- It should be rock-solid (!) I don't want to end up in a very long measurement being interrupted because of a software issue of my USB GPIB converter.
 - It should support additional features like serial poll, remote enabling/disabling
 - If there is no GPIB device connected to the USBGpib converter, or the GPIB device is powered down, there should be no USB device visible on the PC.
 
@@ -31,7 +31,7 @@ All those goals are met.
 
 # 12th January '25 update
 
-## New Gui available!
+## New Gui available! (Windows)
 
 I implemented a small GUI to change the non-volatile settings of the GpibUSB adapter. Sorry - it's windows only :-)
 It is a single .exe file without external dependencies. You can just download it, run it and immediately change settings.
@@ -40,27 +40,27 @@ It is a single .exe file without external dependencies. You can just download it
 
 Please download it from this folder: [SW/UsbGpibGUI](SW/UsbGpibGUI)
 
-The source code is included in the src subdirectory.
+The source code is included in the src sub-directory.
 
-## Python GUI
+## Python GUI (Linux)
 
 UsbGpib user Jim Houston created an impressive pure Python GUI similar to mine - and I believe he began working on it even before I released mine. His GUI stands out for its versatility and platform independence, requiring only Python to run. It can be executed directly with Python 3 and should run on most platforms.
 
 For details about it, have a look into this discussion thread: [https://github.com/xyphro/UsbGpib/discussions/55](https://github.com/xyphro/UsbGpib/discussions/55)
 
-The GUI can be found here: [SW/AlternativeUsbGpibGui](SW/AlternativeUsbGpibGui)
+The GUI can be found here: [SW/NiceGUI/readme.md](SW/NiceGUI/readme.md)
 
 ## New Firmware
 
 I release also herewith Version 1.8 of the firmware. 
-Mainly a bugfix was done, that the string setting now also returns short, when it is actually set to short. (issue report #59).
+Mainly a bug-fix was done, that the string setting now also returns short, when it is actually set to short. (issue report #59).
 
 # 13th January '24 update
 
 New year, new update :-)
 
 I realized a user suggestion, which is a better human readable interface to the internal instrument settings.
-This also exposes new functionality, e.g. shortening of the visa ressource string, adjustable delayed application of AutoID featured, ...
+This also exposes new functionality, e.g. shortening of the visa resource string, adjustable delayed application of AutoID featured, ...
 The read termination setting can now be set in a volatile way and also be read back.
 
 A slight issue sneaked in also and got fixed: After an instrument clear the next GPIB transfer timed out. Nobody found it so far though :-) But I fixed it.
@@ -81,23 +81,19 @@ Please if you test it: Feed it back to me - does it work / does it break anythin
 Mail me at xyphro@gmail.com or raise an issue under the issue section.
 
 [FW image location: SW/binaries](SW/binaries)
-The file TestAndMeasurementReleaseCandidate.bin is the new improved firmware. The TestAndMeasurement.bin is the older stable firmware.
 
-Changes in this release candidate are as announced previously:
-- 488.2 support further roled out. This means Status bytes are automatically read out and reported via interrupt transfers to PC as foreseen in the standard.
-- FASTER (!) 7 x write speed improvement and 4.x times read speed improvement. As reference: On an FSW I get 310kbytes/s as write transfer speed and 240kBytes/s as read transfer speed.
+- 488.2 support further rolled out. This means Status bytes are automatically read out and reported via interrupt transfers to PC as foreseen in the standard.
+- FASTER (!) 7 x write speed improvement and 4.x times read speed improvement. As reference: On an FSW I get 310kBytes/s as write transfer speed and 240kBytes/s as read transfer speed.
 - a fix for read status byte readout leading to issues on my CMU200
 - several smaller race conditions identified and fixed. A lot of work went into stress testing 488.2.
 
-As said, I feel this is the best Firmware image so far, but I changed so much that I want to go first for this small betatest phase asking you explicitely for positive and negative feedback.
-
-After further testing I will also push the sourcecode of this image.
+As said, I feel this is the best Firmware image so far, but I changed so much that I want to go first for this small beta test phase asking you explicitly for positive and negative feedback.
 
 # Hardware
 
 ## Microcontroller choice
 
-Allthough I typically would prefer nowadays an ARM Cortex M0/3/4/7 controller, there is an issue with it. Available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level shifter towards the GPIB Bus.
+Although I typically would prefer nowadays an ARM Cortex M0/3/4/7 controller, there is an issue with it. Available devices support only max. 3.3V supply voltages, such that there would be a requirement for a level-shifter towards the GPIB Bus.
 GPIB is based on 5V (not exactly true, but a first iteration).
 
 This limited the microcontroller choice to e.g. AVR or PIC controllers. Because of very good availability I ended up in ATMEGA32U4 controllers.
@@ -105,7 +101,7 @@ Apart of the device supporting 5V I/O voltages, it also does not require a regul
 
 Apart from that, there is an excellent USB stack available [http://www.fourwalledcubicle.com/LUFA.php](http://www.fourwalledcubicle.com/LUFA.php).
 
-The GPIB side of the schematic can be directly connected to the ATMega32U4 IO pins. The IO pins from the microcontroller side are only set to 2 different states: Tristate (input) or output LOW, to talk over GPIB.
+The GPIB side of the schematic can be directly connected to the ATMega32U4 IO pins. The IO pins from the microcontroller side are only set to 2 different states: Tri-state (input) or output LOW, to talk over GPIB.
 
 ## Component sourcing
 
@@ -119,11 +115,11 @@ All components are easy to source, so I only specify the potential critical ones
 
 The PCB can be ordered at nearly any PCB pool production service (e.g. 10 PCBs for 2 USD + shipping). The gerber files are included in the "HW/Gerber files" subdirectory.
 
-## Mounting the PCB
+## Mounting the PCB & Flashing the firmware
 
 The PCB is available in 2 revisions.
-- [REV 1](HW/REV1/README.md) is the most popularely used right now due to age. It has a USB Type-B connector and an L-shaped housing visible on a few photos of this page.
-- [REV 2](HW/REV2/README.md) has some improvements like beeing smaller, better fit and USB Type-C connector.
+- [REV 1](HW/REV1/README.md) is the most popularly used right now due to age. It has a USB Type-B connector and an L-shaped housing visible on a few photos of this page.
+- [REV 2](HW/REV2/README.md) has some improvements like being smaller, better fit and USB Type-C connector.
 
 Choose whatever you prefer. The software images, but also the external behavior is the same.
 
@@ -132,7 +128,7 @@ Choose whatever you prefer. The software images, but also the external behavior 
 ## REV 1
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/housing.png" width="33%"/><img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/housing_snap.png" width="50%"/>
 
-I created a sophisticated 3D printable housing for this adapter. The design was made with Fusion 360. The project file + the STL files are included in the "Housing" subdirectory.
+I created a sophisticated 3D printable housing for this adapter. The design was made with Fusion 360. The project file + the STL files are included in the "Housing" sub directory.
 
 The PCB fits perfectly into it. Optionally it can be fixed with 2 mounting screws (the GPIB connector has 2 threads, use 2 times 4-40 UNC x 3/8) and the TOP cover snaps onto the housing base.
 
@@ -215,6 +211,7 @@ As this converter implements the standard USBTMC Test and measurement class, you
 - R&S FSW
 - R&S FSV
 - Keithley 199 multimeter
+- HP 34401 DMM from different generations / with different FW versions
 - HP 3325A synthesizer/frequency generator
 - HP 3457A multimeter
 - Agilent E4406A VSA transmitter tester
@@ -224,19 +221,19 @@ As this converter implements the standard USBTMC Test and measurement class, you
 
 ## Scenarious
 
-- I tested as operating systems Windows 7 and 10 so far only. But linux should also work out of the box.
+- It works under all popular operating systems like Windows 7 and 10, 11, Linux and MacOSX
 - USB1.1, USB2.0 and USB3.x ports tested, with and without USB HUB in between.
 - The connection stays responsive, when power cycling the PC, or hibernating/sleeping it
 - Different connection cycles (GPIB side connected first, USB side connected first, swapping GPIB side equipment, ...)
 - Extensive testing of timeout scenarious. E.g. making an illegal query and testing, if the USBTMC handles the timeouts properly. This was a very tricky part to get right.
-- Tested special transfer modes. E.g. capturing screenshots from different equipments is usually something, which will drive other GPIB adapters to the limits, because binary data of unknown length needs to be transported successfully.
+- Tested special transfer modes. E.g. capturing screenshots from different equipment is usually something, which will drive other GPIB adapters to the limits, because binary data of unknown length needs to be transported successfully.
 
 # Setting Parameters
 
 The firmware version from 13th January 2024 onwards has the ability for human readable text base configuration of several parameters.
 The previous methods are still supported, but won't be further documented. You can look them back in the history of this file.
 
-The command parser is quite simpel. For that reason follow the exact syntax as shown below. 
+The command parser is quite simple. For that reason follow the exact syntax as shown below. 
 Don't add extra spaces or make other modifications or concatenate commands.
 
 ## Read termination method
