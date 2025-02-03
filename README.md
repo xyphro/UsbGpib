@@ -48,7 +48,7 @@ UsbGpib user Jim Houston created an impressive pure Python GUI similar to mine -
 
 For details about it, have a look into this discussion thread: [https://github.com/xyphro/UsbGpib/discussions/55](https://github.com/xyphro/UsbGpib/discussions/55)
 
-The GUI can be found here: [SW/NiceGUI/readme.md](SW/NiceGUI/readme.md)
+The GUI can be found here including documentation: [SW/NiceGUI](SW/NiceGUI)
 
 ## New Firmware
 
