@@ -15,7 +15,7 @@ NiceGUI uses the web browser as the frontend for the GUI.  Running the
 usbgpib_gui.py script will launch the browser and run the GUI.
 Here is a screenshot running in this mode.
 
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/nicegui2.png" width="80%"/>
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/nicegui2.png" width="40%"/>
 
 # Setup
 
@@ -59,7 +59,7 @@ sudo apt-get install ^libxcb.*-dev libx11-xcb-dev libglu1-mesa-dev libxrender-de
 To use native mode you need to edit the script.  The last two lines of the script are calls to ui.run().  Uncomment the either line to select the mode.
 Running the script with native mode selected gives a window like this:
 
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/nicegui1.png" width="80%"/>
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/nicegui1.png" width="40%"/>
 
 # usbgpib_conf.py
 
