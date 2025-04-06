@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 321
+  Left = 326
   Height = 328
-  Top = 299
+  Top = 539
   Width = 815
   Caption = 'XyphroLabs UsbGpibGUI'
   ClientHeight = 328

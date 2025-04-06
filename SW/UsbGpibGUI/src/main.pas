@@ -166,6 +166,8 @@ begin
                 ComboBox1.ItemIndex := 0
               else if str = 'auto' then
                 ComboBox1.ItemIndex := 2
+              else if str = 'slow' then
+                ComboBox1.ItemIndex := 2
               else
                 ComboBox1.ItemIndex := -1;
 
@@ -180,7 +182,7 @@ begin
               else
                 ComboBox2.ItemIndex := -1;
 
-              // read termination setting
+              // read ressource string setting
               str := FwQuery('!string?');
               if str = 'short' then
                 ComboBox3.ItemIndex := 0
@@ -241,8 +243,10 @@ begin
   else if ComboBox2.ItemIndex = 2 then
     str := 'eoi';
   if str <> '' then
-    FwWrite('!term '+str);
-  FwWrite('!term store');
+    begin
+      FwWrite('!term '+str);
+      FwWrite('!term store');
+    end;
 end;
 
 procedure TForm1.ComboBox3Change(Sender: TObject);
