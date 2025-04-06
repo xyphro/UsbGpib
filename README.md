@@ -29,6 +29,10 @@ Some goals of the project were:
 
 All those goals are met.
 
+# 6th April '25 update
+
+time to release a bugfix (reported by rapgenic #80): V1.9 of the firmware fixes an issue where the "autoid slow" setting was not applied properly.
+
 # 12th January '25 update
 
 ## New Gui available! (Windows)

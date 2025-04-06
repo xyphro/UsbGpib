@@ -2,3 +2,7 @@
 pictures/Thumbs.db
 pictures/Thumbs.db
 *.db
+*.bak
+HW/REV2/KicadV2/xyp-gpib-backups
+HW/REV2/KicadV2/xyp-gpib-backups/*
+fp-info-cache

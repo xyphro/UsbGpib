@@ -28,6 +28,7 @@ It is very important, that the Fuses of the AVR are programmed.
 
 Here an example how to program the bootloader using avrdude (using usbasp programmer):
 avrdude -c usbasp -p m32u4 -e -Ulock:w:0xFF:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xde:m
+
 avrdude -c usbasp -p m32u4 -U flash:w:BootLoader.hex
 
 To program bootloader and application image at the same time using AvrDude, you can use this command:
@@ -48,7 +49,7 @@ Preparation:
 - Mount the PCB EXCLUDING the GPIB connector.
 - Print the housings located in [this folder](../../Housing/Rev2). I print them using 1mm bottom/top/wall thickness, 0.16mm layer height and 30% infil. On my K1 printer it takes 23 minutes to print, on my Ender 5 2.2 hours.
 - get 2 20mm M3 screws and 2 M3 nuts
-- get a USB connector "24P Male solder type" from e.g. Aliexpress
+- get a GPIB connector "24P Male solder type" from e.g. Aliexpress
 
 If you have everything in place and prepared, insert the PCB including the GPIB connector (unsoldered!) into the bigger part of the housing:
 
