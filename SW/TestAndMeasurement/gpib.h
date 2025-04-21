@@ -48,6 +48,8 @@ bool gpib_gotoLocal(uint8_t addr, gpibtimeout_t ptimeoutfunc);
 /* trigger instrument */
 bool gpib_trigger(uint8_t addr, gpibtimeout_t ptimeoutfunc);
 
+/* return an 8 bit upcounting timer value with 100ms tick */
+extern volatile uint8_t timer0_100mscounter;
 
 #include "gpib_priv.h" 
 

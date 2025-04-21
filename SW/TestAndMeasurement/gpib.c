@@ -16,7 +16,7 @@
 /**********************************************************************************************************
  * STATIC functions
  **********************************************************************************************************/
-static volatile uint8_t timer0_100mscounter;
+volatile uint8_t timer0_100mscounter;
 volatile bool timer0_ticked = false; /* flag going high every 100ms */
 static uint8_t  timer0_div;
 static uint8_t  s_device_state = GPIB_DEVICE_CONNECTSTATE_UNKNOWN;
@@ -34,6 +34,10 @@ static void timer_init(void)
 	timer0_100mscounter = 0;
 }
 
+uint8_t gpib_get_100ms_timer(void)
+{
+	return timer0_100mscounter;
+}
 
 ISR (TIMER0_OVF_vect)
 {

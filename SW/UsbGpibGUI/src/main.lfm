@@ -82,6 +82,8 @@ object Form1: TForm1
         'AutoID off'
         'AutoID on'
         'AutoID slow'
+        'AutoID slower'
+        'AutoID slowest'
       )
       OnChange = ComboBox1Change
       ParentShowHint = False
@@ -100,7 +102,7 @@ object Form1: TForm1
     object ComboBox2: TComboBox
       Left = 128
       Height = 23
-      Hint = 'This selects the read termination setting of your GPIB device.'#13#10#13#10'MOST devices use EOI, which is also the default. But some'#13#10'old devices don''t have the EOI line connected and require '#13#10'a CR or LF read termination.'#13#10#13#10'For devices with EOI support (=most) select EOI.'#13#10#13#10'For devices with CR termination set CR.'#13#10'For devices with LF select LF.'#13#10'For devices with CR+LF termination select LF.'#13#10'And for those with LF+CR select CR.'
+      Hint = 'This selects the read termination setting of your GPIB device.'#13#10#13#10'MOST devices use EOI, which is also the default. But some'#13#10'old devices don''t have the EOI line connected and require '#13#10'a CR or LF read termination.'#13#10#13#10'For devices with EOI support (=most) select EOI.'#13#10#13#10'For devices with CR termination set CR.'#13#10'For devices with LF select LF.'#13#10'For devices with CR+LF termination select LF.'#13#10'And for those with LF+CR select CR.'#13#10#13#10'Note that Read termination can also be set since '#13#10'Firmware version 2.0 in the way usbtmc foresees.'#13#10'In Python you can do this by utilizing the'#13#10'set_visa attribute on attributes '#13#10'VI_ATTR_TERMCHAR_EN and'#13#10'VI_ATTR_TERMCHAR'
       Top = 64
       Width = 156
       ItemHeight = 15

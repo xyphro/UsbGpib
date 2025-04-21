@@ -62,7 +62,7 @@ As a next step insert the PCB into the big part of the housing again. It has a r
 
 Then put the smaller part of the housing on top of it, insert the screws (they can be pushed hard to destroy the "membrane" first time) and nuts and screw it together.
 
-Voil‡... your adapter is finished and ready to use :-)
+Voil√†.. your adapter is finished and ready to use :-)
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="80%"/>
 

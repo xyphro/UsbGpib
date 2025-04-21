@@ -139,7 +139,8 @@
 		typedef struct
 		{
 			uint8_t LastMessageTransaction;
-			uint8_t Reserved[3];
+			uint8_t TermChar;
+			uint8_t Reserved[2];
 		} TMC_DevINMessageHeader_t;
 
 		typedef struct

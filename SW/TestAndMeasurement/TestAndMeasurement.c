@@ -57,7 +57,7 @@ TMC_Capabilities_t Capabilities =
 
 		.Device     =
 			{
-				.SupportsAbortINOnMatch = false, // false
+				.SupportsAbortINOnMatch = true, // was false before version 2.0
 				.Reserved = 0,
 			},
 		.Reserved2 = {0, 0, 0, 0, 0, 0},
@@ -121,6 +121,8 @@ static uint16_t LastTransferLength = 0;
 
 /** This will be set true after a indicator pulse command is received. If the next GPIB command starts with '!', a parameter has to be set */
 static bool s_nextwrite_mightbeparameterset = false;
+
+static volatile uint8_t s_pulse_indicator = 0;
 
 static uint32_t s_remaining_bytes_receive=0;
 
@@ -467,7 +469,6 @@ int main(void)
 	
 	/* physically GPIB is connected, now check if any GPIB address is responsive */
 #ifndef SPEEDTEST_DUMMY_DEVICE
-//asdf
 	while (!findGpibdevice())
 	{
 		_delay_ms(100);
@@ -548,10 +549,27 @@ int main(void)
 	LED(1);
 	USB_Attach();
 	
+	s_pulse_indicator = 0;
+	uint8_t pulseind_starttime = 0;
 	for (;;)
 	{
 		TMC_Task(); // this task is 9.42us active when nothing is triggered, the rest takes 3.3us
 		check_bootloaderEntry();
+		
+		if (s_pulse_indicator > 0) // asynchronous handling of pulse indicator request LED flashing
+		{
+			if (s_pulse_indicator == 2)
+			{
+				pulseind_starttime = timer0_100mscounter;
+				LED(0);
+				s_pulse_indicator--;
+			}
+			else if (timer0_100mscounter > (uint8_t)(2 + pulseind_starttime))
+			{
+				LED(1);
+				s_pulse_indicator--;
+			}
+		}
 		
 		if (!gpib_is_connected()) /* check, if gpib is disconnected */
 		{ /* when we get here, reset the MCU and disconnect from USB ! It will reconnect once plugged in to GPIB again */
@@ -865,9 +883,7 @@ void EVENT_USB_Device_ControlRequest(void)
 				Endpoint_ClearIN();
 				Endpoint_ClearStatusStage();
 				
-				LED(0);
-				_delay_ms(250);
-				LED(1);
+				s_pulse_indicator = 2;
 				
 				s_nextwrite_mightbeparameterset = true;
 				break;
@@ -912,19 +928,6 @@ void EVENT_USB_Device_ControlRequest(void)
 	}
 }
 
-static uint8_t charToval(char c)
-{
-	uint8_t val;
-	val = 0;
-	if ( (c >= '0') && (c <= '9') )
-		val = c-'0';
-	if ( (c >= 'a') && (c <= 'f') )
-		val = c-'a'+10;
-	if ( (c >= 'A') && (c <= 'F') )
-		val = c-'A'+10;
-	return val;
-}
-
 void set_internal_response(uint8_t *pdat, uint8_t len)
 {
 	if (len < sizeof(internal_response_buffer))
@@ -961,13 +964,16 @@ void ProcessInternalCommand(uint8_t Length)
 	
 	parser_reset();
 	cmd_executed = false;
-	while ( (Length--) && (!cmd_executed) )
+	while ( (Length) && (!cmd_executed) )
 	{
+		Length--;
 		uint8_t dat = Endpoint_Read_8();
-		cmd_executed = parser_add( dat );
+		if ((dat != '\r') && (dat != '\n') ) // remove potential termination characters
+			cmd_executed = parser_add( dat );
 	}
+	parser_add('_'); // workaround for autoid slower/est matching in first letters the option autoid slow (result of parser simplification)
 	
-	// remove residual characters from the endpoint buffer
+	// remove residual characters from the endpoint buffer (most likely: termination)
 	while ( (Length--) )
 	{
 		uint8_t dat = Endpoint_Read_8();
@@ -1231,6 +1237,16 @@ static inline void TMC_Task(void)
 					curlen16 = sizeof(readbuffer);// -1;
 					if (curlen16 > MessageHeader.TransferSize)
 						curlen16 = MessageHeader.TransferSize;
+
+					/* New additional method to set termination. Pyvisa example:
+					   dev is here an opened device ressource)
+						  dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR_EN, True)
+						  dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR, ord('\r') ) # pass \0 for eoi, \n for \n or eoi and \r for \r or eoi. All other options will use EOI only termination
+					*/						
+					if (MessageHeader.MessageIDSpecific.DeviceIN.LastMessageTransaction & 0x02) // the read termination character is set as part of this read transaction request
+					{
+						gpib_set_readtermination(MessageHeader.MessageIDSpecific.DeviceIN.TermChar);
+					}
 					
 					/* Check if a response from an internal query is in the buffer */
 					if (internal_response_buffer_len) 
@@ -1256,7 +1272,6 @@ static inline void TMC_Task(void)
 						MessageHeader.TransferSize = GetNextMessage(readbuffer, curlen16, TMC_InLastMessageComplete, &lastmessage, tmc_gpib_read_timedout);
 					}
 					TMC_InLastMessageComplete = lastmessage;
-
 					MessageHeader.MessageIDSpecific.DeviceOUT.LastMessageTransaction = lastmessage;
 					if (!IsTMCBulkINReset)
 						WriteTMCHeader(&MessageHeader);					

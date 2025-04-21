@@ -3,7 +3,11 @@ Versatile, cheap, portable and robust USB to GPIB converter (USBTMC class based)
 
 You'll find many projects like this, but this one is special (ok, everybody will claim this) :-)
 
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGPIB.jpg" width="80%"/>
+V1 Hardware: 
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGPIB.jpg" width="50%"/>
+
+V2 Hardware: 
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="50%"/>
 
 If you have a lot of test equipment at home, you might know the issues: Lots of devices only have GPIB as interface and the  GPIB adapters and GPIB cables on the market are very expensive and some of them even have many issues, when run under Windows 10 (device driver does not work). Or they e.g. are not able to be operated with VISA, because they are UART based, need special command sequences, ...
 
@@ -29,9 +33,26 @@ Some goals of the project were:
 
 All those goals are met.
 
+# 21st April '25 update
+
+Today it's time for another release - version V2.0. 
+
+While writing this and looking at this readme.md file, I certainly think that I should clean it up in future - it is not well structured for new users. Sorry for this, but I have this on my radar and will improve. Whenever I have more time I will also extend it with usage examples / small "trainings", especially for those who are completely new to GPIB and controlling instruments.
+
+I had btw. some occasions where users had issues flashing the device. Many of them were caused by the fact that the .hex and .bin files were saved over the GitHub web interface by rightclicking and selecting "Save as". This will result in a HTML page being saved which will not flash well :-)
+The safest option is to do a git clone or to download this whole github repository as .zip file.
+
+Here the release V2.0 details:
+- **Bugfix:** the options autoid slower and autoid slowest did not work. This is addressed and I test those settings now also properly in release testing, promised :-) The issue was caused in my super slim parser implementation for custom internal commands and "autoid slow" and "autoid slower" start with the same letters causing hickups.
+The Windows GUI is also updated to expose those 2 autoid settings - they were not included before.
+As general good recommendation, I still recommend to turn autoid feature off, as it limits the measurement instruments which are used - Instruments HAVE to support *IDN? query for it to work well, which is for many old equipment not the case and for such old equipment errors will be flagged after the instrument is turned on.
+- **New feature:** I enabled a new method to set the READ termination. One that is fully compliant with usbtmc standard and does not need a workaround with pulse indicator requests. I don't know why I did not spot this earlier, but a discussion with the usbtmc linux kernel mode driver maintainer exposed this to me. When using direct access to usbtmc kernel mode driver you can use the <a href="https://github.com/dpenkler/linux-usbtmc?tab=readme-ov-file#ioctl-to-control-setting-eom-bit" target="_blank">USBTMC_IOCTL_EOM_ENABLE</a> IOCTL to set the read termination. When using a VISA layer, you can set the read termination by setting the VI_ATTR_TERMCHAR_EN and VI_ATTR_TERMCHAR attributes (see below for more details). 
+The previous method of setting read termination is not modified in any way, this just gives an additional method to set the readtermination.
+- **Bugfix / Improvement:** The pulse indicator request function did use a blocking delay to pulse the LED. This delayed USB side handling. In some cases this could trigger timeouts. The LED blinking is now handled fully asynchronous and those timeouts will not occur anymore.
+
 # 6th April '25 update
 
-time to release a bugfix (reported by rapgenic #80): V1.9 of the firmware fixes an issue where the "autoid slow" setting was not applied properly.
+Time to release a bugfix (reported by rapgenic #80): V1.9 of the firmware fixes an issue where the "autoid slow" setting was not applied properly.
 
 # 12th January '25 update
 
@@ -244,7 +265,10 @@ Don't add extra spaces or make other modifications or concatenate commands.
 
 While most GPIB interfaces use the hardware signal EOI to signal the end of a message, not all old equipment supports it. Some older instruments even don't have the EOI pin hardware wise wired and use \r or \n termination.
 
-The following commands are available:
+The USB-TMC standard allows to set the read termination. While in firmware versions before < 2.0 I did not enable that method, it is now finally supported with standard compliance.
+
+I document here the older method (using pulse indicator request), but I add also the newer methods. You can choose which ones to use, but in some cases pulse indicator requests can be difficult to issue, for which reason it is likely better to use the standard compliant method.
+
 
 ### Set read termination to CR (\r):
 ```
@@ -253,6 +277,12 @@ dev.write('!term cr')
 ```
 Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
 
+Alternatively you can set the termination directly with visa means, e.g. using PyVisa:
+```
+dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR_EN, True)
+dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR, ord('\r') )
+```
+
 ### Set read termination to LF (\n):
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
@@ -260,12 +290,24 @@ dev.write('!term lf')
 ```
 Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
 
+Alternatively you can set the termination directly with visa means, e.g. using PyVisa:
+```
+dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR_EN, True)
+dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR, ord('\n') )
+```
+
 ### Set read termination to EOI only (default setting):
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term eoi')
 ```
 Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
+
+Alternatively you can set the termination directly with visa means, e.g. using PyVisa:
+```
+dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR_EN, True)
+dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR, ord('\0') )
+```
 
 ### Save readtermination setting in eeprom (make them non-volatile)
 ```

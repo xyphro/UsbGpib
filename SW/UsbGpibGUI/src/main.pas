@@ -168,6 +168,10 @@ begin
                 ComboBox1.ItemIndex := 2
               else if str = 'slow' then
                 ComboBox1.ItemIndex := 2
+              else if str = 'slower' then
+                ComboBox1.ItemIndex := 3
+              else if str = 'slowest' then
+                ComboBox1.ItemIndex := 4
               else
                 ComboBox1.ItemIndex := -1;
 
@@ -226,7 +230,11 @@ begin
   else if ComboBox1.ItemIndex = 1 then
     str := 'on'
   else if ComboBox1.ItemIndex = 2 then
-    str := 'slow';
+    str := 'slow'
+  else if ComboBox1.ItemIndex = 3 then
+    str := 'slower'
+  else if ComboBox1.ItemIndex = 4 then
+    str := 'slowest';
   if str <> '' then
     FwWrite('!autoid '+str);
 end;
