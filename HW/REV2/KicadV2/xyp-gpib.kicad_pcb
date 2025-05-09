@@ -100,7 +100,7 @@
 		(allow_soldermask_bridges_in_footprints no)
 		(tenting front back)
 		(pcbplotparams
-			(layerselection 0x00000000_00000000_55555555_5755f5ff)
+			(layerselection 0x00000000_00000000_55555555_575575ff)
 			(plot_on_all_layers_selection 0x00000000_00000000_00000000_00000000)
 			(disableapertmacros no)
 			(usegerberextensions no)
@@ -136,7 +136,7 @@
 			(mirror no)
 			(drillshape 0)
 			(scaleselection 1)
-			(outputdirectory "gerbers/")
+			(outputdirectory "../Gerber filesV2/")
 		)
 	)
 	(net 0 "")
@@ -193,6 +193,7 @@
 		(property "Reference" "C1"
 			(at -0.254 1.524 270)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "566da6ff-a2a1-409d-b44b-1730f7f98526")
 			(effects
 				(font
@@ -392,6 +393,7 @@
 		(property "Reference" "C2"
 			(at 1.27 -2.032 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "382ca670-6ae8-4de6-90f9-f241d1337171")
 			(effects
 				(font
@@ -591,6 +593,7 @@
 		(property "Reference" "C7"
 			(at 0.889 1.397 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "15fe8f3d-6077-4e0e-81d0-8ec3f4538981")
 			(effects
 				(font
@@ -790,6 +793,7 @@
 		(property "Reference" "D1"
 			(at 2.5908 -0.0508 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "d0d2eee9-31f6-44fa-8149-ebb4dc2dc0dc")
 			(effects
 				(font
@@ -1024,6 +1028,7 @@
 		(property "Reference" "R1"
 			(at -0.4826 1.3462 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "8d9a3ecc-539f-41da-8099-d37cea9c28e7")
 			(effects
 				(font
@@ -1223,6 +1228,7 @@
 		(property "Reference" "R2"
 			(at 2.794 0.381 180)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "cb24efdd-07c6-4317-9277-131625b065ac")
 			(effects
 				(font
@@ -1422,6 +1428,7 @@
 		(property "Reference" "R3"
 			(at 2.794 0 180)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "abe07c9a-17c3-43b5-b7a6-ae867ac27ea7")
 			(effects
 				(font
@@ -1621,6 +1628,7 @@
 		(property "Reference" "R4"
 			(at -1.7272 0 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "6d26d68f-1ca7-4ff3-b058-272f1c399047")
 			(effects
 				(font
@@ -1820,6 +1828,7 @@
 		(property "Reference" "R5"
 			(at 0.9398 1.3716 270)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "e21aa84b-970e-47cf-b64f-3b55ee0e1b51")
 			(effects
 				(font
@@ -2019,6 +2028,7 @@
 		(property "Reference" "U1"
 			(at 3.937 -4.5466 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "3cd1bda0-18db-417d-b581-a0c50623df68")
 			(effects
 				(font
@@ -3035,6 +3045,7 @@
 		(property "Reference" "C5"
 			(at -0.2794 -1.0922 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "f1830a1b-f0cc-47ae-a2c9-679c82032f14")
 			(effects
 				(font
@@ -3236,6 +3247,7 @@
 		(property "Reference" "C6"
 			(at -0.4826 -1.2446 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "32667662-ae86-4904-b198-3e95f11851bf")
 			(effects
 				(font
@@ -3435,6 +3447,7 @@
 		(property "Reference" "Y1"
 			(at 0.1524 -1.6002 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "0849207c-a51a-42a9-ae14-164d0d18f00b")
 			(effects
 				(font
@@ -3727,6 +3740,7 @@
 		(property "Reference" "C3"
 			(at -2.159 0.5334 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "05dc24a4-ed81-488a-83fe-289204b3e264")
 			(effects
 				(font
@@ -3926,6 +3940,7 @@
 		(property "Reference" "C4"
 			(at -2.0066 -0.1778 180)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "29256b3d-9450-4c0a-a4d4-911f04b9c140")
 			(effects
 				(font
@@ -4125,6 +4140,7 @@
 		(property "Reference" "U2"
 			(at 0 -2 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "fbd3596d-b688-4c82-83b1-6480d101551f")
 			(effects
 				(font
@@ -4602,6 +4618,7 @@
 		(property "Reference" "J1"
 			(at 0.3008 -5.715 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "b93a01f3-a1de-4af4-9e72-a2d7fd70356f")
 			(effects
 				(font
@@ -4971,7 +4988,7 @@
 			(net 2 "GND")
 			(pinfunction "SHIELD")
 			(pintype "passive")
-			(uuid "19a39531-d463-442c-ad68-18c2953ce697")
+			(uuid "5d7b61b6-fa45-4811-91d1-f201b9d45591")
 		)
 		(pad "S1" thru_hole oval
 			(at 4.32 -3.105 90)
@@ -4983,7 +5000,7 @@
 			(net 2 "GND")
 			(pinfunction "SHIELD")
 			(pintype "passive")
-			(uuid "19a39531-d463-442c-ad68-18c2953ce697")
+			(uuid "7730704b-b58f-46ea-80c4-5750a8edeb2b")
 		)
 		(pad "S1" thru_hole oval
 			(at 4.32 1.075 90)
@@ -4995,7 +5012,7 @@
 			(net 2 "GND")
 			(pinfunction "SHIELD")
 			(pintype "passive")
-			(uuid "19a39531-d463-442c-ad68-18c2953ce697")
+			(uuid "6e183e7f-c711-4d6d-825c-c4207f272019")
 		)
 		(embedded_fonts no)
 		(model "${KICAD9_3DMODEL_DIR}/Connector_USB.3dshapes/USB_C_Receptacle_XKB_U262-16XN-4BVC11.wrl"
@@ -5019,6 +5036,7 @@
 		(property "Reference" "R6"
 			(at 2.3876 0 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "094510e5-8ea2-422b-8234-4c207b978552")
 			(effects
 				(font
@@ -5218,6 +5236,7 @@
 		(property "Reference" "D2"
 			(at 2.1844 -0.4572 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "5f721da3-4e11-4ac3-8e7e-948ef306c84a")
 			(effects
 				(font
@@ -5453,6 +5472,7 @@
 			(at 4.2418 1.9558 0)
 			(unlocked yes)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "899c69fe-64d0-45bf-875c-a7120633de3e")
 			(effects
 				(font
@@ -5755,6 +5775,7 @@
 		(property "Reference" "R7"
 			(at 2.0574 0.0762 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "9e3f4582-def2-47e2-b9db-dafda53e4c3b")
 			(effects
 				(font
@@ -5954,6 +5975,7 @@
 		(property "Reference" "R8"
 			(at -0.9906 1.397 0)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "a91b3863-b128-49a6-83b1-be8930945aad")
 			(effects
 				(font
@@ -7370,7 +7392,7 @@
 			)
 		)
 	)
-	(gr_text "REV 2"
+	(gr_text "REV 2.1"
 		(at 216.9668 89.3572 0)
 		(layer "F.SilkS")
 		(uuid "f916296a-cdb7-4527-bb0f-b7e58e313f0a")
@@ -7382,7 +7404,7 @@
 			)
 			(justify left bottom)
 		)
-		(render_cache "REV 2" 0
+		(render_cache "REV 2.1" 0
 			(polygon
 				(pts
 					(xy 217.398028 88.656941) (xy 217.440877 88.662177) (xy 217.471759 88.669676) (xy 217.500156 88.682309)
@@ -7428,6 +7450,19 @@
 					(xy 219.664912 88.755941) (xy 219.674247 88.78675) (xy 219.677419 88.820252) (xy 219.673918 88.855882)
 					(xy 219.663355 88.890603) (xy 219.645252 88.924995) (xy 219.621114 88.955905) (xy 219.583374 88.992052)
 					(xy 219.528235 89.034392) (xy 219.460788 89.082935) (xy 219.420854 89.119205) (xy 219.681522 89.119205)
+				)
+			)
+			(polygon
+				(pts
+					(xy 219.769156 89.088724) (xy 219.947466 89.088724) (xy 219.947466 89.2552) (xy 219.769156 89.2552)
+				)
+			)
+			(polygon
+				(pts
+					(xy 220.410697 88.645569) (xy 220.410697 89.2552) (xy 220.24184 89.2552) (xy 220.24184 88.856632)
+					(xy 220.200569 88.885225) (xy 220.162522 88.906714) (xy 220.12148 88.92461) (xy 220.066388 88.94335)
+					(xy 220.066388 88.807356) (xy 220.122312 88.786283) (xy 220.165748 88.764089) (xy 220.198792 88.741081)
+					(xy 220.22787 88.713359) (xy 220.252398 88.681653) (xy 220.272578 88.645569)
 				)
 			)
 		)

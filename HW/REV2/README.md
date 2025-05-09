@@ -9,6 +9,13 @@ The [software](../../SW) will always stay the same, no matter if REV1 or REV 2.
 I have built many of those adapters myself so far and have developed trust in the design:
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/ManyRev2.jpg" width="80%"/>
 
+## PCB Production
+
+The PCB is designed for the 4-layer JLC04161H-3313 stackup from JLCPCB (impedance matching for USB 90Ohm). However, most FR4-based stackups with ~0.1mm Prepreg (e.g. material between top layer and inner layer 1) should be fine. Additional informations:
+- Outer copper 1oz, inner 0.5oz
+- Hole size 0.3mm (inner diameter), 0.45mm (outer diameter)
+- 5mil trace width and spacing
+
 ## Assembly process
 
 All files related to HW are located in this folder. Gerber file, BOM, Kicad design files.

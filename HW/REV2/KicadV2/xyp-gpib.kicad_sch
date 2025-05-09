@@ -6,8 +6,8 @@
 	(paper "A4")
 	(title_block
 		(title "UsbGpib")
-		(date "2025-05-08")
-		(rev "2")
+		(date "2025-05-09")
+		(rev "2.1")
 		(company "xyphro")
 	)
 	(lib_symbols
