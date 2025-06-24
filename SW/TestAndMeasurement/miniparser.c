@@ -145,11 +145,24 @@ void cmd_term_eoi(void)
 void cmd_term_query(void)
 {
 	char t = gpib_get_readtermination();
+	char resp[4]="";
 	switch (t)
 	{
 		case '\r':	set_internal_response((void*) "cr", 2); break;
 		case '\n':	set_internal_response((void*) "lf", 2); break;
-		default:    set_internal_response((void*)"eoi", 3); break;
+		case '\0':    set_internal_response((void*)"eoi", 3); break;
+		default:
+            resp[0]='0';
+            resp[1]='x';
+            if((t>>4)>9)    //simple conversion hex to ascii
+                resp[2]=(t>>4)+55;
+            else
+                resp[2]=(t>>4)+48;
+            if((t&0xF)>9)
+                resp[3]=(t&0xF)+55;
+            else
+                resp[3]=(t&0xF)+48;
+            set_internal_response((void*)resp, 4); break;
 	}
 }
 
@@ -267,7 +280,7 @@ bool parser_add(uint8_t ch)
             if ((entrych >= 128))
             { // entry to cmd list
 				parser_func_t func;
-				func = pgm_read_ptr_far(&(cmd_list[entryidx]));
+				func = pgm_read_ptr_far((long) &(cmd_list[entryidx]));
 				func(); // dispatch the command!
 				cmd_dispatched = true;
             }

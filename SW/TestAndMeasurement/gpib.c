@@ -408,18 +408,7 @@ char gpib_get_readtermination(void)
 
 void gpib_set_readtermination(char terminator)
 {
-	switch(terminator)
-	{
-		case '\n':
-			s_terminator = '\n';
-			break;
-		case '\r':
-			s_terminator = '\r';
-			break;
-		default:
-			s_terminator = '\0';
-			break;
-	}
+    s_terminator=terminator;
 }
 
 
