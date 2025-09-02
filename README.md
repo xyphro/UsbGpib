@@ -3,9 +3,10 @@
 
 I'm looking for a small group of passionate beta testers to help shape a new GPIB adapter that packs serious capabilities into a tiny form factor. If you're into instrumentation, protocol-level debugging, or just love pushing hardware to its limits—this might be for you. Breaking something is highly valued by me, such that I can fix it :-)
 
+New features:
 - **USB High-Speed (480 MBit/s)** with USBTMC class support  
   Supports multiple GPIB devices on a single adapter
-- **Tiny formfactor**
+- **Tiny formfactor** - Guaranteed to fit into all GPIB sockets due to dimensions and cable escape path matching the standard.
 - **GPIB compliant IO characteristics** including termination
 - **GPIB HS488 mode**  
   Up to **8 MBytes/s** peak speed (if your instrument supports HS488 mode, but normal mode is on par with commercial adapters!)  
