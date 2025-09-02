@@ -1,3 +1,56 @@
+# Beta Testers wanted — I WANT YOU!
+(skip this section if not interested :-))
+
+I'm looking for a small group of passionate beta testers to help shape a new GPIB adapter that packs serious capabilities into a tiny form factor. If you're into instrumentation, protocol-level debugging, or just love pushing hardware to its limits—this might be for you. Breaking something is highly valued by me, such that I can fix it :-)
+
+- **USB High-Speed (480 MBit/s)** with USBTMC class support  
+  Supports multiple GPIB devices on a single adapter
+- **Tiny formfactor**
+- **GPIB compliant IO characteristics** including termination
+- **GPIB HS488 mode**  
+  Up to **8 MBytes/s** peak speed (if your instrument supports HS488 mode, but normal mode is on par with commercial adapters!)  
+- **100MBit/s Ethernet with VXI-11 and PoE**
+  Also works with USB power and non-PoE Ethernet
+- **GPIB Device Mode Support**
+- **Fully GPIB-compliant I/O characteristics**
+
+Here a rendering - my actual prototype is too ugly to show :-D
+
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/NewHighSpeedEthernetUsbVersion.png" width="50%"/>
+(Unfortunately such a nice transparent housing will be far too expensive to produce due to high NRE)
+
+## What You Get as Betatester
+
+- Free hardware shipped directly to you  
+- Beta testing starts **January 2026**  
+- Final hardware expected **late November to mid-December 2026**
+- Software already strongly progressed now
+
+## Who I’m Looking For
+
+You don’t need to tick every box—but here’s what would be amazing:
+
+- Willingness to debug remotely and help zoom into issues  
+  - I won’t nag for daily updates—good things take time  
+  - The adapter includes built-in debug tools like trace generation  
+- Ability to run tracing scripts and share trace files + issue descriptions  
+  - I’ll send updates, you flash and retry—simple loop  
+- Access to a variety of GPIB instruments from different eras
+- **MacOSX testers** especially welcome (I can only test on Linux and Windows)  
+
+## Logistics
+
+- Preference for **European testers** (faster shipping and less costs for me, no customs hassle), but don't let yourself stop you from applying if you're outside Europe.
+- Limited to **3 testers max** in this early phase, depending on coverage areas (otherwise I won't be able to handle all interactions) 
+- Communication via forum or email -> your choice
+
+## Interested?
+
+Write me at: **Xyphro@gmail.com**  
+Let’s build something awesome together.
+
+---
+
 # UsbGpib
 Versatile, cheap, portable and robust USB to GPIB converter (USBTMC class based).
 
