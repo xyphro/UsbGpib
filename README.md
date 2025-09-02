@@ -24,7 +24,7 @@ Here a rendering - my actual prototype is too ugly to show :-D
 
 - Free hardware shipped directly to you  
 - Beta testing starts **January 2026**  
-- Final hardware expected **late November to mid-December 2026**
+- Final hardware expected **late November to mid-December 2025**
 - Software already strongly progressed now
 
 ## Who I’m Looking For
