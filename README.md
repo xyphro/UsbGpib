@@ -1,54 +1,47 @@
-# Beta Testers wanted — I WANT YOU!
-(skip this section if not interested :-))
 
-I'm looking for a small group of passionate beta testers to help shape a new GPIB adapter that packs serious capabilities into a tiny form factor. If you're into instrumentation, protocol-level debugging, or just love pushing hardware to its limits—this might be for you. Breaking something is highly valued by me, such that I can fix it :-)
+# Recent Updates
 
-New features:
-- **USB High-Speed (480 MBit/s)** with USBTMC class support  
-  Supports multiple GPIB devices on a single adapter
-- **Tiny formfactor** - Guaranteed to fit into all GPIB sockets due to dimensions and cable escape path matching the standard.
-- **GPIB compliant IO characteristics** including termination
-- **GPIB HS488 mode**  
-  Up to **8 MBytes/s** peak speed (if your instrument supports HS488 mode, but normal mode is on par with commercial adapters!)  
-- **100MBit/s Ethernet with VXI-11 and PoE**
-  Also works with USB power and non-PoE Ethernet
-- **GPIB Device Mode Support**
-- **Fully GPIB-compliant I/O characteristics**
+-> Scroll further down to see the normal content and skip the news. <-
 
-Here a rendering - my actual prototype is too ugly to show :-D
+## From Bench to Ready: Buy It, Plug It, Use It!
+
+Tired of tinkering? Want to skip the hassle and get straight to using your GPIB setup?
+* Iâ€™ve teamed up with Elecrow to bring you ready-to-roll GPIB-USB converters â€“ perfect for those who want results, not a weekend project.
+* These adapters come fully assembled, programmed, housed, tested, and ready to go. No fuss. No build. Just plug it in and start working.
+* The Adapters match 100% the V2 version described in this repository. 
+
+**Grab yours now:** <a href="https://www.elecrow.com/xyphrolabs-gpibusb.html" target="_blank">https://www.elecrow.com/xyphrolabs-gpibusb.html</a>
+
+Let the data flow begin!
+
+This doesnâ€™t mean Iâ€™m going fully commercial - far from it.
+Offering pre-built adapters is simply a convenience for those whoâ€™d rather skip the build and get straight to using their gear.
+
+All sharing, support, and collaboration will remain fully open, just as before.
+This is about choice, not change!
+
+## Coming soon: Native Linux-Gpib support
+<small>(Or actually: It's already there!)</small>
+
+A contact with the Linux-Gpib maintainer resulted in a great cooperation with good outcome. We managed to jointly get native linux-gpib support up and alive. Thanks a lot for that, Dave!
+
+Weâ€™ve successfully brought full Linux-GPIB compatibility to life. To enable it, youâ€™ll need to flash a dedicated firmware image:  
+- File "LinuxGpib.bin" in sub-folder [LinuxGpib firmware](SW/binaries/) will enable it from firmware perspective. Note: This will make the adapter stop from enumerating as normal usbtmc device (you can reflash the normal firmware again later if you like). The upcoming adapter announced a few days ago will have a combined firmware, but the flash of AtMega32U4 was simply "too full".
+
+Stay tuned â€” Iâ€™ll be publishing a detailed guide soon, covering setup instructions and the powerful benefits of going native on Linux.
+
+Just to avoid misunderstandings: The Adapter always worked under Linux as normal UsbTmc device as it does on any other operating system, but was not supported by the Linux-GPIB library so far. So software packages using linux-GPIB can be used without modification in future.
+
+Would btw. love to get similar integration also in Visa Libraries - let's see what time will bring :-)
+
+## Update on Beta Tester program on new upcoming "V3" Adapter with Ethernet+PoE + High speed USB
+
+I managed to find a decent amount of betatesters for the new upcoming HW. Much more as the originally anticipated 3 persons. Thanks a lot for all who volunteered! 
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/NewHighSpeedEthernetUsbVersion.png" width="50%"/>
-(Unfortunately such a nice transparent housing will be far too expensive to produce due to high NRE)
 
-## What You Get as Betatester
-
-- Free hardware shipped directly to you  
-- Beta testing starts **January 2026**  
-- Final hardware expected **late November to mid-December 2025**
-- Software already strongly progressed now
-
-## Who I’m Looking For
-
-You don’t need to tick every box—but here’s what would be amazing:
-
-- Willingness to debug remotely and help zoom into issues  
-  - I won’t nag for daily updates—good things take time  
-  - The adapter includes built-in debug tools like trace generation  
-- Ability to run tracing scripts and share trace files + issue descriptions  
-  - I’ll send updates, you flash and retry—simple loop  
-- Access to a variety of GPIB instruments from different eras
-- **MacOSX testers** especially welcome (I can only test on Linux and Windows)  
-
-## Logistics
-
-- Preference for **European testers** (faster shipping and less costs for me, no customs hassle), but don't let yourself stop you from applying if you're outside Europe.
-- Limited to **3 testers max** in this early phase, depending on coverage areas (otherwise I won't be able to handle all interactions) 
-- Communication via forum or email -> your choice
-
-## Interested?
-
-Write me at: **Xyphro@gmail.com**  
-Let’s build something awesome together.
+<small>Status: From the HW side the Ethernet and PoE section is tested successfully. USB was already enabled since long time.
+SW side: The USB functionality is fully implemented and first stress testing shows positive results with no lockups. The Ethernet stack is up and running too, but further implementation and testing work is still to be done.</small>
 
 ---
 
