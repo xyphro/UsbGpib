@@ -11,6 +11,7 @@ Startup guides:
 * *Upcoming: Linux without Visa and Python-usbtmc module*
 * *Upcoming: Windows startup guide*
 * *Upcoming: Basics principles and hints for Test & Measurement automation*
+* *Upcoming: Electrical layer aspects for GPIB*
 
 ---
 This page is from XyphroLabs UsbGpib project: <a href="https://github.com/xyphro/UsbGpib" target="_blank">https://github.com/xyphro/UsbGpib</a>

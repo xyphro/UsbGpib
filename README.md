@@ -5,11 +5,17 @@
 :newspaper: [Latest updates](Updates.md)
 <br> :hammer: [Buy it or build it](#buy-it-or-build-it)
 <br> :wave: [UsbGpib Introduction](#usbgpib-introduction)
+<br> :house: [Housings / Enclosure](#housings)
+<br> :computer: [Software](#software)
+<br> :electric_plug: [Using the device](#using-the-device)
+<br> :gear: [Setting and getting parameters](#setting-parameters)
+<br> :heavy_check_mark: [Testing status](#testing-status)
 <br> :notebook: [Tutorials](Tutorials/README.md)
+<br> :heart: [support the Project](Tutorials/README.md)
 
 
 I began restructuring this readme.md file to be less overloaded and confusing. It will take several iterations to finalize it. The previous updates are now located in a separate file with the latest one always on top.
-A Major new point is the Tutorials sections, where step by step guides will be added for different usecases.
+A Major new point is the Tutorials sections, where step by step guides will be added for different use cases.
 
 ---
 
@@ -194,7 +200,15 @@ As this converter implements the standard USBTMC Test and measurement class, you
 
 # Testing status
 
+This project is actively maintained since more than 6 years and I personally consider it as very stable. It is proven by multiple users to operate on MacOSX, Linux and Windows and measurement equipment from several decades.
+
+In general I take bug reports very serious and want to "fix them all". In case you don't get an answer on-time on items you report in the issues section, please write me: Xyphro@gmail.com. 
+I often miss seeing issue reports very quickly, as I don't get an email once they are filed.
+
 ## Sucessfully tested measurement equipment:
+
+Below list is equipment I mainly myself tested. Many other users have other measurement equipment proven in use already.
+
 - R&S FSEM30
 - R&S SMIQ03
 - R&S CMU200
@@ -233,45 +247,48 @@ While most GPIB interfaces use the hardware signal EOI to signal the end of a me
 
 The USB-TMC standard allows to set the read termination. While in firmware versions before < 2.0 I did not enable that method, it is now finally supported with standard compliance.
 
-I document here the older method (using pulse indicator request), but I add also the newer methods. You can choose which ones to use, but in some cases pulse indicator requests can be difficult to issue, for which reason it is likely better to use the standard compliant method.
+I document here the older method (using pulse indicator request), but I add also the newer methods which are 100% UsbTmc compliant and portable across different equipments. You can choose which ones to use, but in some cases pulse indicator requests can be difficult to issue, for which reason it is likely better to use the standard compliant method.
 
 
 ### Set read termination to CR (\r):
+(old method)
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term cr')
 ```
 Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
 
-Alternatively you can set the termination directly with visa means, e.g. using PyVisa:
+(prefered method) Alternatively you can set the termination directly with visa means, e.g. using PyVisa:
 ```
 dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR_EN, True)
 dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR, ord('\r') )
 ```
 
 ### Set read termination to LF (\n):
+(old method)
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term lf')
 ```
 Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
 
-Alternatively you can set the termination directly with visa means, e.g. using PyVisa:
+(prefered method) Alternatively you can set the termination directly with visa means, e.g. using PyVisa:
 ```
 dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR_EN, True)
 dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR, ord('\n') )
 ```
 
 ### Set read termination to EOI only (default setting):
+(old method) 
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term eoi')
 ```
 Above setting is volatile. To make this a permanent setting call the below mentioned "!term store" command.
 
-Alternatively you can set the termination directly with visa means, e.g. using PyVisa:
+(prefered method) Alternatively you can set the termination directly with visa means, e.g. using PyVisa:
 ```
-dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR_EN, True)
+dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR_EN, False)
 dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR, ord('\0') )
 ```
 
@@ -280,6 +297,8 @@ dev.set_visa_attribute(visa.constants.VI_ATTR_TERMCHAR, ord('\0') )
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!term store')
 ```
+
+Above relates to the "old non prefered method". In general it is a good idea to set the read termination volatile and use the above suggested methods highlighted with (prefered method).
 
 ### Query current termination setting from device
 ```
@@ -304,7 +323,7 @@ dev.write('!autoid off')
 ```
 This setting is stored in eeprom = non volatile memory, so will survive a power cycle
 
-### turn AutoID feature on
+### Turn AutoID feature on
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
 dev.write('!autoid on')
@@ -388,15 +407,18 @@ dev.control_in(0xa1, 0x40, 0, 0, 1);
 dev.write('!reset')
 ```
 
-Do a reset of the adapter. Note that due to the reset you have to close the visa session and start a new one.
+Do a reset of the adapter. Note that due to the reset you have to close the visa session and start a new one as the device re-enumerates on the USB.
 
 ---
 
-# If you got here and you want to support me, here is your chance :-)
+# Support the project
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J7WPWSQ)
 
 Or support by buying a fully prebuilt adapter at: <a href="https://www.elecrow.com/xyphrolabs-gpibusb.html" target="_blank">https://www.elecrow.com/xyphrolabs-gpibusb.html</a>
+
+In general any email, post or feedback is also very valuable. Feel free to contact me at Xyphro@gmail.com
+
 
 ---
 
