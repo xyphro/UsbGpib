@@ -1,11 +1,22 @@
 
-# Recent Updates
 
--> Scroll further down to see the normal content and skip the news. <-
+# Table of contents
 
-## From Bench to Ready: Buy It, Plug It, Use It!
+:newspaper: [Latest updates](Updates.md)
+<br> :hammer: [Buy it or build it](#buy-it-or-build-it)
+<br> :wave: [UsbGpib Introduction](#usbgpib-introduction)
+<br> :notebook: [Tutorials](Tutorials/README.md)
+
+
+I began restructuring this readme.md file to be less overloaded and confusing. It will take several iterations to finalize it. The previous updates are now located in a separate file with the latest one always on top.
+A Major new point is the Tutorials sections, where step by step guides will be added for different usecases.
+
+---
+
+# Buy it or build it
 
 Tired of tinkering? Want to skip the hassle and get straight to using your GPIB setup?
+
 * I’ve teamed up with Elecrow to bring you ready-to-roll GPIB-USB converters – perfect for those who want results, not a weekend project.
 * These adapters come fully assembled, programmed, housed, tested, and ready to go. No fuss. No build. Just plug it in and start working.
 * The Adapters match 100% the V2 version described in this repository. 
@@ -20,32 +31,11 @@ Offering pre-built adapters is simply a convenience for those who’d rather ski
 All sharing, support, and collaboration will remain fully open, just as before.
 This is about choice, not change!
 
-## Coming soon: Native Linux-Gpib support
-<small>(Or actually: It's already there!)</small>
-
-A contact with the Linux-Gpib maintainer resulted in a great cooperation with good outcome. We managed to jointly get native linux-gpib support up and alive. Thanks a lot for that, Dave!
-
-We’ve successfully brought full Linux-GPIB compatibility to life. To enable it, you’ll need to flash a dedicated firmware image:  
-- File "LinuxGpib.bin" in sub-folder [LinuxGpib firmware](SW/binaries/) will enable it from firmware perspective. Note: This will make the adapter stop from enumerating as normal usbtmc device (you can reflash the normal firmware again later if you like). The upcoming adapter announced a few days ago will have a combined firmware, but the flash of AtMega32U4 was simply "too full".
-
-Stay tuned — I’ll be publishing a detailed guide soon, covering setup instructions and the powerful benefits of going native on Linux.
-
-Just to avoid misunderstandings: The Adapter always worked under Linux as normal UsbTmc device as it does on any other operating system, but was not supported by the Linux-GPIB library so far. So software packages using linux-GPIB can be used without modification in future.
-
-Would btw. love to get similar integration also in Visa Libraries - let's see what time will bring :-)
-
-## Update on Beta Tester program on new upcoming "V3" Adapter with Ethernet+PoE + High speed USB
-
-I managed to find a decent amount of betatesters for the new upcoming HW. Much more as the originally anticipated 3 persons. Thanks a lot for all who volunteered! 
-
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/NewHighSpeedEthernetUsbVersion.png" width="50%"/>
-
-<small>Status: From the HW side the Ethernet and PoE section is tested successfully. USB was already enabled since long time.
-SW side: The USB functionality is fully implemented and first stress testing shows positive results with no lockups. The Ethernet stack is up and running too, but further implementation and testing work is still to be done.</small>
+The full design files are located in this repository in case you want to build the devices yourself.
 
 ---
 
-# UsbGpib
+# UsbGpib Introduction
 Versatile, cheap, portable and robust USB to GPIB converter (USBTMC class based).
 
 You'll find many projects like this, but this one is special (ok, everybody will claim this) :-)
@@ -56,21 +46,21 @@ V1 Hardware:
 V2 Hardware: 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="50%"/>
 
-If you have a lot of test equipment at home, you might know the issues: Lots of devices only have GPIB as interface and the  GPIB adapters and GPIB cables on the market are very expensive and some of them even have many issues, when run under Windows 10 (device driver does not work). Or they e.g. are not able to be operated with VISA, because they are UART based, need special command sequences, ...
+If you have a lot of test equipment at home, you might know the issues: Lots of devices only have GPIB as interface and the GPIB adapters and GPIB cables on the market are very expensive and some of them even have many issues, when run under Windows 10 (device driver does not work). Or they e.g. are not able to be operated with VISA, because they are UART based, need special command sequences, ...
 
 <img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/SizeComparison.jpg" width="40%" align="right"/>
 The adapters are also typically very long, such that they extend the overall length of your test equipment by at least 10cm (~4 inches).
 
-Apart of the 2 very big manufacturers, other GPIB adapters, e.g. with Ethernet or also USB interface are not recognized my normal VISA providers or PyVisa, making the measurement control implementation specific for your GPIB adapter.
+Apart of the 2 very big manufacturers, other GPIB adapters, e.g. with Ethernet or also USB interface are not recognized by normal VISA providers or PyVisa, making the measurement control implementation specific for your GPIB adapter.
 
-I've got frustrated and tried to turn it into something positive - Here a video showing the final device in action - click to view:
+I've got frustrated and tried to turn it into something positive. Here a video showing the final device in action - click to view:
 
 [![](https://img.youtube.com/vi/pZp1QZCXrF8/0.jpg)](https://www.youtube.com/watch?v=pZp1QZCXrF8) 
 
 
 Some goals of the project were:
 - Work based on the standard USBTMC protocol. This allows the GPIB test equipment to look like a normal USB based measurement device and work flawless with e.g. NI VISA, Labview, Matlab or PyVisa.
-- Have a small length - otherwise my equipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short.
+- Have a small length - otherwise my equipment has the risk of falling from the shelf :-) Also the USB cable should connect 90 degree angled, to make it very short. With V2 HW, the length got further reduced to the size of a GPIB connector.
 - It should be cheap but still versatile (you can build a single one of these for only 14 USD!)
 - It should support ALL my test equipment, from many different GPIB implementation generations and different GPIB flavors
 - The Firmware should be upgradeable over USB
@@ -80,86 +70,7 @@ Some goals of the project were:
 
 All those goals are met.
 
-# 21st April '25 update
-
-Today it's time for another release - version V2.0. 
-
-While writing this and looking at this readme.md file, I certainly think that I should clean it up in future - it is not well structured for new users. Sorry for this, but I have this on my radar and will improve. Whenever I have more time I will also extend it with usage examples / small "trainings", especially for those who are completely new to GPIB and controlling instruments.
-
-I had btw. some occasions where users had issues flashing the device. Many of them were caused by the fact that the .hex and .bin files were saved over the GitHub web interface by rightclicking and selecting "Save as". This will result in a HTML page being saved which will not flash well :-)
-The safest option is to do a git clone or to download this whole github repository as .zip file.
-
-Here the release V2.0 details:
-- **Bugfix:** the options autoid slower and autoid slowest did not work. This is addressed and I test those settings now also properly in release testing, promised :-) The issue was caused in my super slim parser implementation for custom internal commands and "autoid slow" and "autoid slower" start with the same letters causing hickups.
-The Windows GUI is also updated to expose those 2 autoid settings - they were not included before.
-As general good recommendation, I still recommend to turn autoid feature off, as it limits the measurement instruments which are used - Instruments HAVE to support *IDN? query for it to work well, which is for many old equipment not the case and for such old equipment errors will be flagged after the instrument is turned on.
-- **New feature:** I enabled a new method to set the READ termination. One that is fully compliant with usbtmc standard and does not need a workaround with pulse indicator requests. I don't know why I did not spot this earlier, but a discussion with the usbtmc linux kernel mode driver maintainer exposed this to me. When using direct access to usbtmc kernel mode driver you can use the <a href="https://github.com/dpenkler/linux-usbtmc?tab=readme-ov-file#ioctl-to-control-setting-eom-bit" target="_blank">USBTMC_IOCTL_EOM_ENABLE</a> IOCTL to set the read termination. When using a VISA layer, you can set the read termination by setting the VI_ATTR_TERMCHAR_EN and VI_ATTR_TERMCHAR attributes (see below for more details). 
-The previous method of setting read termination is not modified in any way, this just gives an additional method to set the readtermination.
-- **Bugfix / Improvement:** The pulse indicator request function did use a blocking delay to pulse the LED. This delayed USB side handling. In some cases this could trigger timeouts. The LED blinking is now handled fully asynchronous and those timeouts will not occur anymore.
-
-# 6th April '25 update
-
-Time to release a bugfix (reported by rapgenic #80): V1.9 of the firmware fixes an issue where the "autoid slow" setting was not applied properly.
-
-# 12th January '25 update
-
-## New Gui available! (Windows)
-
-I implemented a small GUI to change the non-volatile settings of the GpibUSB adapter. Sorry - it's windows only :-)
-It is a single .exe file without external dependencies. You can just download it, run it and immediately change settings.
-
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/UsbGpibGUI.png" width="80%"/>
-
-Please download it from this folder: [SW/UsbGpibGUI](SW/UsbGpibGUI)
-
-The source code is included in the src sub-directory.
-
-## Python GUI (Linux)
-
-UsbGpib user Jim Houston created an impressive pure Python GUI similar to mine - and I believe he began working on it even before I released mine. His GUI stands out for its versatility and platform independence, requiring only Python to run. It can be executed directly with Python 3 and should run on most platforms.
-
-For details about it, have a look into this discussion thread: [https://github.com/xyphro/UsbGpib/discussions/55](https://github.com/xyphro/UsbGpib/discussions/55)
-
-The GUI can be found here including documentation: [SW/NiceGUI](SW/NiceGUI)
-
-## New Firmware
-
-I release also herewith Version 1.8 of the firmware. 
-Mainly a bug-fix was done, that the string setting now also returns short, when it is actually set to short. (issue report #59).
-
-# 13th January '24 update
-
-New year, new update :-)
-
-I realized a user suggestion, which is a better human readable interface to the internal instrument settings.
-This also exposes new functionality, e.g. shortening of the visa resource string, adjustable delayed application of AutoID featured, ...
-The read termination setting can now be set in a volatile way and also be read back.
-
-A slight issue sneaked in also and got fixed: After an instrument clear the next GPIB transfer timed out. Nobody found it so far though :-) But I fixed it.
-
-Have fun using this!
-(would anybody volunteers to make a simple cross platform gui for the non volatile settings :-) ?)
-
-# 19th December '23 update
-
-Finally I made it - the new HW design is on this page. As I had to restructure the repository a bit it took quite a while.
-The software image is always the same and runs on both HW revisions.
-
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/Upcoming_Rev2.png" width="40%"/>
-
-I also have put a binary for a new Firmware image in there. I am still busy optimizing certain things but want to give you a try before doing a next release.
-Please if you test it: Feed it back to me - does it work / does it break anything -> sharing is caring. 
-
-Mail me at xyphro@gmail.com or raise an issue under the issue section.
-
-[FW image location: SW/binaries](SW/binaries)
-
-- 488.2 support further rolled out. This means Status bytes are automatically read out and reported via interrupt transfers to PC as foreseen in the standard.
-- FASTER (!) 7 x write speed improvement and 4.x times read speed improvement. As reference: On an FSW I get 310kBytes/s as write transfer speed and 240kBytes/s as read transfer speed.
-- a fix for read status byte readout leading to issues on my CMU200
-- several smaller race conditions identified and fixed. A lot of work went into stress testing 488.2.
-
-As said, I feel this is the best Firmware image so far, but I changed so much that I want to go first for this small beta test phase asking you explicitly for positive and negative feedback.
+---
 
 # Hardware
 
@@ -181,7 +92,8 @@ All components are easy to source, so I only specify the potential critical ones
 
 - 16 MHz Crystal: Farnell 2853867 - MCSJK-7E-16.00-8-30-100-B-30 
 - REV 1 GPIB connector: Farnell 2421095 - NORCOMP 112-024-113R001. For REV 2 use a straight 24P male solder type connector e.g. from AliExpress.
-- USB connector: Farnell 2668483 - Amphenol ICC 61729-1011BLF
+- USB connector for V1 HW: Farnell 2668483 - Amphenol ICC 61729-1011BLF
+- USB connector for V2 HW: Best is to look on AliExpress for 57 series 24P connector as a starting point.
 
 ## PCB
 
@@ -192,8 +104,11 @@ The PCB can be ordered at nearly any PCB pool production service (e.g. 10 PCBs f
 The PCB is available in 2 revisions.
 - [REV 1](HW/REV1/README.md) is the most popularly used right now due to age. It has a USB Type-B connector and an L-shaped housing visible on a few photos of this page.
 - [REV 2](HW/REV2/README.md) has some improvements like being smaller, better fit and USB Type-C connector.
+- A REV 3 is upcoming. It will be a major redesign with more speed, Ethernet and power over Ethernet support, but the same DNA: Standard protocols being used and ensure compatibility and stability!
 
 Choose whatever you prefer. The software images, but also the external behavior is the same.
+
+---
 
 # Housings
 
@@ -223,6 +138,8 @@ When operating the device without housing, take very well care when plugging in 
 Information on how to build it can be found in the HW/REV 2 folder: [REV 2](HW/REV2/README.md).
 Note, that also the programming/build instructions moved to this location.
 
+---
+
 # Software
 
 ## Source code
@@ -235,6 +152,8 @@ Note: The Software is compatible with any HW revision in this repository. For RE
 ## Binaries
 
 For those, that just want to create their own device, I've included the binary output in the "SW/binaries" subdirectory.
+
+---
 
 # Using the device
 
@@ -471,7 +390,14 @@ dev.write('!reset')
 
 Do a reset of the adapter. Note that due to the reset you have to close the visa session and start a new one.
 
+---
 
 # If you got here and you want to support me, here is your chance :-)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J7WPWSQ)
+
+Or support by buying a fully prebuilt adapter at: <a href="https://www.elecrow.com/xyphrolabs-gpibusb.html" target="_blank">https://www.elecrow.com/xyphrolabs-gpibusb.html</a>
+
+---
+
+This page is from XyphroLabs UsbGpib project: <a href="https://github.com/xyphro/UsbGpib" target="_blank">https://github.com/xyphro/UsbGpib</a>
