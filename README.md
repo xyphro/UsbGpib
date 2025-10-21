@@ -5,13 +5,13 @@
 :newspaper: [Latest updates](Updates.md)
 <br> :hammer: [Buy it or build it](#buy-it-or-build-it)
 <br> :wave: [UsbGpib Introduction](#usbgpib-introduction)
-<br> :house: [Housings / Enclosure](#housings)
+<br> :house: [Housing / Enclosure](#housings)
 <br> :computer: [Software](#software)
-<br> :electric_plug: [Using the device](#using-the-device)
-<br> :gear: [Setting and getting parameters](#setting-parameters)
+<br> &nbsp; &nbsp; :electric_plug: [Using the device](#using-the-device)
+<br> &nbsp; &nbsp; :gear: [Setting and getting parameters](#setting-parameters)
 <br> :heavy_check_mark: [Testing status](#testing-status)
 <br> :notebook: [Tutorials](Tutorials/README.md)
-<br> :heart: [support the Project](Tutorials/README.md)
+<br> :heart: [Support the Project](support-the-project)
 
 
 I began restructuring this readme.md file to be less overloaded and confusing. It will take several iterations to finalize it. The previous updates are now located in a separate file with the latest one always on top.
