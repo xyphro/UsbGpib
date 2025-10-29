@@ -3,6 +3,7 @@ This new file will in future contain all updates. The latest updates are always 
 
 # Recent Updates
 
+
 ## From Bench to Ready: Buy It, Plug It, Use It!
 
 Tired of tinkering? Want to skip the hassle and get straight to using your GPIB setup?

@@ -10,12 +10,10 @@
 <br> &nbsp; &nbsp; :electric_plug: [Using the device](#using-the-device)
 <br> &nbsp; &nbsp; :gear: [Setting and getting parameters](#setting-parameters)
 <br> :heavy_check_mark: [Testing status](#testing-status)
-<br> :notebook: [Tutorials](Tutorials/README.md)
-<br> :heart: [Support the Project](support-the-project)
+<br> :notebook: [Tutorials](Tutorials/README.md) <- **New!**
+<br> :heart: [Support the Project](#support-the-project)
 
-
-I began restructuring this readme.md file to be less overloaded and confusing. It will take several iterations to finalize it. The previous updates are now located in a separate file with the latest one always on top.
-A Major new point is the Tutorials sections, where step by step guides will be added for different use cases.
+Latest update [29th October 2025]: Added a startup tutorial for Windows -> Checkout the tutorial link above.
 
 ---
 
@@ -417,8 +415,8 @@ Do a reset of the adapter. Note that due to the reset you have to close the visa
 
 Or support by buying a fully prebuilt adapter at: <a href="https://www.elecrow.com/xyphrolabs-gpibusb.html" target="_blank">https://www.elecrow.com/xyphrolabs-gpibusb.html</a>
 
-In general any email, post or feedback is also very valuable. Feel free to contact me at Xyphro@gmail.com
-
+In general any email, post or feedback is also very valuable, and don't feel bad if you don't use the support options :-)
+Feel free to contact me at Xyphro@gmail.com
 
 ---
 

@@ -9,7 +9,9 @@ The documentation is in PDF format. You can download the PDF file by clicking th
 Startup guides:
 * <a href="https://github.com/xyphro/UsbGpib/blob/master/Tutorials/XyphroLabs%20UsbGpib%20guide%20Linux%20with%20Visa.pdf" target="_blank">Linux with Visa and Python startup guide</a>
 * *Upcoming: Linux without Visa and Python-usbtmc module*
-* *Upcoming: Windows startup guide*
+* *Upcoming: Linux without Visa and Python pyvisa-py module*
+* <a href="https://github.com/xyphro/UsbGpib/blob/master/Tutorials/Using%20XyphroLabs%20UsbGpib%20adapter%20with%20Windows.pdf"
+target="_blank">Windows with Visa and Python startup guide</a>
 * *Upcoming: Basics principles and hints for Test & Measurement automation*
 * *Upcoming: Electrical layer aspects for GPIB*
 
