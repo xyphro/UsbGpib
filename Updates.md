@@ -3,6 +3,12 @@ This new file will in future contain all updates. The latest updates are always 
 
 # Recent Updates
 
+## 23rd November 2025
+
+I just finalized a user manual for the UsbGPIB V2 adapter, checkout [Tutorials](Tutorials/README.md) section.
+
+In case you miss certain aspects and want me to add them, let me know (Discussion section, Issue section or email to xyphro@gmail.com)
+
 
 ## From Bench to Ready: Buy It, Plug It, Use It!
 

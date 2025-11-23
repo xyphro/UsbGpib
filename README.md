@@ -13,7 +13,7 @@
 <br> :notebook: [Tutorials](Tutorials/README.md) <- **New!**
 <br> :heart: [Support the Project](#support-the-project)
 
-Latest update [29th October 2025]: Added a startup tutorial for Windows -> Checkout the tutorial link above.
+Latest update [23rd Nov 2025]: Added a User manual for UsbGPIB V2 under the Tuturial section
 
 ---
 
