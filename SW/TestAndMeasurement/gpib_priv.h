@@ -35,6 +35,7 @@
 
 void gpib_recover(void);
 extern char s_terminator; /* defined in gpib.c */
+extern bool s_terminator_enabled; /* defined in gpib.c */
 extern volatile bool timer0_ticked; /* flag going high every 100ms - defined in gpib.c */
 
 /* check if 100ms timer ticked. returns true once every 100ms */
@@ -170,10 +171,10 @@ static inline uint8_t gpib_readdat_quick(bool *pEoi, bool *ptimedout, gpibtimeou
 	}
 
 	
-	if (s_terminator == '\0')
-		*pEoi = eoi;
-	else
+	if (s_terminator_enabled)
 		*pEoi = eoi || (c == s_terminator);
+	else
+		*pEoi = eoi;
 
 	if (timedout)
 	{

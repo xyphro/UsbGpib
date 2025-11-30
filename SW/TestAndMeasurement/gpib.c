@@ -24,6 +24,7 @@ static uint8_t s_gpib_disconnect_counter;
 static volatile bool     s_gpib_transaction_active = false; /* TRUE, if a device is addressed as talker or listener */
 
 char s_terminator = '\0'; /* \0 = no termination character - EOI only, other options are '\n' or '\r' */
+bool s_terminator_enabled = false;
  
 static void timer_init(void)
 {
@@ -406,20 +407,14 @@ char gpib_get_readtermination(void)
 	return s_terminator;
 }
 
+void gpib_enable_readterminator(bool enable)
+{
+	s_terminator_enabled = enable;
+}
+
 void gpib_set_readtermination(char terminator)
 {
-	switch(terminator)
-	{
-		case '\n':
-			s_terminator = '\n';
-			break;
-		case '\r':
-			s_terminator = '\r';
-			break;
-		default:
-			s_terminator = '\0';
-			break;
-	}
+	s_terminator = terminator;
 }
 
 

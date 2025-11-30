@@ -160,7 +160,7 @@ void cmd_term_store(void)
 
 void cmd_ver_query(void)
 {
-	set_internal_response((void*)"V2.0", 4);
+	set_internal_response((void*)"V2.2", 4);
 }
 
 void cmd_0000(void)

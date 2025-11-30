@@ -13,7 +13,13 @@
 <br> :notebook: [Tutorials](Tutorials/README.md) <- **New!**
 <br> :heart: [Support the Project](#support-the-project)
 
-Latest update [23rd Nov 2025]: Added a User manual for UsbGPIB V2 under the Tuturial section
+# Summarized latest updates
+
+For detailed visibility look under the Latest update link above!
+
+[30th Nov 2025]: **Released new firmware version V2.2**. See [Latest updates](Updates.md) section.
+
+[23rd Nov 2025]: Added a User manual for UsbGPIB V2 under the Tutorial section
 
 ---
 

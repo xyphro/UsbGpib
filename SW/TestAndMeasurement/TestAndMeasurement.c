@@ -98,6 +98,9 @@ static bool handleLocalLockout = false;
 /** Flag that a goto local should be executed */
 static bool handleGoToLocal = false;
 
+/** Flag that a REN state countrol should be executed */
+static uint8_t handleRenControl = 0;
+
 /** Flag that a ReadStatusByte should be executed */
 static bool    handleReadStatusByte = false;
 static uint8_t handleReadStatusByte_btagvalue = 0;
@@ -437,9 +440,20 @@ int main(void)
 	
 	gpib_init();
 	
-	/* apply settings from eeprom */
+	/* apply termination settings from eeprom. The eeprom supports CR+EOI, LF+EOI and EOI only and no other ones. 
+	   To change the termination to other ones use the standard USBTMC method to define read termination (see Github doc)
+	 */
 	eeprom_busy_wait();	
-	gpib_set_readtermination(eeprom_read_byte((const uint8_t *)105));
+	uint8_t eep_readterm_char = eeprom_read_byte((const uint8_t *)105);
+	if ((eep_readterm_char == '\n') || (eep_readterm_char == '\r'))
+	{
+		gpib_set_readtermination(eep_readterm_char);
+		gpib_enable_readterminator(true);
+	}
+	else
+	{
+		gpib_enable_readterminator(false);
+	}
 	
 	GlobalInterruptEnable();
 	
@@ -891,11 +905,11 @@ void EVENT_USB_Device_ControlRequest(void)
 			case Req_RenControl:
 				if ((USB_ControlRequest.wValue & 0xff) == 1)
 				{
-					gpib_ren(1);
+					handleRenControl = 0x80 | 1;
 				}
 				else
 				{
-					gpib_ren(0);
+					handleRenControl = 0x80 | 0;
 				}
 				Endpoint_ClearSETUP();
 
@@ -1092,6 +1106,7 @@ bool TMC_InLastMessageComplete = true;
 void TMC_resetstates(void)
 {
 	internal_response_buffer_len = 0;
+	handleRenControl = 0; 
 	handleGoToLocal = false;
 	handleSDC = false;
 	handleLocalLockout = false;
@@ -1099,6 +1114,7 @@ void TMC_resetstates(void)
 	TMC_LastMessageComplete = true;
 	TMC_InLastMessageComplete = true;
 	s_remaining_bytes_receive = 0;
+	
 	gpib_interface_clear(); 
 //	gpib_untalk_unlisten();
 }
@@ -1192,11 +1208,23 @@ static inline void TMC_Task(void)
 			handleLocalLockout = false;
 		}
 		
-		if (handleGoToLocal)
-		{
-			timeout_start(50000); /* 0.5s timeout*/
-			gpib_gotoLocal(gpib_addr, is_timedout);
-			handleGoToLocal = false;
+		if (TMC_LastMessageComplete && TMC_InLastMessageComplete)
+		{ // Issue report from Michael. When executing a long write transfer and then gotolocal, goto local does not happen unless a delay is placed inbetween
+			Endpoint_SelectEndpoint(TMC_OUT_EPADDR);
+			if (!Endpoint_IsOUTReceived()) // This additional check is needed because we use double buffering and the last Bulk out transfer might not have been handled yet.
+			{
+				if (handleGoToLocal)
+				{
+					timeout_start(50000); /* 0.5s timeout*/
+					gpib_gotoLocal(gpib_addr, is_timedout);
+					handleGoToLocal = false;
+				}
+				if (handleRenControl)
+				{
+					gpib_ren(handleRenControl & 1);
+					handleRenControl = 0;
+				}
+			}
 		}
 		
 
@@ -1246,7 +1274,13 @@ static inline void TMC_Task(void)
 					if (MessageHeader.MessageIDSpecific.DeviceIN.LastMessageTransaction & 0x02) // the read termination character is set as part of this read transaction request
 					{
 						gpib_set_readtermination(MessageHeader.MessageIDSpecific.DeviceIN.TermChar);
+						gpib_enable_readterminator(true);
 					}
+					else
+					{
+						gpib_enable_readterminator(false);
+					}
+					
 					
 					/* Check if a response from an internal query is in the buffer */
 					if (internal_response_buffer_len) 
@@ -1296,7 +1330,6 @@ static inline void TMC_Task(void)
 					{
 						TMC_resetstates();
 					}
-					
 					break;
 				default:
 					Endpoint_StallTransaction();

@@ -30,6 +30,7 @@ bool gpib_ATN_HIGH(void);
 
 uint8_t gpib_search(void);
 
+void gpib_enable_readterminator(bool enable);
 void gpib_set_readtermination(char terminator);
 char gpib_get_readtermination(void);
 

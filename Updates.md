@@ -3,6 +3,25 @@ This new file will in future contain all updates. The latest updates are always 
 
 # Recent Updates
 
+## 30th November 2025
+
+**Just released a new firmware after testing - version 2.2.**
+
+Changes:
+* Read termination related:
+  * When the "USBTMC native" method to set the termination was once enabled, disabling it did not have effect anymore - it stayed enabled. Only power cycling got it out of that enabled state. Fixed and tested now.
+  * Only \n \r and EOI only were supported read terminations. However, as reported in <a href="https://github.com/xyphro/UsbGpib/issues/85" target="_blank">issue 85</a>, there is quite a number of measurement equipment which requires e.g. ETX (0x03) read termination.  
+  I removed now this artificial limitation for read termination, such that any read termination character can be set. From 0x00 to 0xff all codes are supported now.  
+  For the eeprom non-volatile based method only \r \n and eoi only options are available and there is no plan to extend it to any termination character as this eeprom based method will also get retired for the upcoming V3 UsbGpib adapter.
+* GotoLocal synchronization. USBTMC uses 2 different transfer methods for transfering certain types of messages. Control transfers and Bulk transfers. When e.g. sending a USBTMC command like Reading data which uses Bulk transfers followed by another one like GotoLocal which uses control transfers it is important that they also get executed in that order.   
+This is something I took deep care off already since long time for other other control transfers, however as it turned out never tested for GoToLocal.   
+And things that are not tested don't work, right?   
+Michael discovered this during porting of his <a href="https://github.com/VK2BEA/HP8753-Companion" target="_blank">HP8753-Companion</a> to support the UsbGpib V2 adapter which led to me releasing V2.1 to him a while ago.
+
+The issue is fixed now and confirmed working. This V2.2 includes the 2 additional improvements now.
+
+Next release is planned to cover some good improvements I got suggested on AutoID handling.
+
 ## 23rd November 2025
 
 I just finalized a user manual for the UsbGPIB V2 adapter, checkout [Tutorials](Tutorials/README.md) section.
