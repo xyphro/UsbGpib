@@ -25,7 +25,7 @@ As I have an outstanding Betatestprogram for V3 I want to share some updates - o
 
 Here the "messy table view" during some later software development :-)
 
-<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/V3SneakPreview.png" width="60%"/>
+<img src="https://github.com/xyphro/UsbGpib/blob/master/pictures/V3SneakPreview.png?raw=true" width="60%"/>
 
 The schedule slipped a bit while getting the V2 adapter ready for sale, but V3 is converging and nearing completion. A batch of prototypes has been ordered with CNC aluminum housings, anodizing, and laser marking.
 
