@@ -18,8 +18,34 @@
 For detailed visibility look under the Latest update link above!
 
 [30th Nov 2025]: **Released new firmware version V2.2**. See [Latest updates](Updates.md) section.
-
 [23rd Nov 2025]: Added a User manual for UsbGPIB V2 under the Tutorial section
+
+# V3 Preview
+As I have an outstanding Betatestprogram for V3 I want to share some updates - on this main page.
+
+Here the "messy table view" during some later software development :-)
+
+<img src="https://raw.githubusercontent.com/xyphro/UsbGpib/master/pictures/V3SneakPreview.png" width="60%"/>
+
+The schedule slipped a bit while getting the V2 adapter ready for sale, but V3 is converging and nearing completion. A batch of prototypes has been ordered with CNC aluminum housings, anodizing, and laser marking.
+
+Progress:
+
+| Item | Comment & State |
+|------|-----------------|
+| Hardware | Optimized after two extra iterations; GPIB-compliant electrical characteristics; prevents back-powering from device GPIB bus |
+| POE | Fully works. Challenging to get right, but finally working well and cost optimized | 
+| Mechanics | Six (!) 3D designs completed; 3D-printed housings with/without Ethernet; CNC machined housing prototypes ordered |
+| GPIB stack | Fully up and running and "ruggedized"            |
+| USB Boot loader | Complete; UF2-like workflow for easy use without special software and tested functionality with Mac, Windows, Linux | 
+| USB high speed functionality | New MCU USB stack written from scratch for low latency and high throughput |
+| USBTMC | USBTMC part fully works and passes several compliance / stress tests |
+| Ethernet | Ethernet stack and low level driver is fully done and ready |
+| VXI11 & HiSlip | VXI11 mostly complete with ongoing optimizations; HiSlip near finalization with minor polish remaining |
+
+The prototypes will arrive approximately end of January.
+Very keen on bringing them up and distributing!
+
 
 ---
 
