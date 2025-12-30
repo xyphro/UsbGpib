@@ -17,8 +17,9 @@
 
 For detailed visibility look under the Latest update link above!
 
+[30th Dec 2025]: **Added a link to Digikey US**
+
 [30th Nov 2025]: **Released new firmware version V2.2**. See [Latest updates](Updates.md) section.
-[23rd Nov 2025]: Added a User manual for UsbGPIB V2 under the Tutorial section
 
 # V3 Preview
 As I have an outstanding Betatestprogram for V3 I want to share some updates - on this main page.
@@ -51,13 +52,21 @@ Very keen on bringing them up and distributing!
 
 # Buy it or build it
 
-Tired of tinkering? Want to skip the hassle and get straight to using your GPIB setup?
+* Tired of tinkering? Want to skip the hassle and get straight to using your GPIB setup?  
+* You’d rather spend your time using your instruments instead of assembling hardware?
 
+Skip the soldering iron and jump straight into your GPIB workflow!
+
+You’ve got two solid options to get a ready‑to‑run UsbGpib adapter.
+
+## &#x1f1fa;&#x1f1f8; - United States
+* If you're in the US, you can order the UsbGpibV2 directly from DigiKey US with fast domestic shipping. No long waits, no customs paperwork, no surprises - just quick delivery and a smooth experience: <br> &#x1F449; <a href="https://www.digikey.com/en/products/detail/binho-llc/GpibUsb-V2/28716413?s=N4IgTCBcDaIB4E8AOALATgexAXQL5A" target="_blank"> https://www.digikey.com/en/products/detail/binho-llc/GpibUsb-V2/28716413?s=N4IgTCBcDaIB4E8AOALATgexAXQL5A</a>
+
+## &#x1F30E; - Worldwide
 * I’ve teamed up with Elecrow to bring you ready-to-roll GPIB-USB converters – perfect for those who want results, not a weekend project.
 * These adapters come fully assembled, programmed, housed, tested, and ready to go. No fuss. No build. Just plug it in and start working.
 * The Adapters match 100% the V2 version described in this repository. 
-
-**Grab yours now:** <a href="https://www.elecrow.com/xyphrolabs-gpibusb.html" target="_blank">https://www.elecrow.com/xyphrolabs-gpibusb.html</a>
+* &#x1F449; <a href="https://www.elecrow.com/xyphrolabs-gpibusb.html" target="_blank">https://www.elecrow.com/xyphrolabs-gpibusb.html</a>
 
 Let the data flow begin!
 

@@ -3,6 +3,10 @@ This new file will in future contain all updates. The latest updates are always 
 
 # Recent Updates
 
+## 30th December 2025
+
+Updated the "Buy it or build it section" and added a Digikey US link for buying the adapter.
+
 ## 30th November 2025
 
 **Just released a new firmware after testing - version 2.2.**
