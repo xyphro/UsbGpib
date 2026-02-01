@@ -7,7 +7,7 @@ In case you have ideas/demands for certain topics to be turned into tutorials, f
 The documentation is in PDF format. You can download the PDF file by clicking the top right download button, after you clicked a link below.
 
 UsbGpibV2 user manual:
-* <a href="https://github.com/xyphro/UsbGpib/blob/master/Tutorials/UsbGpibV2_manual.pdf">UsbGpibV2 Manual</a>
+* [UsbGpibV2 Manual](UsbGpibV2_manual.md)
 
 Startup guides:
 * <a href="https://github.com/xyphro/UsbGpib/blob/master/Tutorials/XyphroLabs%20UsbGpib%20guide%20Linux%20with%20Visa.pdf" target="_blank">Linux with Visa and Python startup guide</a>
