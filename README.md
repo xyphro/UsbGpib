@@ -13,6 +13,29 @@
 <br> :notebook: [Tutorials](Tutorials/README.md) <- **New!**
 <br> :heart: [Support the Project](#support-the-project)
 
+
+<div style="border:1px solid #e6b3b3; background:#800000; padding:1em; border-radius:6px; color:#ffffff;"" >
+
+### Statement on UsbGPIB V2 Clones
+
+I recently discovered that the UsbGPIB V2 has been cloned and is being sold on platforms like AliExpress and that even for an extremly expensive price. Listening my Nickname and even my full name. It’s disheartening to see this happening. This project has been actively maintained for roughly seven years, with continuous improvements, extensive testing, and a strong focus on compatibility and high‑performance operation. It reflects a long‑term, quality‑minded effort - built after work, on weekends, and supported through countless interactions, issue reports, and community discussions.
+The documentation alone took a significant amount of time and care to create.
+
+Along the way, the project also led to great technical discussions and even a number of great "email friendships" - something that has always meant a lot to me.
+
+Things often look simple once they’re finished, but getting them to that point requires a lot of building, refining, and testing and sustained effort behind the scenes.
+
+I genuinely *want* people to build it themselves. Seeing individuals or community‑organized groups reproduce the design is one of the most rewarding parts of this project; it shows that the work is useful and inspires others. That kind of engagement is exactly why I made it open in the first place.
+
+What really breaks my motivation is seeing companies take this open work - something I poured years of care, testing, and refinement into - mass‑produce it, and profit from it without giving anything back.
+
+Because of this, I now have to think carefully about how I approach the upcoming V3. This situation may influence if, when, and how V3 will be released as open source. Right now, I’m heavily demotivated after seeing how V2 is being exploited.
+
+It simply takes the wind out of my sails right now.
+
+[xyphro@gmail.com](mailto:xyphro@gmail.com)
+</div>
+
 # Summarized latest updates
 
 For detailed visibility look under the Latest update link above!
