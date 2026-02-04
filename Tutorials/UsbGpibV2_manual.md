@@ -18,12 +18,14 @@
 
 # XyphroLabs UsbGpib V2 User Manual
 
-**XyphroLabs UsbGpib V2**
-
-Last Update: 1st February 2026
+Last Update: 1st February 2026  
+This document is part of [Xyphro
+UsbGpib](https://github.com/xyphro/UsbGpib) project
 
 Prefer PDF? Click here:
-[<img src="pictures/pdf_icon.svg" style="width:3cm" alt="image" />](UsbGpibV2_manual.pdf)
+[<img src="pictures/pdf_icon.svg" style="width:3cm" alt="image" />](UsbGpibV2_manual.pdf)  
+Note: Click on the download RAW button on top right when viewing the PDF
+online.
 
 # Introduction
 
@@ -408,9 +410,9 @@ adapter.
 ------------------------------------------------------------------------
 
 **What are the AutoID timing options?**  
-When the autoID feature is enabled there are different delay options.
+When the AutoID feature is enabled there are different delay options.
 This delay specifies how long the adapter waits after instrument turnon
-before executing the \*IDN? query for the autoID feature. While 5s works
+before executing the \*IDN? query for the AutoID feature. While 5s works
 for each instrument, some instruments require a setting to higher number
 which is exposed by the other AutoID settings. AutoID is a non-volatile
 setting which is permanently stored in the MCUs eeprom. **UsbGpibGui**:
@@ -431,7 +433,7 @@ setting which is permanently stored in the MCUs eeprom. **UsbGpibGui**:
   it.
 
 **Tip:** Turn AutoID OFF for older non SCPI compliant instruments to
-avoid that they start up with an Error. To change the AutOID settings
+avoid that they start up with an Error. To change the AutoID settings
 you can use e.g. the UsbGpibGui in the UsbGpib SW folder for Windows or
 NiceGui for Linux. Note that UsbGpib GUI requires a Visa installation.
 
@@ -444,12 +446,12 @@ It is best to use standard VISA attributes:
 
 - Set `VI_ATTR_TERMCHAR` to `0x0A` (or any other ASCII character).
 
-With firmware version \>= 2.2 you can set any read termination character
-you like, from ASCII code 0 to 255. This enables instruments to react on
-EOT, CR, LF or any other character like e.g. ’,’ for easier parsing of
-input data. Independent of the set termination character setting the
-instrument will always react on the GPIB EOI as termination of a read
-query.
+With firmware version $`\ge`$ 2.2 you can set any read termination
+character you like, from ASCII code 0 to 255. This enables instruments
+to react on EOT, CR, LF or any other character like e.g. ’,’ for easier
+parsing of input data. Independent of the set termination character
+setting the instrument will always react on the GPIB EOI as termination
+of a read query.
 
 When read termination is turned off, the read termination is EOI only.
 
@@ -476,8 +478,8 @@ risk of getting blocked or locked out in future.
   to "nicely integrate" into any VISA environment by following industry
   standards rather than exploiting a specific manufacturer’s driver.
 
-In short: It is a legally independent, professional-grade tool designed
-to coexist peacefully within the ecosystem of your choice.
+In short: It is an independent, professional-grade tool designed to
+coexist peacefully within the ecosystem of your choice.
 
 ------------------------------------------------------------------------
 
@@ -491,14 +493,29 @@ your software does not need to poll for status continuously.
 **Can I use it with Linux?**  
 Yes, it can be used either as a standard USBTMC device or through
 Linux-GPIB for advanced features like controlling multiple instruments
-with a single adapter.
+with a single adapter. In case you want to use Linux-GPIB, have a look
+here and search for "xyphro" for further instructions:
+[<https://linux-gpib.sourceforge.io/doc_html/supported-hardware.html>](https://linux-gpib.sourceforge.io/doc_html/supported-hardware.html)  
 
 ------------------------------------------------------------------------
 
 **Do I really need to use a VISA library?**  
-Technically, no—but it is highly recommended. Because the adapter
+Technically, no-but it is highly recommended. Because the adapter
 follows the standard **USBTMC** protocol, it is natively recognized by
-modern operating systems.
+modern operating systems. Visa, while it seems like an "old-school
+concept" is a quite convinient tool to enable access to instruments over
+multiple different interfaces with a common interface.
+
+I started e.g. by controlling only USBTMC instruments and made a
+dedicated solution for that without visa, but when I later wanted to
+control GPIB instruments and Ethernet based instruments in the same
+setup, that "island solution" concept breaked and I started looking
+seriously into Visa and saw the clear benefits. Don’t get shocked by
+Gigabytes of Visa installation - there are smaller Visas available like
+e.g. R&S Visa. Lean and mean and available for Mac OS, Windows, Linux
+and even Raspberry PI with the same application level interface across
+those operating systems. You also get a very stable tested solution for
+your instrument access and can focus on the real measurement task.
 
 - **With VISA:** Libraries like *R&S VISA* or *NI-VISA* provide a
   unified API. This is the most stable path for tools like LabVIEW or

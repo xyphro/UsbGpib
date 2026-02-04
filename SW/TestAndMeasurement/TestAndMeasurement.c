@@ -278,6 +278,8 @@ bool identifyGpibDevice(void)
 	
 	if (timeout_val != 0) 
 	{
+		char prev_c = '\0';
+		bool suppress_character = false;
 		timeout_start(100000); /* 1s timeout*/
 		gpib_make_talker(gpib_addr, is_timedout);
 		len = 0;
@@ -285,10 +287,15 @@ bool identifyGpibDevice(void)
 		{
 			c = gpib_readdat(&eoi, &timedout, is_timedout);
 			hascomma = hascomma || (c == ',');
-			if ( (c=='\"') || (c=='*') || (c=='/') || (c=='\\') || (c==':') || (c=='?') || (c==' ') || (c==',') || (c=='&') ) /* YEP, a comma and amphersand is allowed in USBTMC spec, but R&S SW does not like this... */
-				c='_';
-			if ( (c >=32) && (c <=126))
+			if ( (c=='\"') || (c=='*') || (c=='/') || (c=='\\') || (c==':') || (c=='?') || (c==' ') || (c==',') || (c=='&') || (c=='_') ) /* YEP, a comma and amphersand is allowed in USBTMC spec, but R&S SW does not like this... */
+			{
+				suppress_character = (prev_c == '_'); // Issue report from Sebastian by mail. Keysight Visa does not support double underscores (even though it is OK according to USBTMC spec)
+				c='_'; 
+			}
+			if ( (c >=32) && (c <=126) && (!suppress_character) )
 				tmc_serial_string.UnicodeString[len++] = cpu_to_le16(c);
+			suppress_character = false;
+			prev_c = c;
 		}
 		while ((len < TMC_MAX_SERIAL_STRING_LENGTH) && (!timedout) && (!eoi));
 		/* strip away spaces at end */
@@ -739,6 +746,7 @@ void EVENT_USB_Device_ControlRequest(void)
 					
 					/* Write the request response byte */
 					Endpoint_Write_8(TMCRequestStatus);
+					Endpoint_Write_8(CurrentTransferTag); // address Issue #96
 					Endpoint_ClearIN();
 					Endpoint_ClearStatusStage();
 				}
@@ -760,6 +768,8 @@ void EVENT_USB_Device_ControlRequest(void)
 					/* Write the request response bytes */
 					Endpoint_Write_8(TMCRequestStatus);
 					Endpoint_Write_16_LE(0);
+					Endpoint_Write_16_LE(0); // Address issue #96
+					Endpoint_Write_16_LE(0); // Address issue #96
 					Endpoint_Write_32_LE(LastTransferLength);
 
 					Endpoint_ClearIN();
@@ -817,6 +827,8 @@ void EVENT_USB_Device_ControlRequest(void)
 					/* Write the request response bytes */
 					Endpoint_Write_8(TMCRequestStatus);
 					Endpoint_Write_16_LE(0);
+					Endpoint_Write_16_LE(0); // Address issue #96
+					Endpoint_Write_16_LE(0); // Address issue #96					
 					Endpoint_Write_32_LE(LastTransferLength);
 
 					Endpoint_ClearIN();

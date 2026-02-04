@@ -17,7 +17,13 @@
 
 For detailed visibility look under the Latest update link above!
 
-[30th Dec 2025]: **Added a link to Digikey US**
+[04th Feb 2026]: **Updated Firmware version to V2.3 - see latest updates section for more information**
+<br>
+[04th Feb 2026]: **Updated V3 Preview slightly**
+<br>
+[04th Feb 2026]: **Added Markdown versions of the tutorials**
+<br>
+[04th Feb 2026]: **Added a link to Binho webshop**
 
 [30th Nov 2025]: **Released new firmware version V2.2**. See [Latest updates](Updates.md) section.
 
@@ -39,14 +45,15 @@ Progress:
 | Mechanics | Six (!) 3D designs completed; 3D-printed housings with/without Ethernet; CNC machined housing prototypes ordered |
 | GPIB stack | Fully up and running and "ruggedized"            |
 | USB Boot loader | Complete; UF2-like workflow for easy use without special software and tested functionality with Mac, Windows, Linux | 
-| USB high speed functionality | New MCU USB stack written from scratch for low latency and high throughput |
+| USB high speed functionality | New MCU USB stack written from scratch for zero copy low latency and high throughput |
 | USBTMC | USBTMC part fully works and passes several compliance / stress tests |
 | Ethernet | Ethernet stack and low level driver is fully done and ready |
-| VXI11 & HiSlip | VXI11 mostly complete with ongoing optimizations; HiSlip near finalization with minor polish remaining |
+| VXI11 | VXI11 is fully up and running, supporting 16 simultaneous connections. Subaddress features, SRQ handling, VXI11 device discovery: All working :-) |
+| MDNS | I added MDNS functionality for device discovery on top of VXI11 device discovery. It was quite complex to realize, but is working correctly and detected by popular Visas and e.g. Avahi browser. |
 
-The prototypes will arrive approximately end of January.
-Very keen on bringing them up and distributing!
+Overall I am happy with the firmware status, despite a few delays due to real-world conditions (this is mainly a hobby).
 
+A short time ago (today is 4th February '26) the Prototypes got shipped to me - including great looking CNC Aluminum housings. I expect to receive them very soon for distribution to Beta testers! I'll explicitly write emails to those to ask for address details once I am ready to ship.
 
 ---
 
@@ -60,7 +67,10 @@ Skip the soldering iron and jump straight into your GPIB workflow!
 You’ve got two solid options to get a ready‑to‑run UsbGpib adapter.
 
 ## &#x1f1fa;&#x1f1f8; - United States
-* If you're in the US, you can order the UsbGpibV2 directly from DigiKey US with fast domestic shipping. No long waits, no customs paperwork, no surprises - just quick delivery and a smooth experience: <br> &#x1F449; <a href="https://www.digikey.com/en/products/detail/binho-llc/GpibUsb-V2/28716413?s=N4IgTCBcDaIB4E8AOALATgexAXQL5A" target="_blank"> https://www.digikey.com/en/products/detail/binho-llc/GpibUsb-V2/28716413?s=N4IgTCBcDaIB4E8AOALATgexAXQL5A</a>
+* If you're in the US, you can now order the UsbGpibV2 directly from several sources, including my distribution partner Binho LLC. Enjoy fast domestic shipping with no long waits, no customs paperwork, and no surprises - just quick delivery and a smooth experience: 
+<br> &#x1F449; <a href="https://binho.io/test-measurement/products/usbgpib-v2/" target="_blank">https://binho.io/test-measurement/products/usbgpib-v2/</a>
+<br> &#x1F449; <a href="https://www.digikey.com/short/29nqq5cz" target="_blank"> https://www.digikey.com/short/29nqq5cz</a>
+<br> &#x1F449; Amazon US also has it listed, but right now no stock, but worthwhile to check it out there too.
 
 ## &#x1F30E; - Worldwide
 * I’ve teamed up with Elecrow to bring you ready-to-roll GPIB-USB converters – perfect for those who want results, not a weekend project.

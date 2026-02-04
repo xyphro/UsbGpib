@@ -3,6 +3,19 @@ This new file will in future contain all updates. The latest updates are always 
 
 # Recent Updates
 
+## 04th February 2026
+
+The PDF manuals are now also available in Markdown, generated automatically from the same source as the PDF document. This makes the documentation easier to browse, diff, and maintain in version control, while ensuring both formats stay perfectly in sync. -> See [Tutorials](Tutorials/README.md) section.
+
+Furthermore I am releasing Firmware version V2.3. 
+Changes:
+- It turned out that Keysight Visa in certain versions can crash when a USBTMC device has a serialnumber with double underscore characters. Note, that the USBTMC standard does not disallow for double underscores. The AutoID function can return double underscores for some instruments - illegal characters returned by *IDN? query get replaced by underscores, so with 2 illegal characters you get double underscores as serial number = visa ressource name. I've now included a filter now to suppress double underscores when autoid is enabled.
+- I've fixed Issues #96 and #97 reported by user thewon86. Those were USBTMC protocol issues which were never uncovered or effects seen so far, however the implementation was indeed incorrect here.
+
+I updated also slightly the V3 announcement in the main README.MD. Basically: Firmware is ready for betatesting, Hardware arriving soon and gets distributed immediately once it arrives (@Betatesters: You'll get mail before shipping)!
+
+My US distribution partner <a href="https://binho.io/" target="_blank">binho</a> also added UsbGPIB directly to their webshop (<a href="https://binho.io/test-measurement/products/usbgpib-v2/" target="_blank">https://binho.io/test-measurement/products/usbgpib-v2/</a>). This is ideal for US-market: Devices ship directly from San Francisco and are available for a good price! Checkout also their offerings on Host adapters and PCBite!
+
 ## 30th December 2025
 
 Updated the "Buy it or build it section" and added a Digikey US link for buying the adapter.

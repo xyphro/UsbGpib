@@ -31,6 +31,8 @@ static const char cmd_parser[] PROGMEM = {0x06, 'a' , 0x0d, 't' , 0x4c, 'v' , 0x
     0x15, 0x02, 's' , 0xc0, 'n' , 0xcc, 0x01, 'h' , 0xc3, 0x01, 'o' , 0xc6, 0x01, 'r' , 
     0xc9, 0x01, 't'|0x80 , 0x13, 0x01, 'o' , 0xcf, 0x01, 'r' , 0xd2, 0x01, 'm' , 0xd5, 
     0x01, 'a' , 0xd8, 0x01, 'l'|0x80 , 0x14 };
+	
+	
 
 void cmd_autoid_on(void);
 void cmd_autoid_off(void);
@@ -160,7 +162,7 @@ void cmd_term_store(void)
 
 void cmd_ver_query(void)
 {
-	set_internal_response((void*)"V2.2", 4);
+	set_internal_response((void*)"V2.3", 4);
 }
 
 void cmd_0000(void)

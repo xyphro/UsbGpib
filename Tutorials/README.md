@@ -4,17 +4,16 @@ I am busy creating several tutorials starting first with basic first bringup ins
 
 In case you have ideas/demands for certain topics to be turned into tutorials, feel free to contact me: Xyphro@gmail.com
 
-The documentation is in PDF format. You can download the PDF file by clicking the top right download button, after you clicked a link below.
+The documentation is now provided in Markdown, with an option to view the corresponding PDF version directly from each page. After opening any of the links below, you can download the PDF using the download button in the top‑right corner.
 
 UsbGpibV2 user manual:
 * [UsbGpibV2 Manual](UsbGpibV2_manual.md)
 
 Startup guides:
-* <a href="https://github.com/xyphro/UsbGpib/blob/master/Tutorials/XyphroLabs%20UsbGpib%20guide%20Linux%20with%20Visa.pdf" target="_blank">Linux with Visa and Python startup guide</a>
+* [Linux with Visa and Python startup guide](XyphroLabs%20UsbGpib%20guide%20Linux%20with%20Visa.md)
 * *Upcoming: Linux without Visa and Python-usbtmc module*
 * *Upcoming: Linux without Visa and Python pyvisa-py module*
-* <a href="https://github.com/xyphro/UsbGpib/blob/master/Tutorials/Using%20XyphroLabs%20UsbGpib%20adapter%20with%20Windows.pdf"
-target="_blank">Windows with Visa and Python startup guide</a>
+* [Windows with Visa and Python startup guide](Using%20XyphroLabs%20UsbGpib%20adapter%20with%20Windows.md)
 * *Upcoming: Basics principles and hints for Test & Measurement automation*
 * *Upcoming: Electrical layer aspects for GPIB*
 
