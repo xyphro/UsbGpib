@@ -33,6 +33,8 @@ Because of this, I now have to think carefully about how I approach the upcoming
 
 It simply takes the wind out of my sails right now.
 
+Official sources are listed below under **[Buy it or build it](#buy-it-or-build-it)** - Binho, DigiKey US, Amazon US, and Elecrow. Only purchases from these sources support open‑source projects. Or: You are welcome to build it yourself!
+
 [xyphro@gmail.com](mailto:xyphro@gmail.com)
 </div>
 
