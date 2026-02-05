@@ -1,0 +1,5 @@
+avrdude -P COM4 -b 19200 -c avrisp -p m32u4 -U lfuse:r:-:i -U hfuse:r:-:i
+
+avrdude -P COM4 -b 19200 -c avrisp -p m32u4 -e -Ulock:w:0xFF:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xde:m avrdude -P COM4 -b 19200 -c avrisp -p m32u4 -U flash:w:BootLoader.hex
+
+avrdude -P COM9 -b 19200 -c avrisp -p m32u4 -e -Ulock:w:0x3F:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xde:m -U flash:w:TestAndMeasurement.bin -U flash:w:BootLoader.hex
