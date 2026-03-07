@@ -13,72 +13,40 @@
 <br> :notebook: [Tutorials](Tutorials/README.md) <- **New!**
 <br> :heart: [Support the Project](#support-the-project)
 
-
-<div style="border:1px solid #e6b3b3; background:#800000; padding:1em; border-radius:6px; color:#ffffff;"" >
-
-### Statement on UsbGPIB V2 Clones
-
-I recently discovered that the UsbGPIB V2 has been cloned and is being sold on platforms like AliExpress and that even for an extremly expensive price. Listening my Nickname and even my full name. It’s disheartening to see this happening. This project has been actively maintained for roughly seven years, with continuous improvements, extensive testing, and a strong focus on compatibility and high‑performance operation. It reflects a long‑term, quality‑minded effort - built after work, on weekends, and supported through countless interactions, issue reports, and community discussions.
-The documentation alone took a significant amount of time and care to create.
-
-Along the way, the project also led to great technical discussions and even a number of great "email friendships" - something that has always meant a lot to me.
-
-Things often look simple once they’re finished, but getting them to that point requires a lot of building, refining, and testing and sustained effort behind the scenes.
-
-I genuinely *want* people to build it themselves. Seeing individuals or community‑organized groups reproduce the design is one of the most rewarding parts of this project; it shows that the work is useful and inspires others. That kind of engagement is exactly why I made it open in the first place.
-
-What really breaks my motivation is seeing companies take this open work - something I poured years of care, testing, and refinement into - mass‑produce it, and profit from it without giving anything back.
-
-Because of this, I now have to think carefully about how I approach the upcoming V3. This situation may influence if, when, and how V3 will be released as open source. Right now, I’m heavily demotivated after seeing how V2 is being exploited.
-
-It simply takes the wind out of my sails right now.
-
-Official sources are listed below under **[Buy it or build it](#buy-it-or-build-it)** - Binho, DigiKey US, Amazon US, and Elecrow. Only purchases from these sources support open‑source projects. Or: You are welcome to build it yourself!
-
-[xyphro@gmail.com](mailto:xyphro@gmail.com)
-</div>
-
 # Summarized latest updates
 
 For detailed visibility look under the Latest update link above!
 
+[07th Mar 2026]: **USbGpib V2 back in Stock on Elecrow**  
+
+[07th Mar 2026]: **10 UsbGpib V3 == GPIBee prototypes ready for testing**
+
 [04th Feb 2026]: **Updated Firmware version to V2.3 - see latest updates section for more information**
-<br>
+
 [04th Feb 2026]: **Updated V3 Preview slightly**
-<br>
+
 [04th Feb 2026]: **Added Markdown versions of the tutorials**
-<br>
-[04th Feb 2026]: **Added a link to Binho webshop**
 
-[30th Nov 2025]: **Released new firmware version V2.2**. See [Latest updates](Updates.md) section.
 
-# V3 Preview
-As I have an outstanding Betatestprogram for V3 I want to share some updates - on this main page.
+# Next version update USBGpib V3 
 
-Here the "messy table view" during some later software development :-)
+**UsbGpib V3 has a Name - Introducing GPIBee**
 
-<img src="https://github.com/xyphro/UsbGpib/blob/master/pictures/V3SneakPreview.png?raw=true" width="60%"/>
+...and as you’ll see in the picture: The beauties are ready!
 
-The schedule slipped a bit while getting the V2 adapter ready for sale, but V3 is converging and nearing completion. A batch of prototypes has been ordered with CNC aluminum housings, anodizing, and laser marking.
+<img src="pictures/10GPIBees.jpg" style="width=60%" alt="image" />
 
-Progress:
+After months of development, redesigns, loosing hair on fixing SW bugs and teasing the new Ethernet + PoE capabilities, the next generation of UsbGpib finally has its official identity. From this point forward, UsbGpib V3 will be known as GPIBee - a compact, fast, and delightfully capable little worker that's ready to buzz around your lab equipment.
 
-| Item | Comment & State |
-|------|-----------------|
-| Hardware | Optimized after two extra iterations; GPIB-compliant electrical characteristics; prevents back-powering from device GPIB bus |
-| POE | Fully works. Challenging to get right, but finally working well and cost optimized | 
-| Mechanics | Six (!) 3D designs completed; 3D-printed housings with/without Ethernet; CNC machined housing prototypes ordered |
-| GPIB stack | Fully up and running and "ruggedized"            |
-| USB Boot loader | Complete; UF2-like workflow for easy use without special software and tested functionality with Mac, Windows, Linux | 
-| USB high speed functionality | New MCU USB stack written from scratch for zero copy low latency and high throughput |
-| USBTMC | USBTMC part fully works and passes several compliance / stress tests |
-| Ethernet | Ethernet stack and low level driver is fully done and ready |
-| VXI11 | VXI11 is fully up and running, supporting 16 simultaneous connections. Subaddress features, SRQ handling, VXI11 device discovery: All working :-) |
-| MDNS | I added MDNS functionality for device discovery on top of VXI11 device discovery. It was quite complex to realize, but is working correctly and detected by popular Visas and e.g. Avahi browser. |
+PoE is fully operational, VXI-11 supports multiple simultaneous connections, and USB High-Speed is performing flawlessly - on MY bench. Which does not mean (yet) on everybody elses bench. Testing is by multiple people is always very important!
 
-Overall I am happy with the firmware status, despite a few delays due to real-world conditions (this is mainly a hobby).
+I now have ten GPIBee prototypes fully assembled and sitting proudly on my desk. These units will soon head out to the first wave of beta testers who’ve been following the journey and are eager to put them through real‑world use.
+I had hoped to start shipping next week, but with Embedded World taking up my entire schedule, distribution will begin shortly after I'm back. The excitement doesn't slow down - it just builds a little more.
 
-A short time ago (today is 4th February '26) the Prototypes got shipped to me - including great looking CNC Aluminum housings. I expect to receive them very soon for distribution to Beta testers! I'll explicitly write emails to those to ask for address details once I am ready to ship.
+Thank you all for the incredible support, feedback, and enthusiasm.
+
+GPIBee is about to take its first flight, and you're part of the swarm that made it possible.
+Stay tuned - beta testing starts soon, and the prototypes look fantastic.
 
 ---
 

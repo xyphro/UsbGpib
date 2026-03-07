@@ -3,6 +3,10 @@ This new file will in future contain all updates. The latest updates are always 
 
 # Recent Updates
 
+## 07th March 2026
+
+Chinese New year struck in and just shortly before it UsbGPIB V2 ran out of stock. Fortunately it is now back in stock and ready to order again!
+
 ## 04th February 2026
 
 The PDF manuals are now also available in Markdown, generated automatically from the same source as the PDF document. This makes the documentation easier to browse, diff, and maintain in version control, while ensuring both formats stay perfectly in sync. -> See [Tutorials](Tutorials/README.md) section.
