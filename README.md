@@ -17,15 +17,13 @@
 
 For detailed visibility look under the Latest update link above!
 
+[18th Apr 2026]: **Released Firmware V2.4: Added support for multiple GPIB devices**
+
+[18th Apr 2026]: **Added some updated notes on GPIBee**
+
 [07th Mar 2026]: **USbGpib V2 back in Stock on Elecrow**  
 
 [07th Mar 2026]: **10 UsbGpib V3 == GPIBee prototypes ready for testing**
-
-[04th Feb 2026]: **Updated Firmware version to V2.3 - see latest updates section for more information**
-
-[04th Feb 2026]: **Updated V3 Preview slightly**
-
-[04th Feb 2026]: **Added Markdown versions of the tutorials**
 
 
 # Next version update USBGpib V3 
@@ -47,6 +45,51 @@ Thank you all for the incredible support, feedback, and enthusiasm.
 
 GPIBee is about to take its first flight, and you're part of the swarm that made it possible.
 Stay tuned - beta testing starts soon, and the prototypes look fantastic.
+
+## GPIBee update 18th April: 
+
+The first prototypes have been shipped, and internal testing is already well advanced.  
+Across all protocols, read performance shows a **3.5× to 5× speed increase**, and this is **without** any dedicated speed-optimization work applied yet.
+
+## Communication Modes
+
+### USB Interface
+
+GPIBee supports three independent USB-based communication modes:
+
+1. **Network mode**  
+   GPIBee exposes a USB-based Ethernet interface. An IP address is assigned automatically, enabling true plug-and-play operation.  
+   - Full **VXI-11** support  
+   - Integrated **web server** providing configuration pages, a GPIB command console, and the complete manual matching the currently installed firmware  
+   - Ideal for multi-device setups and remote control - it should be considered as the first Goto solution in terms of USB based modes.
+
+2. **USBTMC mode**  
+   Similar to **UsbGpib V2**, but extended with additional commands, including the ability to set the target **GPIB device address** — enabling communication with multiple GPIB instruments.
+
+3. **++ protocol mode**  
+   Exposes a **USB CDC UART** implementing the popular ++ protocol, compatible with existing controllers using that protocol — but at significantly higher speed.
+
+The USB modes are **mutually exclusive**. The active mode can be selected via the **web interface** or through internal **SCPI commands**.
+
+### Ethernet Interface
+
+1. **VXI-11**  
+   Provides multiple logical channels, allowing communication with several GPIB devices simultaneously without manually switching addresses between commands. 
+   - Proper **lock handling** for multi-client access  
+   - Full **SRQ** support  
+   - Full **GPIB subaddressing** support
+
+2. **++ protocol**  
+   Optional **TCP/IP** service on port **1234**, offering the same `++` protocol implementation as in USB CDC UART mode.
+
+Both Ethernet protocols can be **active at the same time**. The Ethernet interface also exposes the same **web interface** as USB network mode, enabling GPIB transfers, configuration changes, and access to the **firmware-synchronized manual**.
+
+## GPIBee Beta Testing Status
+
+The current beta focus remains on **functional correctness and stability**.  
+**Speed optimization** will follow next.
+
+For testers not having received an adapter yet: Additional prototype units will be shipped soon. Handling too many testers at once would otherwise become too **time-intensive**.
 
 ---
 
@@ -348,6 +391,67 @@ dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables i
 print(dev.query('!term?'))
 ```
 This returns a text string containing "lf", "cr" or "eoi"
+
+## Multi-device support - Setting the GPIB device target address
+
+Since Firmware version V2.4 USBGpib allows supporting multiple instruments.
+
+While the USBTMC protocol allows only setting a single device to be addressed and composite USB devices are not well supported by all VISA implementations, I decided to add a command to set the address of the GPIB device which is addressed.
+
+There is a minor limitation of this approach, which is that service request SRQ handling is only done properly to the currently selected GPIB device.
+Another one is, that users shall never forget to set the GPIB address to the correct setting before issuing a command.
+
+### Setting a primary address only
+
+Substitute the text <Primary_address> with a number from 1 to 30 to set the primary address of the new GPIB device to talk to in following GPIB transactions
+
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1);
+dev.write('!addr <Primary_address>')
+```
+
+### Setting a primary + secondary address
+
+Substitute the text <Primary_address> with a number from 1 to 30 to set the primary address and <Secondary_address> with a number from 0..6 or 96..102 of the new GPIB device to talk to in following GPIB transactions.
+Note, that not the full subaddress range of 0..31 or 96..127 is supported as of now - this requires a bit more work. Most common device with subaddresses like R&S CMU200 only are well covered with that current range.
+
+```
+dev.control_in(0xa1, 0x40, 0, 0, 1);
+dev.write('!addr <Primary_address> <Secondary_address>')
+```
+### Python wrapper example code for GPIB address setting
+
+```
+import pyvisa as visa
+dev = 'USB0::0x03EB::0x2065::GPIB_22_14236333938351C00011::INSTR'
+rm = visa.ResourceManager()
+dev = rm.open_resource(dev, open_timeout=1000)
+
+def set_gpib_addr(primary_address, secondary_address = None):
+    dev.control_in(0xa1, 0x40, 0, 0, 1);
+    if secondary_address is None:
+        dev.write('!addr %d' % primary_address);
+    else:
+        dev.write('!addr %d %d' % (primary_address, secondary_address));
+    
+# Address CMU200, which is for me on primary address 1, secondary address 0
+set_gpib_addr(1, 0)
+print(dev.query('*IDN?'))
+
+# address HP3457A on primary GPIB address 22
+set_gpib_addr(22)
+dev.write('END,ALWAYS')
+print(dev.query('ID?'))
+```
+
+This code results in my current testsetup with CMU200 and HP3457A in this output:
+
+```
+Rohde&Schwarz,CMU 200-1100.0008.02,xxxxxx,V5.22
+
+HP3457A
+```
+
 
 
 ## AutoID setting

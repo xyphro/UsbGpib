@@ -3,6 +3,16 @@ This new file will in future contain all updates. The latest updates are always 
 
 # Recent Updates
 
+## 18th April 2026
+
+USBGpib has now support to address multiple GPIB devices with the newly added firmware version V2.4.
+
+Similar to some UART based GPIB controllers a command is added to set the GPIB address of the device to talk to.
+
+Look for "Multi‑device support" in [README.md](README.md) for more details and instructions.
+
+## Multi-device support - Setting the GPIB device target address
+
 ## 07th March 2026
 
 Chinese New year struck in and just shortly before it UsbGPIB V2 ran out of stock. Fortunately it is now back in stock and ready to order again!
