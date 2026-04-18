@@ -162,7 +162,7 @@ void cmd_term_store(void)
 
 void cmd_ver_query(void)
 {
-	set_internal_response((void*)"V2.3", 4);
+	set_internal_response((void*)"V2.4", 4);
 }
 
 void cmd_0000(void)
@@ -227,10 +227,80 @@ void cmd_string_query(void)
 
 PGM_P pparser_ps = cmd_parser;
 
+// below data is required for address parameter decoding
+static bool addr_number_decoding;
+static uint8_t addr[3];
+
+static void numparser_init(void)
+{
+    uint8_t *num = addr;
+    uint8_t *num_idx = (uint8_t *)&num[2];
+    num[0] = 255;
+    num[1] = 255;
+    *num_idx = 255;
+}
+
+static void numparser_addchar(char ch)
+{
+    uint8_t *num = addr;
+    uint8_t *num_idx = (uint8_t *)&num[2];
+
+    if ((ch >= '0') && (ch <= '9'))
+    { // is numeric
+        if (*num_idx == 255)
+            *num_idx = 0;
+
+        if (*num_idx < sizeof(num))
+        {
+            if (num[*num_idx] == 255)
+                num[*num_idx] = 0;
+
+            num[*num_idx] = num[*num_idx]*10 + ((uint8_t)(ch-'0'));
+        }
+    }
+    else
+    {
+        //if (num_idx == 0)
+        if (*num_idx != 255)
+            if (num[*num_idx] != 255)
+                *num_idx += 1;
+    }
+}
+
+#define MAX_SADDR (6u)
+extern uint8_t gpib_addr;
+void parser_finalize(void)
+{
+    uint8_t paddr, saddr;
+    if (!addr_number_decoding)
+        return;
+    paddr = addr[0];
+    saddr = addr[1];
+    if ( !((paddr >= 1) && (paddr <= 30)) )
+        return; // invalid primary address given
+    if (saddr == 255)
+    { // only a single number given, so the primary address. valid range = 1..31
+        gpib_addr = paddr;
+    }
+    else
+    { // 2 numbers given, so primary and secondary address. we allow here giving the secondary address in range 0..30 or 96..126
+        if (saddr <= MAX_SADDR)
+            saddr += 96;
+        if ( (saddr >= 96) && (saddr <= (96+MAX_SADDR)) )
+        {
+            saddr -= 96;
+            gpib_addr = paddr | ((saddr+1)<<5);
+        }
+    }
+}
+
+
 void parser_reset(void)
 {
     pparser_ps = cmd_parser;
+    addr_number_decoding = false;
 }
+
 
 
 bool parser_add(uint8_t ch)
@@ -247,6 +317,12 @@ bool parser_add(uint8_t ch)
 	// enforce lower case
 	if ( (ch >=65) && (ch<=90) )
 		ch += 32;
+		
+    if (addr_number_decoding)
+    {
+        numparser_addchar((char)ch);
+        return false;
+    }
 
 	entrycount = pgm_read_byte(pparser_ps++);
     while (cnt < entrycount)
@@ -268,6 +344,12 @@ bool parser_add(uint8_t ch)
         {
             if ((entrych >= 128))
             { // entry to cmd list
+                addr_number_decoding = (entryidx == 17); // addr command
+                if (addr_number_decoding)
+                {
+                    numparser_init();
+                    return false;
+                }			
 				parser_func_t func;
 				func = pgm_read_ptr_far(&(cmd_list[entryidx]));
 				func(); // dispatch the command!

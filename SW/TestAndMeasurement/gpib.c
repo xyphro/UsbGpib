@@ -92,26 +92,20 @@ static bool gpib_cmd_LAG(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
 	bool result;
 	result = gpib_tx((addr & 0x1f) | 0x20, true, ptimeoutfunc);
-	if (addr & 0xe0)
+	if (addr & 0xe0) // Bit 5..7 encode the subaddress-1. In future the GPIB addresses need to be extended to 16 bit to expose the full subaddress range
 	{ /* send a secondary address? */
-		result = gpib_tx(0x60, true, ptimeoutfunc);        // SAG (SA0)
+		result = gpib_tx(0x60 | ((addr>>5) -1), true, ptimeoutfunc);        // SAG (SA0..SA6)
 	}
 	return result;
 }
-
-static bool gpib_cmd_SECADDR(uint8_t addr, gpibtimeout_t ptimeoutfunc)
-{
-	return gpib_tx(addr | 0x60, true, ptimeoutfunc);
-}
-
 
 static bool gpib_cmd_TAG(uint8_t addr, gpibtimeout_t ptimeoutfunc)
 {
 	bool result;
 	result = gpib_tx((addr & 0x1f) | 0x40, true, ptimeoutfunc);
-	if (addr & 0xe0)
+	if (addr & 0xe0) // Bit 5..7 encode the subaddress-1. In future the GPIB addresses need to be extended to 16 bit to expose the full subaddress range
 	{ /* send a secondary address? */
-		result = gpib_tx(0x60, true, ptimeoutfunc);        // SAG (SA0)	
+		result = gpib_tx(0x60 | ((addr>>5)-1), true, ptimeoutfunc);        // SAG (SA0..SA6)
 	}
 	return result;
 }

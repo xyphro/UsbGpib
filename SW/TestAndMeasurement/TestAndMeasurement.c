@@ -129,7 +129,7 @@ static volatile uint8_t s_pulse_indicator = 0;
 
 static uint32_t s_remaining_bytes_receive=0;
 
-static uint8_t gpib_addr = 1;
+uint8_t gpib_addr = 1;
 
 /** This readbuffer is used to buffer GPIB read data.
  *  As the message header in USBTMC indicates how much data is read and the instrument
@@ -767,8 +767,7 @@ void EVENT_USB_Device_ControlRequest(void)
 
 					/* Write the request response bytes */
 					Endpoint_Write_8(TMCRequestStatus);
-					Endpoint_Write_16_LE(0);
-					Endpoint_Write_16_LE(0); // Address issue #96
+					Endpoint_Write_8(0); // Address issue #96
 					Endpoint_Write_16_LE(0); // Address issue #96
 					Endpoint_Write_32_LE(LastTransferLength);
 
@@ -826,8 +825,7 @@ void EVENT_USB_Device_ControlRequest(void)
 
 					/* Write the request response bytes */
 					Endpoint_Write_8(TMCRequestStatus);
-					Endpoint_Write_16_LE(0);
-					Endpoint_Write_16_LE(0); // Address issue #96
+					Endpoint_Write_8(0);
 					Endpoint_Write_16_LE(0); // Address issue #96					
 					Endpoint_Write_32_LE(LastTransferLength);
 
@@ -998,6 +996,7 @@ void ProcessInternalCommand(uint8_t Length)
 			cmd_executed = parser_add( dat );
 	}
 	parser_add('_'); // workaround for autoid slower/est matching in first letters the option autoid slow (result of parser simplification)
+	parser_finalize(); // finalization - required for addr command dispatching
 	
 	// remove residual characters from the endpoint buffer (most likely: termination)
 	while ( (Length--) )
