@@ -286,6 +286,14 @@ Then open a command line and enter a command like the following:
 
 <img src="pictures/copy_command.png" style="width:80.0%" alt="image" />
 
+<div class="tcolorbox">
+
+On Linux, use this command to transfer a firmware update, instead of
+using cp:
+`dd if=TestAndMeasurement.bin of=/mnt/FLASH.BIN bs=512 conv=notrunc oflag=direct,sync`
+
+</div>
+
 Adjust the file paths and drive letters to your actual system. When no
 error is shown, you can unplug USB (and GPIB) and reconnect to power
 cycle the adapter and use the new firmware.
