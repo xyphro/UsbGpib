@@ -1,0 +1,46 @@
+name: Release binaries
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: opensuse/tumbleweed
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+      - name: install-build-tools
+        run: zypper in -y cross-avr-gcc12 avr-libc make git libisl23 libmpc3 nodejs-default
+      - name: download-LUFA
+        run: |
+            git clone --depth=1 https://github.com/abcminiuser/lufa.git
+            ln -s lufa/LUFA
+      - name: prepare-release-dir
+        run: mkdir binaries
+      - name: build-bootloader
+        run: |
+            cd SW/MassStorage
+            make -f makefile
+            cp BootloaderMassStorage.hex ../../binaries
+      - name: build-application
+        run: |
+            cd SW/TestAndMeasurement
+            sed -i 's|../../../../LUFA|../../LUFA|g' makefile
+            make -f makefile
+            cp TestAndMeasurement.bin ../../binaries
+      - name: debug-print
+        run: |
+            ls -l binaries
+      - name: upload-binaries-to-release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: binaries/*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
