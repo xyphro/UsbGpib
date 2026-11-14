@@ -351,7 +351,7 @@ bool parser_add(uint8_t ch)
                     return false;
                 }			
 				parser_func_t func;
-				func = pgm_read_ptr_far(&(cmd_list[entryidx]));
+				func = pgm_read_ptr(&(cmd_list[entryidx]));
 				func(); // dispatch the command!
 				cmd_dispatched = true;
             }

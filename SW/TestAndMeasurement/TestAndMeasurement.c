@@ -286,6 +286,8 @@ bool identifyGpibDevice(void)
 		do
 		{
 			c = gpib_readdat(&eoi, &timedout, is_timedout);
+			if (len >= TMC_MAX_SERIAL_STRING_LENGTH)
+				continue;
 			hascomma = hascomma || (c == ',');
 			if ( (c=='\"') || (c=='*') || (c=='/') || (c=='\\') || (c==':') || (c=='?') || (c==' ') || (c==',') || (c=='&') || (c=='_') ) /* YEP, a comma and amphersand is allowed in USBTMC spec, but R&S SW does not like this... */
 			{
@@ -297,7 +299,7 @@ bool identifyGpibDevice(void)
 			suppress_character = false;
 			prev_c = c;
 		}
-		while ((len < TMC_MAX_SERIAL_STRING_LENGTH) && (!timedout) && (!eoi));
+		while ((!timedout) && (!eoi) && (c != '\n')); /* also stop on LF: instruments without EOI would otherwise run into the timeout */
 		/* strip away spaces at end */
 		while ((tmc_serial_string.UnicodeString[len-1] == '_') && (len > 1))
 			len--;
@@ -322,13 +324,15 @@ bool identifyGpibDevice(void)
 				do
 				{
 					c = gpib_readdat(&eoi, &timedout, is_timedout);
+					if (len >= TMC_MAX_SERIAL_STRING_LENGTH)
+						continue;
 					hascomma = hascomma || (c == ',');
 					if ( (c=='\"') || (c=='*') || (c=='/') || (c=='\\') || (c==':') || (c=='?') || (c==' ') || (c==',') || (c=='&'))
 						c='_';
 					if ( (c >=32) && (c <=126) )
 						tmc_serial_string.UnicodeString[len++] = cpu_to_le16(c);
 				}
-				while ((len < TMC_MAX_SERIAL_STRING_LENGTH) && (!timedout) && (!eoi) && (c != '\r') && (c != '\n'));
+				while ((!timedout) && (!eoi) && (c != '\r') && (c != '\n'));
 				/* strip away spaces at end */
 				while ((tmc_serial_string.UnicodeString[len-1] == '_') && (len > 1))
 					len--;
@@ -661,6 +665,17 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 
 void TMC_resetstates(void);
 
+static void clear_status_stage_unless_abandoned(void)
+{
+	timeout_start(50000); /* 0.5s timeout*/
+	while (!Endpoint_IsOUTReceived())
+	{
+		if (Endpoint_IsSETUPReceived() || (USB_DeviceState == DEVICE_STATE_Unattached) || is_timedout())
+			return;
+	}
+	Endpoint_ClearOUT();
+}
+
 /** Event handler for the USB_ControlRequest event. This is used to catch and process control requests sent to
  *  the device from the USB host before passing along unhandled control requests to the library for processing
  *  internally.
@@ -675,7 +690,7 @@ void handle_control_Req_ReadStatusByte(void)
 	btag = handleReadStatusByte_btagvalue;
 
 	gpib_ren(1); /* ensure that remote control is enabled */
-	timeout_start(150000); /* 1.5s timeout*/
+	timeout_start(50000); /* 0.5s timeout*/
 	statusReg =  gpib_readStatusByte(gpib_addr, is_timedout);
 	statusReg |= srq_statusbyte; // or previously read autoread status byte (Visa will issue a read status byte after receiving a SRQ interrupt transfer)
 	srq_statusbyte = 0x00; // clear previously read autoread status byte
@@ -691,7 +706,7 @@ void handle_control_Req_ReadStatusByte(void)
 	handleRSTB = true;
 
 	Endpoint_ClearIN();
-	Endpoint_ClearStatusStage();
+	clear_status_stage_unless_abandoned();
 	
 	handleReadStatusByte = false; /* no matter what - we can cancel the pending transfer handling */
 	Endpoint_SelectEndpoint(PrevEndpoint);
@@ -1016,9 +1031,11 @@ void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfe
 	dat = Endpoint_Read_8();
 	/* check, if this is an internal command (=sidechannel for configuration settings )*/ 
 	isinternalcommand = isFirstTransfer && s_nextwrite_mightbeparameterset && (dat == '!');
+	if (isFirstTransfer)
+		s_nextwrite_mightbeparameterset = false;
 	if (isinternalcommand)
 	{
-		ProcessInternalCommand(Length);
+		ProcessInternalCommand(Length - 1);
 	}
 	else
 	{
@@ -1057,7 +1074,6 @@ void ProcessSentMessage(uint8_t* const Data, uint8_t Length, bool isFirstTransfe
 			gpib_untalk_unlisten(ptimeoutfunc);
 		LED(1);
 	}
-	s_nextwrite_mightbeparameterset = false;
 	gpib_write_is_busy = !isLastTransfer; /* required to handle read status byte synchronization issue */
 	
 	if (handleReadStatusByte && !timedout)
