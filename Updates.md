@@ -3,6 +3,24 @@ This new file will in future contain all updates. The latest updates are always 
 
 # Recent Updates
 
+## 15th Nov 2026
+
+Firmware V2.5 is available in SW/binaries.
+
+- Fixed: after stopping an application (e.g. with ctrl-c), the next read could return old data.
+- Fixed: AutoID could lock up instruments with *IDN? answers longer than 50 characters (seen on a Keithley 2000).
+- Fixed: "!autoid slow" had no effect.
+- Fixed: a "!" command sent directly after a write could get lost.
+- Fixed: reading the status byte of a GPIB address without an instrument could hang the adapter (R&S VISA).
+- The firmware now builds with avr-gcc 14.
+- New: automated test for the internal commands in SW/Tests.
+
+Thanks to Andreas Tobler, who found and fixed most of these!
+
+Rick Fischer made a web front panel for the HP 6033A power supply, running on a Raspberry Pi with a UsbGpib V2: https://github.com/RLF62/hp6033a-web-controller
+
+An experiment: VisaMCP lets an AI assistant control any instrument your VISA can see, also over UsbGpib V2: https://www.gpibee.com/tools/visamcp.html
+
 ## 17th Aug 2026
 
 UsbGPIB V3 = GPIBee is available - see: https://www.gpibee.com/

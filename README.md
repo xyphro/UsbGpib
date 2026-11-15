@@ -10,52 +10,37 @@
 <br> &nbsp; &nbsp; :electric_plug: [Using the device](#using-the-device)
 <br> &nbsp; &nbsp; :gear: [Setting and getting parameters](#setting-parameters)
 <br> :heavy_check_mark: [Testing status](#testing-status)
-<br> :notebook: [Tutorials](Tutorials/README.md) <- **New!**
+<br> :notebook: [Tutorials](Tutorials/README.md)
+<br> :bulb: [Projects made with UsbGpib](#projects-made-with-usbgpib)
+<br> :robot: [VisaMCP - AI control of your instruments](#visamcp---let-an-ai-assistant-talk-to-your-instruments)
+<br> :rocket: [GPIBee, the successor](#looking-for-a-major-step-up)
 <br> :heart: [Support the Project](#support-the-project)
 
 # Summarized latest updates
 
 For detailed visibility look under the Latest update link above!
 
-[17h Aug 2026] Nice project: **[XyphroLabs-USBGpib-DMM4050](https://github.com/ZandanKhan/XyphroLabs-USBGpib-DMM4050)** — a Python GUI by [Zandan Khan](https://github.com/ZandanKhan) for controlling the Tektronix DMM 4050 (6½-digit precision multimeter) over UsbGpib, with measurement logging to CSV. Great example of building a full front-end on top of this adapter.
+[15th Nov 2026]: **Firmware V2.5** is out. It is a bugfix release, the details are in [Latest updates](Updates.md). Thanks to Andreas Tobler, who found and fixed most of the issues!
 
-[17th Aug 2026]: **GPIBee is available, but...**
+[15th Nov 2026]: Rick Fischer made a web front panel for the HP 6033A power supply, see [Projects made with UsbGpib](#projects-made-with-usbgpib).
 
+[15th Nov 2026]: An experiment: [VisaMCP](#visamcp---let-an-ai-assistant-talk-to-your-instruments) lets an AI assistant control your instruments. It works with UsbGpib V2.
 
+# Looking for a major step up?
 
-# GPIBee = UsbGpib V3 is available!
+**GPIBee** is the successor of UsbGpib:
 
-The title says it: GPIBee - UsbGpib V3 - is now available. Finally!  
-  
-It's for everyone who's told me, in issues and DMs, "I love this, but I don't have time to build one": USB-C and Ethernet with PoE, VXI-11 with multiple simultaneous sessions, and 3.5-5x the speed of V2 - in a proper enclosure, with real support behind it. 
-It's built, tested, and shipping now.
+- Ethernet with PoE in addition to USB. The Ethernet port is galvanically isolated.
+- More host side protocols: USBTMC, VXI-11, the ++ protocol (Prologix/AR488 style) and native linux-gpib
+- It can act as a remote GPIB gateway: reach your GPIB bus over the network, also from several PCs at the same time
+- Multiple instruments on one adapter, each one with its own VISA resource. No address switching needed.
+- Web front panels for your instruments without writing code
+- Significantly faster than UsbGpib V2
+- Parallel poll, auto discovery in the network (LXI, mDNS) and firmware updates from the browser
 
-I put together a short video showing it in action: [Introducing GPIBee](https://lnkd.in/epR7Xf-b).  
-And you can find the full details at [GPIBee.com](https://www.gpibee.com).
+&#x1F449; Check it out at [www.gpibee.com](https://www.gpibee.com)
 
-This didn't come out of nowhere - there's a bit of a story behind it, including one thing I haven't said outright until now, something I went back and forth on for quite a while before deciding.
-
-~7 years ago I started UsbGpib as a weekend project: An open, MIT-licensed way to talk to GPIB instruments without paying for an $800+ commercial adapter. I never expected it to pick up 642 stars, 82 forks, and end up soldered into home labs, universities, and repair benches around the world. That still means a lot to me, and it's the reason I kept and keep maintaining it for as long as I have.
-
-A fair bit of that maintenance happened on evenings and weekends that would otherwise have gone to family time or just switching off. Nothing dramatic - just the normal trade-off of a side project that grew bigger than expected. Honestly, the part I'll remember most isn't the hours, it's the people: The issues, the emails, the odd late-night message or calls from someone debugging their own build. I've genuinely enjoyed those conversations, and they're a big part of why I kept going.
-
-Along the way I also learned some harder lessons. To be clear, I've always been and are genuinely happy to see people or companies build their own UsbGpib - that's exactly what open source is for. What sat less well with me was seeing unrelated manufacturers turn V2 into a business of their own, selling it at scale with no attribution back to the project. That's a different thing entirely from working with official partners like Elecrow and Binho, who I have a real relationship with and who've supported this project properly.
-
-But it stayed with me while I was figuring out what V3 should be, and it wasn't an easy decision to make.
-
-So here's the thing I haven't said outright until now: V3 - GPIBee - is a commercial product rather than an open one. Something which might change in future, but for now it is.
-
-That's a real change from V1/V2, and I don't want to gloss over it.
-
-Here's the honest reasoning:
-
-- Going commercial means there's a sustainable way to keep this going, rather than relying on whatever spare evenings I happen to have.
-- It lets me fund the things a hobby project can't - CNC-machined, EMI-shielded enclosures, firmware QA, and proper support.
-- It gives the project a legitimate path forward that undercutting clones can't quietly erase.
-
-None of that changes what's already yours. V1 and V2 stay exactly as they are - MIT-licensed, fully open, schematics and firmware included, free to build and modify. And to be clear: I'm not walking away from it. I'll keep maintaining UsbGpib - answering issues, keeping it working - alongside GPIBee, not instead of it.
-
-I'm proud of where this landed, and I'm looking forward to keeping both projects going - UsbGpib and GPIBee side by side. Thanks for seven years of bug reports and good conversations so far, with plenty more to come I hope. I hope some of you will give GPIBee a look, and either way, I'd genuinely love to hear what you think.
+GPIBee is a commercial product. UsbGpib V1/V2 stays open source (MIT) and I keep maintaining it.
 
 ---
 
@@ -206,6 +191,15 @@ At the time of publication LUFA 170418 release was used, with GCC as compiler.
 
 Note: The Software is compatible with any HW revision in this repository. For REV 1 and REV 2 hardware you don't need different SW images.
 
+The current firmware version is V2.5.
+
+## Tests
+
+"SW/Tests" contains a Python test for the internal commands (the ones starting with "!"). It needs pyvisa and pytest and an adapter plugged into a powered instrument:
+```
+python test_internal_commands.py -v
+```
+
 ## Binaries
 
 For those, that just want to create their own device, I've included the binary output in the "SW/binaries" subdirectory.
@@ -260,43 +254,65 @@ I often miss seeing issue reports very quickly, as I don't get an email once the
 
 Below list is equipment I mainly myself tested. Many other users have other measurement equipment proven in use already.
 
-- R&S FSEM30
-- R&S SMIQ03
-- R&S CMU200
-- R&S SMW200A
-- R&S FSW
-- R&S FSV
-- Keithley 199 multimeter
-- HP 34401 DMM from different generations / with different FW versions
-- HP 3325A synthesizer/frequency generator
-- HP 3457A multimeter
-- Agilent E4406A VSA transmitter tester
-- Tektronix TDS7104 Digital Phosphor Oscilloscope
-- HP 8596A spectrum analyzer
 - Agilent E3648A dual power supply
+- Agilent E4406A VSA transmitter tester
+- HP 3325A synthesizer/frequency generator
+- HP 34401 DMM from different generations / with different FW versions
+- HP 3457A multimeter
+- HP 8596A spectrum analyzer
+- Keithley 199 multimeter
+- R&S CMU200
+- R&S FSEM30
+- R&S FSV
+- R&S FSW
+- R&S SMIQ03
+- R&S SMW200A
+- Tektronix TDS7104 Digital Phosphor Oscilloscope
 
 A rather incomplete summary of equipment reported to work from users is:
-- Keithley S46T
-- HP/Agilent/Keysight 34401A of different generations
-- HP/Aglient/Keysight 34410A
-- Agilent N6700B
-- Agilent E4416A
+- Advantest R3261
+- Agilent 33210A
+- Agilent 33250A
+- Agilent 33500B
 - Agilent 34970
-- Keysight E3645A
+- Agilent 4294A
+- Agilent 54624A
+- Agilent E3631A
+- Agilent E3641A
+- Agilent E4416A
+- Agilent E4418B
+- Agilent N6700B
+- Fluke 45
+- Fluke 5100B
+- Fluke 5500A
+- Fluke 5522A
+- Hameg 3524
+- HP 33120A
+- HP 3314A
+- HP 4276A
+- HP 438A
+- HP 6033A
+- HP 8753C
+- HP/Agilent/Keysight 34401A of different generations
+- HP/Agilent/Keysight 34410A
+- ICS 4899GPIB
+- Keithley 2000
 - Keithley 2230G-30-1
 - Keithley 2601A
-- Tektronix AFG3102
-- Tektronix 3014C
-- Rohde & Schwarz SMB 100A
-- Agilent E3631A
-- ICS 4899GPIB
-- TTI QL564TP
-- Lecroy LW110
+- Keithley S46T
+- Keysight E3645A
 - LeCroy 334A
 - LeCroy 354A
-- Hameg 3524
-- Fluke 5522A
-- Fluke 5500A 
+- Lecroy LW110
+- LeCroy WaveRunner 610Zi
+- Rohde & Schwarz SMB 100A
+- Tektronix 3014C
+- Tektronix AFG3102
+- Tektronix DMM 4050
+- Tektronix TDS2014
+- Tektronix TM5000 (DM5010, PS5010, FG5010)
+- TTI QL564TP
+- TTI QP355TP
 - and many more... It will take quite a while till I have parsed all my emails for working instruments :-)
 
 
@@ -504,7 +520,7 @@ Returns as text string either: "off", "on", "slow", "slower" or "slowest".
 
 ## Firmware version
 
-Finally I implemented a command to query the USB adapters firmware version :-)
+Query the firmware version of the adapter:
 
 ```
 dev.control_in(0xa1, 0x40, 0, 0, 1); # USBTMC pulse indicator request (enables internal command processing)
@@ -545,6 +561,32 @@ dev.write('!reset')
 ```
 
 Do a reset of the adapter. Note that due to the reset you have to close the visa session and start a new one as the device re-enumerates on the USB.
+
+---
+
+# Projects made with UsbGpib
+
+Rick Fischer built a web front panel for his HP 6033A power supply: [hp6033a-web-controller](https://github.com/RLF62/hp6033a-web-controller). It runs on a Raspberry Pi with a UsbGpib V2 (he tested a Pi 3 and a Pi Zero 2 W), shows voltage and current live and lets you set the supply from any browser. More HP instruments are planned. For Tektronix scopes with Ethernet he made a matching [tektronix-ethernet-controller](https://github.com/RLF62/tektronix-ethernet-controller), which runs with his TDS 3032B.
+
+Zandan Khan wrote [XyphroLabs-USBGpib-DMM4050](https://github.com/ZandanKhan/XyphroLabs-USBGpib-DMM4050), a Python GUI for the Tektronix DMM 4050 with measurement logging to CSV.
+
+Devin (W6DVN) ported the KE5FX GPIB Toolkit to UsbGpib V2: [https://github.com/fehknt/GPIB](https://github.com/fehknt/GPIB)
+
+Did you build something with UsbGpib? Send me a mail and I add it here.
+
+---
+
+# VisaMCP - let an AI assistant talk to your instruments
+
+This is an experiment and not a product: [VisaMCP](https://www.gpibee.com/tools/visamcp.html) is a free MCP server. It runs locally on your PC and gives an AI assistant like Claude access to your installed VISA.
+
+There are MCP servers for single instruments. But what is an MCP server for your spectrum analyzer worth, if the signal generator, the power supply and the DMM next to it cannot be controlled in the same flow?
+
+VisaMCP works with any instrument your VISA can see: GPIB, USB-TMC, LAN/VXI-11 or serial. It runs with UsbGpib V2 and with GPIBee, with R&S VISA and NI-VISA, on Windows and Linux. I tested it with Claude Desktop and Claude Code.
+
+A warning: an AI can misread a manual or pick the wrong channel, and the command still goes to your instrument. Set limits on the instrument itself and start with equipment which forgives mistakes.
+
+I am curious what you do with it, so feedback is very welcome!
 
 ---
 
