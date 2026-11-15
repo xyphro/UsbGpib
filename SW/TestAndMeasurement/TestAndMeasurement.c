@@ -299,7 +299,7 @@ bool identifyGpibDevice(void)
 			suppress_character = false;
 			prev_c = c;
 		}
-		while ((!timedout) && (!eoi) && (c != '\n')); /* also stop on LF: instruments without EOI would otherwise run into the timeout */
+		while ((!timedout) && (!eoi) && (c != '\n')); /* stop on LF too */
 		/* strip away spaces at end */
 		while ((tmc_serial_string.UnicodeString[len-1] == '_') && (len > 1))
 			len--;
@@ -1130,6 +1130,14 @@ bool TMC_LastMessageComplete = true;
 bool TMC_eom;
 bool TMC_InLastMessageComplete = true;
 
+/* discard all committed bulk IN data */
+static void TMC_FlushBulkIn(void)
+{
+	Endpoint_SelectEndpoint(TMC_IN_EPADDR);
+	Endpoint_AbortPendingIN();
+	Endpoint_ResetEndpoint(TMC_IN_EPADDR);
+}
+
 void TMC_resetstates(void)
 {
 	internal_response_buffer_len = 0;
@@ -1416,8 +1424,7 @@ static inline void TMC_Task(void)
 		Endpoint_ClearOUT();
 		Endpoint_ClearOUT();
 
-		Endpoint_SelectEndpoint(TMC_IN_EPADDR);
-		Endpoint_AbortPendingIN();
+		TMC_FlushBulkIn();
 
 		/* SDC has to be sent before clearing state, because SDC request is stopped in reset states */
 		if (handleSDC)
@@ -1464,6 +1471,12 @@ bool ReadTMCHeader(TMC_MessageHeader_t* const MessageHeader)
 	
 	/* Store the new command tag value for later use */
 	CurrentTransferTag = MessageHeader->Tag;
+
+	/* a previous response was never read by the host => remove it */
+	Endpoint_SelectEndpoint(TMC_IN_EPADDR);
+	if (Endpoint_GetBusyBanks() != 0)
+		TMC_FlushBulkIn();
+	Endpoint_SelectEndpoint(TMC_OUT_EPADDR);
 
 	/* Indicate if the command has been aborted or not */
 	return !IsTMCBulkOUTReset;
